@@ -1,0 +1,12 @@
+# IDE Files
+/.classpath
+/.project
+/.settings/
+/.vscode
+/.idea/
+
+# Build
+/target/
+/bin/
+/*.log
+antihealthindicator.iml

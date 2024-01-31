@@ -1,0 +1,23 @@
+name: AntiHealthIndicator
+authors: [ Bram ]
+description: Spoofs certain information sent by the server to other players to prevent them from deducing information about the player's health, armor, held item, etc.
+website: https://github.com/Bram1903/AntiHealthIndicator
+main: com.deathmotion.antihealthindicator.AntiHealthIndicator
+version: 1.0.0
+api-version: 1.13
+folia-supported: true
+load: POSTWORLD
+permissions:
+  AntiHealthIndicator.Notify:
+    description: "This permission allows players to be notified when an update is found."
+    default: op
+  AntiHealthIndicator.Bypass:
+    description: "This permission prevents the player from receiving spoofed data."
+    default: op
+softdepend:
+  - ProtocolLib
+  - ProtocolSupport
+  - ViaVersion
+  - ViaBackwards
+  - ViaRewind
+  - Geyser-Spigot
