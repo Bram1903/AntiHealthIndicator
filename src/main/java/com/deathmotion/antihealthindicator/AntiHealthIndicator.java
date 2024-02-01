@@ -22,9 +22,10 @@ public class AntiHealthIndicator extends JavaPlugin {
 
     @Getter
     private static AntiHealthIndicator instance;
+    private ServerScheduler scheduler;
+
     private final ConcurrentHashMap<Player, Integer> vehicles = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, Entity> entityDataMap = new ConcurrentHashMap<>();
-    private ServerScheduler scheduler;
 
     @Getter
     @Setter

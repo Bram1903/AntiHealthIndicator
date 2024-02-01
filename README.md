@@ -34,7 +34,8 @@ Technically, it should also work on any Spigot or Paper fork, but I can't guaran
 
 - **Completely Asynchronous** - The plugin is designed to be as lightweight as possible.
   All packet modifications are done asynchronously, so the main thread is never blocked.
-- **Folia Support** - The plugin integrates with [Folia](https://papermc.io/software/folia), which is a Paper fork that adds regionised multithreading to the server.
+- **Folia Support** - The plugin integrates with [Folia](https://papermc.io/software/folia), which is a Paper fork that
+  adds regionised multithreading to the server.
 - **Configurable** - The plugin is highly configurable, allowing you to adjust the settings to your liking.
 - **Update Checker** - The plugin automatically checks for updates on startup.
   If a new version is available, a message will be sent to the console.
