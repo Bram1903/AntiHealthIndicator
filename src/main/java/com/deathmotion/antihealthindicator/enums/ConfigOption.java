@@ -16,7 +16,6 @@ public enum ConfigOption {
 
     ENTITY_DATA_ENABLED("spoof.entity-data.enabled", true),
     AIR_TICKS_ENABLED("spoof.entity-data.air-ticks.enabled", true),
-
     HEALTH_ENABLED("spoof.entity-data.health.enabled", true),
     IGNORE_VEHICLES_ENABLED("spoof.entity-data.health.ignore-vehicles", true),
 
@@ -26,8 +25,8 @@ public enum ConfigOption {
 
     ABSORPTION_ENABLED("spoof.entity-data.absorption.enabled", true),
     XP_ENABLED("spoof.entity-data.xp.enabled", true),
-    ITEMS_ENABLED("spoof.entity-data.items.enabled", true),
 
+    ITEMS_ENABLED("spoof.entity-data.items.enabled", true),
     STACK_AMOUNT_ENABLED("spoof.entity-data.items.stack-amount.enabled", true),
     DURABILITY_ENABLED("spoof.entity-data.items.durability.enabled", true),
     ENCHANTMENTS_ENABLED("spoof.entity-data.items.enchantments.enabled", true);
