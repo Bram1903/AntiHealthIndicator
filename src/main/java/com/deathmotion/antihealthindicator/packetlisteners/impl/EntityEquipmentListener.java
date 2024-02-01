@@ -131,7 +131,7 @@ public class EntityEquipmentListener extends PacketListenerAbstract {
     }
 
     /**
-     * Spoof the enchantment level of the item to luck of the sea 1
+     * Spoof the enchantment level of the item to Fortune III (Xbox 360 Reference)
      *
      * @param clientVersion the player client version
      * @param equipmentList the list of equipment
