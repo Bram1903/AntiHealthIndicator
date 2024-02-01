@@ -40,7 +40,7 @@ Technically, it should also work on any Spigot or Paper fork, but I can't guaran
   If a new version is available, a message will be sent to the console.
 - **Stand Alone** - The plugin is completely stand alone, meaning it doesn't require any other plugins to function.
 - **Permission Bypass** - The plugin allows you to bypass the spoofing features with the `AntiHealthIndicator.Bypass`
-  permission (can be disabled in the config).
+  permission (can be enabled in the config).
 
 ### Spoofers
 
