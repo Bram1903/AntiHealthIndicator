@@ -1,22 +1,22 @@
-package com.deathmotion.antihealthindicator.packetlisteners;
+package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AntiHealthIndicator;
-import com.deathmotion.antihealthindicator.cache.CacheManager;
+import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.events.EntityState;
 import com.deathmotion.antihealthindicator.events.VehicleState;
-import com.deathmotion.antihealthindicator.packetlisteners.impl.*;
+import com.deathmotion.antihealthindicator.packetlisteners.*;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketListenerManager {
-    private final JavaPlugin plugin;
-    private final Configuration config;
+    private final AntiHealthIndicator plugin;
+    private final ConfigManager config;
 
     public PacketListenerManager(AntiHealthIndicator plugin) {
         this.plugin = plugin;
-        this.config = plugin.getConfig();
+        this.config = plugin.getConfigManager();
+
+        setupPacketListeners();
     }
 
     public void setupPacketListeners() {
@@ -27,7 +27,7 @@ public class PacketListenerManager {
     }
 
     private void setupEntityListeners() {
-        if (this.plugin.getConfig().getBoolean("spoof.entity-data.enabled", true)) {
+        if (config.getConfigurationOption(ConfigOption.ENTITY_DATA_ENABLED)) {
             if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
                 setupEntityCache();
             }
@@ -38,32 +38,32 @@ public class PacketListenerManager {
                 PacketEvents.getAPI().getEventManager().registerListener(new SpawnLivingEntityListener(this.plugin));
             }
 
-            boolean spoofHealth = this.config.getBoolean("spoof.entity-data.health.enabled", true);
-            boolean ignoreVehicles = this.config.getBoolean("spoof.entity-data.health.ignore-vehicles.enabled", true);
+            boolean spoofHealth = config.getConfigurationOption(ConfigOption.HEALTH_ENABLED);
+            boolean ignoreVehicles = config.getConfigurationOption(ConfigOption.IGNORE_VEHICLES_ENABLED);
             if (spoofHealth && ignoreVehicles) {
                 this.plugin.getServer().getPluginManager().registerEvents(new VehicleState(this.plugin), this.plugin);
             }
 
-            if (this.config.getBoolean("spoof.entity-data.items.enabled", true)) {
+            if (config.getConfigurationOption(ConfigOption.ITEMS_ENABLED)) {
                 PacketEvents.getAPI().getEventManager().registerListener(new EntityEquipmentListener(this.plugin));
             }
         }
     }
 
     private void setupAdditionalListeners() {
-        if (this.config.getBoolean("spoof.food-saturation.enabled", true)) {
+        if (config.getConfigurationOption(ConfigOption.SPOOF_FOOD_SATURATION_ENABLED)) {
             PacketEvents.getAPI().getEventManager().registerListener(new PlayerUpdateHealthListener(this.plugin));
         }
-        if (this.config.getBoolean("spoof.world-seed.enabled", false)) {
+        if (config.getConfigurationOption(ConfigOption.SPOOF_WORLD_SEED_ENABLED)) {
             PacketEvents.getAPI().getEventManager().registerListener(new WorldSeedListener(this.plugin));
         }
-        if (this.config.getBoolean("spoof.enchant-seed.enabled", false)) {
+        if (config.getConfigurationOption(ConfigOption.ENCHANTMENTS_ENABLED)) {
             PacketEvents.getAPI().getEventManager().registerListener(new WindowItemsListener(this.plugin));
         }
     }
 
     private void setupEntityCache() {
-        this.plugin.getServer().getPluginManager().registerEvents(new EntityState(), this.plugin);
-        new CacheManager().cacheLivingEntityData();
+        this.plugin.getServer().getPluginManager().registerEvents(new EntityState(this.plugin), this.plugin);
+        this.plugin.getCacheManager().cacheLivingEntityData();
     }
 }

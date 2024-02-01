@@ -1,19 +1,20 @@
-package com.deathmotion.antihealthindicator.packetlisteners.impl;
+package com.deathmotion.antihealthindicator.packetlisteners;
 
+import com.deathmotion.antihealthindicator.AntiHealthIndicator;
+import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class WorldSeedListener extends PacketListenerAbstract {
 
     protected final boolean bypassPermissionEnabled;
 
-    public WorldSeedListener(JavaPlugin plugin) {
-        this.bypassPermissionEnabled = plugin.getConfig().getBoolean("allow-bypass.enabled", false);
+    public WorldSeedListener(AntiHealthIndicator plugin) {
+        this.bypassPermissionEnabled = plugin.getConfigManager().getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
     }
 
     @Override

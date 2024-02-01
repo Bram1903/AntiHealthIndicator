@@ -1,15 +1,15 @@
-package com.deathmotion.antihealthindicator.packetlisteners.impl;
+package com.deathmotion.antihealthindicator.packetlisteners;
 
-import com.deathmotion.antihealthindicator.packetlisteners.impl.abstracts.EntityListenerAbstract;
+import com.deathmotion.antihealthindicator.AntiHealthIndicator;
+import com.deathmotion.antihealthindicator.packetlisteners.abstracts.EntityListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class SpawnLivingEntityListener extends EntityListenerAbstract {
 
-    public SpawnLivingEntityListener(JavaPlugin plugin) {
+    public SpawnLivingEntityListener(AntiHealthIndicator plugin) {
         super(plugin);
     }
 

@@ -1,56 +1,25 @@
 package com.deathmotion.antihealthindicator;
 
-import com.deathmotion.antihealthindicator.events.UpdateNotifier;
-import com.deathmotion.antihealthindicator.packetlisteners.PacketListenerManager;
+import com.deathmotion.antihealthindicator.managers.CacheManager;
+import com.deathmotion.antihealthindicator.managers.ConfigManager;
+import com.deathmotion.antihealthindicator.managers.PacketListenerManager;
+import com.deathmotion.antihealthindicator.managers.UpdateManager;
+import com.deathmotion.antihealthindicator.schedulers.Scheduler;
 import com.deathmotion.antihealthindicator.schedulers.ServerScheduler;
-import com.deathmotion.antihealthindicator.schedulers.impl.BukkitScheduler;
-import com.deathmotion.antihealthindicator.schedulers.impl.FoliaScheduler;
-import com.deathmotion.antihealthindicator.util.UpdateChecker;
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
-import lombok.Setter;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class AntiHealthIndicator extends JavaPlugin {
 
     @Getter
-    private static AntiHealthIndicator instance;
+    private ConfigManager configManager;
+    private CacheManager cacheManager;
+    private UpdateManager updateManager;
     private ServerScheduler scheduler;
-
-    private final ConcurrentHashMap<Player, Integer> vehicles = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer, Entity> entityDataMap = new ConcurrentHashMap<>();
-
-    @Getter
-    @Setter
-    private boolean isUpdateAvailable = false;
-
-    @Getter
-    @Setter
-    private String latestVersion;
-
-    private static ServerScheduler getCorrectScheduler(JavaPlugin plugin) {
-        if (isFolia()) {
-            return new FoliaScheduler(plugin);
-        }
-
-        return new BukkitScheduler(plugin);
-    }
-
-    private static boolean isFolia() {
-        try {
-            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
 
     @Override
     public void onLoad() {
@@ -64,15 +33,13 @@ public class AntiHealthIndicator extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        instance = this;
+        scheduler = new Scheduler().getScheduler(this);
+        configManager = new ConfigManager(this);
+        cacheManager = new CacheManager(this);
+        updateManager = new UpdateManager(this);
 
-        saveDefaultConfig();
+        new PacketListenerManager(this);
 
-        scheduler = getCorrectScheduler(this);
-
-        new PacketListenerManager(this).setupPacketListeners();
-
-        updateChecker();
         enableBStats();
 
         getLogger().info("Plugin has successfully been initialized!");
@@ -82,16 +49,6 @@ public class AntiHealthIndicator extends JavaPlugin {
     public void onDisable() {
         PacketEvents.getAPI().terminate();
         getLogger().info("Plugin has been uninitialized!");
-    }
-
-    private void updateChecker() {
-        if (getConfig().getBoolean("update-checker.enabled", true)) {
-            new UpdateChecker(this).checkForUpdate();
-
-            if (getConfig().getBoolean("update-checker.notify-in-game", true)) {
-                getServer().getPluginManager().registerEvents(new UpdateNotifier(), this);
-            }
-        }
     }
 
     private void enableBStats() {

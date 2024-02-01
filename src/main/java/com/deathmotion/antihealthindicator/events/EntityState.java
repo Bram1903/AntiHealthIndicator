@@ -1,6 +1,7 @@
 package com.deathmotion.antihealthindicator.events;
 
 import com.deathmotion.antihealthindicator.AntiHealthIndicator;
+import com.deathmotion.antihealthindicator.managers.CacheManager;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -14,16 +15,16 @@ import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.event.world.EntitiesUnloadEvent;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class listens to entity events, such as spawning, dying, loading and unloading.
  */
 public class EntityState implements Listener {
-    private final AntiHealthIndicator instance = AntiHealthIndicator.getInstance();
+    private final CacheManager cacheManager;
 
-    // Map that stores entity data.
-    private final ConcurrentHashMap<Integer, Entity> entityDataMap = instance.getEntityDataMap();
+    public EntityState(AntiHealthIndicator plugin) {
+        this.cacheManager = plugin.getCacheManager();
+    }
 
     /**
      * Handles the EntitySpawnEvent, creating a new instance of EntityDataMap for the spawned entity.
@@ -68,7 +69,7 @@ public class EntityState implements Listener {
             return;
         }
 
-        entityDataMap.remove(event.getEntity().getEntityId());
+        cacheManager.removeEntityFromCache(event.getEntity().getEntityId());
     }
 
     /**
@@ -81,7 +82,7 @@ public class EntityState implements Listener {
         List<Entity> entityList = event.getEntities();
         for (Entity entity : entityList) {
             if (entity instanceof LivingEntity) {
-                entityDataMap.remove(entity.getEntityId());
+                cacheManager.removeEntityFromCache(entity.getEntityId());
             }
         }
     }
@@ -93,7 +94,7 @@ public class EntityState implements Listener {
      */
     @EventHandler
     public void playerQuit(PlayerQuitEvent event) {
-        entityDataMap.remove(event.getPlayer().getEntityId());
+        this.cacheManager.removeEntityFromCache(event.getPlayer().getEntityId());
     }
 
     /**
@@ -106,6 +107,6 @@ public class EntityState implements Listener {
             return;
         }
 
-        this.entityDataMap.putIfAbsent(entity.getEntityId(), entity);
+        this.cacheManager.addEntityToCache(entity);
     }
 }

@@ -1,5 +1,8 @@
-package com.deathmotion.antihealthindicator.packetlisteners.impl;
+package com.deathmotion.antihealthindicator.packetlisteners;
 
+import com.deathmotion.antihealthindicator.AntiHealthIndicator;
+import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
@@ -12,34 +15,14 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collections;
 import java.util.List;
 
 public class EntityEquipmentListener extends PacketListenerAbstract {
-    private final boolean bypassPermissionEnabled;
+    private final ConfigManager configManager;
 
-    /**
-     * Whether to use the damageable interface to set the durability of the item,
-     * The damageable interface was added in 1.13
-     */
     private final boolean useDamageableInterface;
-
-    /**
-     * Whether to spoof the amount of the item stack to one
-     */
-    private final boolean spoofItemStackAmount;
-
-    /**
-     * Whether to spoof the durability of the item, to appear as if it is new
-     */
-    private final boolean spoofItemStackDurability;
-
-    /**
-     * Whether to spoof the enchantment of the item, to hide the actual enchantments
-     */
-    private final boolean spoofEnchantment;
 
     /**
      * The enchantment list to spoof the item with
@@ -49,14 +32,9 @@ public class EntityEquipmentListener extends PacketListenerAbstract {
             .level(3)
             .build());
 
-    public EntityEquipmentListener(JavaPlugin plugin) {
-        this.bypassPermissionEnabled = plugin.getConfig().getBoolean("allow-bypass.enabled", false);
-
+    public EntityEquipmentListener(AntiHealthIndicator plugin) {
+        this.configManager = plugin.getConfigManager();
         this.useDamageableInterface = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13);
-
-        this.spoofItemStackAmount = plugin.getConfig().getBoolean("spoof.entity-data.items.stack-amount.enabled", true);
-        this.spoofItemStackDurability = plugin.getConfig().getBoolean("spoof.entity-data.items.durability.enabled", true);
-        this.spoofEnchantment = plugin.getConfig().getBoolean("spoof.entity-data.items.enchantment.enabled", true);
     }
 
     /**
@@ -70,7 +48,7 @@ public class EntityEquipmentListener extends PacketListenerAbstract {
             WrapperPlayServerEntityEquipment packet = new WrapperPlayServerEntityEquipment(event);
             Player player = (Player) event.getPlayer();
 
-            if (bypassPermissionEnabled) {
+            if (configManager.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED)) {
                 if (player.hasPermission("AntiHealthIndicator.Bypass")) return;
             }
 
@@ -79,13 +57,13 @@ public class EntityEquipmentListener extends PacketListenerAbstract {
                 return;
             }
 
-            if (spoofItemStackAmount)
+            if (configManager.getConfigurationOption(ConfigOption.STACK_AMOUNT_ENABLED))
                 spoofItemStackAmount(equipmentList);
 
-            if (spoofItemStackDurability)
+            if (configManager.getConfigurationOption(ConfigOption.DURABILITY_ENABLED))
                 spoofItemStackDurability(equipmentList);
 
-            if (spoofEnchantment)
+            if (configManager.getConfigurationOption(ConfigOption.ENCHANTMENTS_ENABLED))
                 spoofEnchantment(packet.getClientVersion(), equipmentList);
 
             packet.setEquipment(equipmentList);

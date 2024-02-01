@@ -1,4 +1,4 @@
-package com.deathmotion.antihealthindicator.util.entity;
+package com.deathmotion.antihealthindicator.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;

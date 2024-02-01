@@ -1,39 +1,28 @@
-package com.deathmotion.antihealthindicator.packetlisteners.impl.abstracts;
+package com.deathmotion.antihealthindicator.packetlisteners.abstracts;
 
 import com.deathmotion.antihealthindicator.AntiHealthIndicator;
-import com.deathmotion.antihealthindicator.util.entity.EntityMetadataIndex;
-import com.deathmotion.antihealthindicator.util.entity.EntityUtil;
+import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import com.deathmotion.antihealthindicator.managers.CacheManager;
+import com.deathmotion.antihealthindicator.managers.ConfigManager;
+import com.deathmotion.antihealthindicator.util.EntityMetadataIndex;
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import org.bukkit.entity.*;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class EntityListenerAbstract extends PacketListenerAbstract {
-    protected final boolean bypassPermissionEnabled;
-    protected final boolean spoofAirTicks;
-    protected final boolean spoofHealth;
-    protected final boolean spoofAbsorption;
-    protected final boolean spoofXp;
-    protected final boolean ignoreVehicles;
-    protected final boolean ignoreWolves;
-    protected final boolean ignoreTamedWolves;
-    protected final boolean ignoreOwnedWolves;
+    private final ConfigManager configManager;
+    private final CacheManager cacheManager;
 
 
-    public EntityListenerAbstract(JavaPlugin plugin) {
-        this.bypassPermissionEnabled = plugin.getConfig().getBoolean("allow-bypass.enabled", false);
-        this.spoofAirTicks = plugin.getConfig().getBoolean("spoof.entity-data.air-ticks.enabled", true);
-        this.spoofHealth = plugin.getConfig().getBoolean("spoof.entity-data.health.enabled", true);
-        this.spoofAbsorption = plugin.getConfig().getBoolean("spoof.entity-data.absorption.enabled", true);
-        this.spoofXp = plugin.getConfig().getBoolean("spoof.entity-data.spoof-xp.enabled", true);
-        this.ignoreVehicles = plugin.getConfig().getBoolean("spoof.entity-data.health.ignore-vehicles", true);
-        this.ignoreWolves = plugin.getConfig().getBoolean("spoof.entity-data.health.ignore-wolves.enabled", true);
-        this.ignoreTamedWolves = plugin.getConfig().getBoolean("spoof.entity-data.health.ignore-tamed-wolves.enabled", false);
-        this.ignoreOwnedWolves = plugin.getConfig().getBoolean("spoof.entity-data.health.ignore-owned-wolves.enabled", true);
+    public EntityListenerAbstract(AntiHealthIndicator plugin) {
+        cacheManager = plugin.getCacheManager();
+        configManager = plugin.getConfigManager();
     }
 
     @Override
@@ -58,19 +47,18 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
     protected void handlePacket(Player player, int packetEntityId, List<EntityData> entityMetadata) {
         if (player.getEntityId() == packetEntityId) return;
 
-        if (bypassPermissionEnabled) {
+        if (configManager.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED)) {
             if (player.hasPermission("AntiHealthIndicator.Bypass")) return;
         }
 
-        if (ignoreVehicles) {
-            ConcurrentHashMap<Player, Integer> vehicles = AntiHealthIndicator.getInstance().getVehicles();
-            if (vehicles.containsKey(player) && vehicles.get(player) == packetEntityId) return;
+        if (configManager.getConfigurationOption(ConfigOption.IGNORE_VEHICLES_ENABLED)) {
+            if (cacheManager.isPlayerVehicleInCache(player.getUniqueId(), packetEntityId)) return;
         }
 
-        Entity entity = EntityUtil.getEntityDataById(packetEntityId);
+        Entity entity = getEntityDataById(packetEntityId);
         if (entity == null) return;
 
-        if (ignoreWolves && entity instanceof Wolf) {
+        if (configManager.getConfigurationOption(ConfigOption.IGNORE_WOLVES_ENABLED) && entity instanceof Wolf) {
             if (shouldIgnoreWolf(player, (Wolf) entity)) return;
         }
 
@@ -87,7 +75,30 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
         }
     }
 
+    /**
+     * Retrieves an Entity object by identifier.
+     * <p>
+     * If the server version is older than 1.18, it will use the `SpigotReflectionUtils#getEntityById` method.
+     * Otherwise, it will use the AntiHealthIndicator's instance method to get the entity data
+     * from the entityDataMap.
+     * If an entity with the provided entityId does not exist, it
+     * will return null.
+     *
+     * @param entityId Identifier of the entity to retrieve
+     * @return Entity object if found, otherwise null
+     */
+    public Entity getEntityDataById(int entityId) {
+        if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_18)) {
+            return SpigotReflectionUtil.getEntityById(entityId);
+        }
+
+        return cacheManager.getEntityFromCache(entityId);
+    }
+
     private boolean shouldIgnoreWolf(Player player, Wolf wolf) {
+        boolean ignoreTamedWolves = configManager.getConfigurationOption(ConfigOption.FOR_TAMED_WOLVES_ENABLED);
+        boolean ignoreOwnedWolves = configManager.getConfigurationOption(ConfigOption.FOR_OWNED_WOLVES_ENABLED);
+
         if (!ignoreTamedWolves && !ignoreOwnedWolves) {
             return true;
         }
@@ -104,19 +115,19 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
     }
 
     private void spoofLivingEntityMetadata(EntityData obj) {
-        if (obj.getIndex() == EntityMetadataIndex.AIR_TICKS && spoofAirTicks) {
+        if (obj.getIndex() == EntityMetadataIndex.AIR_TICKS && configManager.getConfigurationOption(ConfigOption.AIR_TICKS_ENABLED)) {
             setDynamicValue(obj, 1);
         }
-        if (obj.getIndex() == EntityMetadataIndex.HEALTH && spoofHealth) {
+        if (obj.getIndex() == EntityMetadataIndex.HEALTH && configManager.getConfigurationOption(ConfigOption.HEALTH_ENABLED)) {
             obj.setValue(0.5f);
         }
     }
 
     private void spoofPlayerMetadata(EntityData obj) {
-        if (obj.getIndex() == EntityMetadataIndex.ABSORPTION && spoofAbsorption) {
+        if (obj.getIndex() == EntityMetadataIndex.ABSORPTION && configManager.getConfigurationOption(ConfigOption.ABSORPTION_ENABLED)) {
             setDynamicValue(obj, 0);
         }
-        if (obj.getIndex() == EntityMetadataIndex.XP && spoofXp) {
+        if (obj.getIndex() == EntityMetadataIndex.XP && configManager.getConfigurationOption(ConfigOption.XP_ENABLED)) {
             setDynamicValue(obj, 0);
         }
     }
