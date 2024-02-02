@@ -19,10 +19,13 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
     private final ConfigManager configManager;
     private final CacheManager cacheManager;
 
+    private final boolean healthTexturesSupported;
 
     public EntityListenerAbstract(AntiHealthIndicator plugin) {
         cacheManager = plugin.getCacheManager();
         configManager = plugin.getConfigManager();
+
+        healthTexturesSupported = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_15);
     }
 
     @Override
@@ -68,6 +71,7 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
 
         if (entity instanceof IronGolem && configManager.getConfigurationOption(ConfigOption.IGNORE_IRON_GOLEMS_ENABLED)) {
             if (!configManager.getConfigurationOption(ConfigOption.GRADUAL_IRON_GOLEM_HEALTH_ENABLED)) return;
+            if (!healthTexturesSupported) return;
 
             entityMetadata.forEach(this::spoofIronGolemMetadata);
             return;
@@ -102,6 +106,22 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
         return cacheManager.getEntityFromCache(entityId);
     }
 
+    /**
+     * This method checks if a Wolf should be ignored based on taming and ownership.
+     *
+     * @param player The Player for whom the check is being made.
+     * @param wolf   The Wolf that is being checked.
+     * @return boolean Returns true if the Wolf should be ignored, false otherwise.
+     * <p>
+     * Rules:
+     * 1. If the config options `FOR_TAMED_WOLVES_ENABLED` and
+     * `FOR_OWNED_WOLVES_ENABLED` are both set to false, the method will return true.
+     * 2. If the config option `FOR_TAMED_WOLVES_ENABLED` is true,
+     * and the Wolf is tamed, the method will return true.
+     * 3. If the config option `FOR_OWNED_WOLVES_ENABLED` is true,
+     * the method will return true only if the Wolf is tamed,
+     * has an owner, and the owner's UUID matches the Player's UUID.
+     */
     private boolean shouldIgnoreWolf(Player player, Wolf wolf) {
         boolean ignoreTamedWolves = configManager.getConfigurationOption(ConfigOption.FOR_TAMED_WOLVES_ENABLED);
         boolean ignoreOwnedWolves = configManager.getConfigurationOption(ConfigOption.FOR_OWNED_WOLVES_ENABLED);
@@ -153,6 +173,14 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
         }
     }
 
+    /**
+     * This method modifies the metadata of a LivingEntity.
+     * <p>
+     * For air ticks metadata, it sets a dynamic air ticks value to 1 if the configuration option for it is enabled.
+     * For health metadata, it sets health to 0.5 if the configuration option for it is enabled.
+     *
+     * @param obj the Living Entity's data.
+     */
     private void spoofLivingEntityMetadata(EntityData obj) {
         if (obj.getIndex() == MetadataIndex.AIR_TICKS && configManager.getConfigurationOption(ConfigOption.AIR_TICKS_ENABLED)) {
             setDynamicValue(obj, 1);
@@ -162,6 +190,14 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
         }
     }
 
+    /**
+     * This method modifies the metadata of a Player.
+     * <p>
+     * For absorption metadata, it sets absorption to 0 if the configuration option for it is enabled.
+     * For XP metadata, it sets XP to 0 if the configuration option for it is enabled.
+     *
+     * @param obj the Player's data.
+     */
     private void spoofPlayerMetadata(EntityData obj) {
         if (obj.getIndex() == MetadataIndex.ABSORPTION && configManager.getConfigurationOption(ConfigOption.ABSORPTION_ENABLED)) {
             setDynamicValue(obj, 0);

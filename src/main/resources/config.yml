@@ -81,6 +81,7 @@ spoof:
         # It will always show the highest possible health for the current texture based on the health of the iron golem.
         # This will make it impossible for other players to determine the exact health of the iron golem
         # until it reaches the next health texture, which is vanilla behavior.
+        # This setting will only have effect from version 1.15 and above.
         gradual:
           enabled: true
 
