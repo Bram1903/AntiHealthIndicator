@@ -4,7 +4,7 @@ import com.deathmotion.antihealthindicator.AntiHealthIndicator;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
-import com.deathmotion.antihealthindicator.util.EntityMetadataIndex;
+import com.deathmotion.antihealthindicator.util.MetadataIndex;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
@@ -57,7 +57,7 @@ public class VehicleState implements Listener {
         User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
 
         List<EntityData> metadata = new ArrayList<>();
-        metadata.add(new EntityData(EntityMetadataIndex.HEALTH, EntityDataTypes.FLOAT, healthValue));
+        metadata.add(new EntityData(MetadataIndex.HEALTH, EntityDataTypes.FLOAT, healthValue));
         user.writePacket(new WrapperPlayServerEntityMetadata(vehicle.getEntityId(), metadata));
 
         if (isEntering) {

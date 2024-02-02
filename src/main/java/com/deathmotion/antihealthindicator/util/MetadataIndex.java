@@ -7,7 +7,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
  * This class holds the indexes of different entity metadata elements like health, absorption and air ticks,
  * the values of which might vary based on the server version.
  */
-public class EntityMetadataIndex {
+public class MetadataIndex {
 
     public static final int AIR_TICKS;
 

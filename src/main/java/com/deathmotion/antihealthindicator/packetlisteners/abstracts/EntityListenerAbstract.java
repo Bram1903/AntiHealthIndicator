@@ -4,7 +4,7 @@ import com.deathmotion.antihealthindicator.AntiHealthIndicator;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
-import com.deathmotion.antihealthindicator.util.EntityMetadataIndex;
+import com.deathmotion.antihealthindicator.util.MetadataIndex;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
@@ -115,19 +115,19 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
     }
 
     private void spoofLivingEntityMetadata(EntityData obj) {
-        if (obj.getIndex() == EntityMetadataIndex.AIR_TICKS && configManager.getConfigurationOption(ConfigOption.AIR_TICKS_ENABLED)) {
+        if (obj.getIndex() == MetadataIndex.AIR_TICKS && configManager.getConfigurationOption(ConfigOption.AIR_TICKS_ENABLED)) {
             setDynamicValue(obj, 1);
         }
-        if (obj.getIndex() == EntityMetadataIndex.HEALTH && configManager.getConfigurationOption(ConfigOption.HEALTH_ENABLED)) {
+        if (obj.getIndex() == MetadataIndex.HEALTH && configManager.getConfigurationOption(ConfigOption.HEALTH_ENABLED)) {
             obj.setValue(0.5f);
         }
     }
 
     private void spoofPlayerMetadata(EntityData obj) {
-        if (obj.getIndex() == EntityMetadataIndex.ABSORPTION && configManager.getConfigurationOption(ConfigOption.ABSORPTION_ENABLED)) {
+        if (obj.getIndex() == MetadataIndex.ABSORPTION && configManager.getConfigurationOption(ConfigOption.ABSORPTION_ENABLED)) {
             setDynamicValue(obj, 0);
         }
-        if (obj.getIndex() == EntityMetadataIndex.XP && configManager.getConfigurationOption(ConfigOption.XP_ENABLED)) {
+        if (obj.getIndex() == MetadataIndex.XP && configManager.getConfigurationOption(ConfigOption.XP_ENABLED)) {
             setDynamicValue(obj, 0);
         }
     }
