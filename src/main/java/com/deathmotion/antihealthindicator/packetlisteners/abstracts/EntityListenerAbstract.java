@@ -186,7 +186,9 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
             setDynamicValue(obj, 1);
         }
         if (obj.getIndex() == MetadataIndex.HEALTH && configManager.getConfigurationOption(ConfigOption.HEALTH_ENABLED)) {
-            obj.setValue(0.5f);
+            if (((Float) obj.getValue()) > 0) {
+                obj.setValue(0.5f);
+            }
         }
     }
 
