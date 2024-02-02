@@ -8,11 +8,11 @@ import com.deathmotion.antihealthindicator.packetlisteners.*;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 
-public class PacketListenerManager {
+public class PacketManager {
     private final AntiHealthIndicator plugin;
     private final ConfigManager config;
 
-    public PacketListenerManager(AntiHealthIndicator plugin) {
+    public PacketManager(AntiHealthIndicator plugin) {
         this.plugin = plugin;
         this.config = plugin.getConfigManager();
 

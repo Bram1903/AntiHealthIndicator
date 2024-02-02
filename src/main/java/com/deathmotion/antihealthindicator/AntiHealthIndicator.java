@@ -2,7 +2,7 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
-import com.deathmotion.antihealthindicator.managers.PacketListenerManager;
+import com.deathmotion.antihealthindicator.managers.PacketManager;
 import com.deathmotion.antihealthindicator.managers.UpdateManager;
 import com.deathmotion.antihealthindicator.schedulers.Scheduler;
 import com.deathmotion.antihealthindicator.schedulers.ServerScheduler;
@@ -38,7 +38,7 @@ public class AntiHealthIndicator extends JavaPlugin {
         cacheManager = new CacheManager(this);
         updateManager = new UpdateManager(this);
 
-        new PacketListenerManager(this);
+        new PacketManager(this);
 
         enableBStats();
 
