@@ -16,15 +16,13 @@ public class CacheManager {
 
     private final ConcurrentHashMap<Integer, Entity> entityDataMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<UUID, Integer> vehicles = new ConcurrentHashMap<>();
-    AntiHealthIndicator plugin;
+    ServerScheduler scheduler;
 
     public CacheManager(AntiHealthIndicator plugin) {
-        this.plugin = plugin;
+        this.scheduler = plugin.getScheduler();
     }
 
     public void cacheLivingEntityData() {
-        ServerScheduler scheduler = plugin.getScheduler();
-
         scheduler.runTask(null, () -> {
             for (World world : Bukkit.getWorlds()) {
                 for (Entity entity : world.getEntities()) {
