@@ -40,8 +40,6 @@ public class AntiHealthIndicator extends JavaPlugin {
         new PacketManager(this);
 
         enableBStats();
-
-        getLogger().info("Plugin has successfully been initialized!");
     }
 
     @Override
