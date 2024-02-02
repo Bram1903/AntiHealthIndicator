@@ -17,12 +17,11 @@ public enum ConfigOption {
     ENTITY_DATA_ENABLED("spoof.entity-data.enabled", true),
     AIR_TICKS_ENABLED("spoof.entity-data.air-ticks.enabled", true),
     HEALTH_ENABLED("spoof.entity-data.health.enabled", true),
-    IGNORE_VEHICLES_ENABLED("spoof.entity-data.health.ignore-vehicles", true),
 
+    IGNORE_VEHICLES_ENABLED("spoof.entity-data.health.ignore-vehicles", true),
     IGNORE_WOLVES_ENABLED("spoof.entity-data.health.ignore-wolves.enabled", true),
     FOR_TAMED_WOLVES_ENABLED("spoof.entity-data.health.ignore-wolves.when.for-tamed-wolves", false),
     FOR_OWNED_WOLVES_ENABLED("spoof.entity-data.health.ignore-wolves.when.for-owned-wolves", true),
-
     IGNORE_IRON_GOLEMS_ENABLED("spoof.entity-data.health.ignore-iron-golems.enabled", true),
     GRADUAL_IRON_GOLEM_HEALTH_ENABLED("spoof.entity-data.health.ignore-iron-golems.gradual.enabled", true),
 
