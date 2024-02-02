@@ -23,6 +23,9 @@ public enum ConfigOption {
     FOR_TAMED_WOLVES_ENABLED("spoof.entity-data.health.ignore-wolves.when.for-tamed-wolves", false),
     FOR_OWNED_WOLVES_ENABLED("spoof.entity-data.health.ignore-wolves.when.for-owned-wolves", true),
 
+    IGNORE_IRON_GOLEMS_ENABLED("spoof.entity-data.health.ignore-iron-golems.enabled", true),
+    GRADUAL_IRON_GOLEM_HEALTH_ENABLED("spoof.entity-data.health.ignore-iron-golems.gradual.enabled", true),
+
     ABSORPTION_ENABLED("spoof.entity-data.absorption.enabled", true),
     XP_ENABLED("spoof.entity-data.xp.enabled", true),
 

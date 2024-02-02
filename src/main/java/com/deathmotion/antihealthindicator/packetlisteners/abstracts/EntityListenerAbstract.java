@@ -58,11 +58,18 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
         Entity entity = getEntityDataById(packetEntityId);
         if (entity == null) return;
 
-        if (configManager.getConfigurationOption(ConfigOption.IGNORE_WOLVES_ENABLED) && entity instanceof Wolf) {
+        if (entity instanceof Wither || entity instanceof EnderDragon) {
+            return;
+        }
+
+        if (entity instanceof Wolf && configManager.getConfigurationOption(ConfigOption.IGNORE_WOLVES_ENABLED)) {
             if (shouldIgnoreWolf(player, (Wolf) entity)) return;
         }
 
-        if (entity instanceof Wither || entity instanceof EnderDragon) {
+        if (entity instanceof IronGolem && configManager.getConfigurationOption(ConfigOption.IGNORE_IRON_GOLEMS_ENABLED)) {
+            if (!configManager.getConfigurationOption(ConfigOption.GRADUAL_IRON_GOLEM_HEALTH_ENABLED)) return;
+
+            entityMetadata.forEach(this::spoofIronGolemMetadata);
             return;
         }
 
@@ -112,6 +119,38 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
         }
 
         return false;
+    }
+
+    /**
+     * This method sets the health of the Iron Golem based on its current health value.
+     * It will adjust the health to the highest possible value within the range
+     * that the current health falls into.
+     * This is done so the correct health texture is displayed on the client.
+     *
+     * @param obj the Iron Golem entity data.
+     */
+    private void spoofIronGolemMetadata(EntityData obj) {
+        // Checks if the metadata index is related to air ticks and if the configuration option for it is enabled
+        if (obj.getIndex() == MetadataIndex.AIR_TICKS && configManager.getConfigurationOption(ConfigOption.AIR_TICKS_ENABLED)) {
+            // Sets a dynamic value for air ticks
+            setDynamicValue(obj, 1);
+        }
+        // Checks if the metadata index is related to health and if the configuration option for it is enabled
+        if (obj.getIndex() == MetadataIndex.HEALTH && configManager.getConfigurationOption(ConfigOption.HEALTH_ENABLED)) {
+            // Retrieves the current health of the Iron Golem
+            float health = (float) obj.getValue();
+
+            // Adjusts the Iron Golem's health based on its current health range.
+            if (health > 74) {
+                obj.setValue(100f);
+            } else if (health <= 74 && health > 49) {
+                obj.setValue(74f);
+            } else if (health <= 49 && health > 24) {
+                obj.setValue(49f);
+            } else if (health <= 24 && health > 0) {
+                obj.setValue(24f);
+            }
+        }
     }
 
     private void spoofLivingEntityMetadata(EntityData obj) {
