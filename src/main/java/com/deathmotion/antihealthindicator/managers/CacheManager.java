@@ -14,9 +14,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class CacheManager {
 
+    private final ServerScheduler scheduler;
+
     private final ConcurrentHashMap<Integer, Entity> entityDataMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<UUID, Integer> vehicles = new ConcurrentHashMap<>();
-    ServerScheduler scheduler;
 
     public CacheManager(AntiHealthIndicator plugin) {
         this.scheduler = plugin.getScheduler();
