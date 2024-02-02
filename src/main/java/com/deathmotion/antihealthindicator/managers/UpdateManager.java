@@ -6,7 +6,6 @@ import com.deathmotion.antihealthindicator.events.UpdateNotifier;
 import com.deathmotion.antihealthindicator.schedulers.ServerScheduler;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import lombok.Getter;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,43 +21,32 @@ public class UpdateManager {
 
     private final AntiHealthIndicator plugin;
     private final ServerScheduler scheduler;
-
-    @Getter
-    private boolean updateAvailable;
-    @Getter
-    private String latestVersion;
+    private final ConfigManager configManager;
 
     public UpdateManager(AntiHealthIndicator plugin) {
         this.plugin = plugin;
         this.scheduler = plugin.getScheduler();
+        this.configManager = plugin.getConfigManager();
+
         initializeUpdateCheck();
     }
 
     private void initializeUpdateCheck() {
         if (isUpdateCheckerEnabled()) {
             checkForUpdate(shouldPrintUpdateToConsole());
-            if (shouldNotifyInGame()) {
-                notifyInGame();
-            }
         }
     }
 
     private boolean isUpdateCheckerEnabled() {
-        return plugin.getConfigManager().getConfigurationOption(ConfigOption.UPDATE_CHECKER_ENABLED);
+        return configManager.getConfigurationOption(ConfigOption.UPDATE_CHECKER_ENABLED);
     }
 
     private boolean shouldPrintUpdateToConsole() {
-        return plugin.getConfigManager().getConfigurationOption(ConfigOption.UPDATE_CHECKER_PRINT_TO_CONSOLE);
+        return configManager.getConfigurationOption(ConfigOption.UPDATE_CHECKER_PRINT_TO_CONSOLE);
     }
 
     private boolean shouldNotifyInGame() {
-        return plugin.getConfigManager().getConfigurationOption(ConfigOption.NOTIFY_IN_GAME);
-    }
-
-    private void notifyInGame() {
-        scheduler.runTask(null, () -> {
-            plugin.getServer().getPluginManager().registerEvents(new UpdateNotifier(plugin), plugin);
-        });
+        return configManager.getConfigurationOption(ConfigOption.NOTIFY_IN_GAME);
     }
 
     public void checkForUpdate(boolean printToConsole) {
@@ -112,19 +100,24 @@ public class UpdateManager {
         }
 
         if (isNewVersionAvailable) {
-            updateAvailable = true;
-            this.latestVersion = latestVersion.stream()
+            String formattedVersion = latestVersion.stream()
                     .map(String::valueOf)
                     .collect(Collectors.joining("."));
 
-            printUpdateInfo(printToConsole);
+            printUpdateInfo(printToConsole, formattedVersion);
         }
     }
 
-    private void printUpdateInfo(boolean printToConsole) {
+    private void printUpdateInfo(boolean printToConsole, String formattedVersion) {
         if (printToConsole) {
-            this.plugin.getLogger().info("Found a new version " + latestVersion);
+            this.plugin.getLogger().info("Found a new version " + formattedVersion);
             this.plugin.getLogger().info(GITHUB_RELEASES_URL);
+        }
+
+        if (shouldNotifyInGame()) {
+            scheduler.runTask(null, () -> {
+                plugin.getServer().getPluginManager().registerEvents(new UpdateNotifier(formattedVersion), plugin);
+            });
         }
     }
 

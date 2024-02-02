@@ -16,10 +16,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class AntiHealthIndicator extends JavaPlugin {
 
     @Getter
+    private ServerScheduler scheduler;
     private ConfigManager configManager;
     private CacheManager cacheManager;
-    private UpdateManager updateManager;
-    private ServerScheduler scheduler;
 
     @Override
     public void onLoad() {
@@ -36,8 +35,8 @@ public class AntiHealthIndicator extends JavaPlugin {
         scheduler = new Scheduler().getScheduler(this);
         configManager = new ConfigManager(this);
         cacheManager = new CacheManager(this);
-        updateManager = new UpdateManager(this);
 
+        new UpdateManager(this);
         new PacketManager(this);
 
         enableBStats();
