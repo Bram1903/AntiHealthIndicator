@@ -70,7 +70,7 @@ public class UpdateManager {
         URL api = new URL(GITHUB_API_URL);
         URLConnection con = getConnection(api);
 
-        JsonObject json = new JsonParser().parse(new InputStreamReader(con.getInputStream())).getAsJsonObject();
+        JsonObject json = JsonParser.parseReader(new InputStreamReader(con.getInputStream())).getAsJsonObject();
 
         return parseVersion(json.get("tag_name").getAsString().replaceFirst("^[vV]", ""));
     }
