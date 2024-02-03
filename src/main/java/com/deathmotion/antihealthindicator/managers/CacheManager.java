@@ -1,7 +1,7 @@
 package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AntiHealthIndicator;
-import com.deathmotion.antihealthindicator.schedulers.ServerScheduler;
+import io.github.retrooper.packetevents.util.FoliaCompatUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -14,22 +14,20 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class CacheManager {
 
-    private final ServerScheduler scheduler;
+    private final AntiHealthIndicator plugin;
 
     private final ConcurrentHashMap<Integer, Entity> entityDataMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<UUID, Integer> vehicles = new ConcurrentHashMap<>();
 
     public CacheManager(AntiHealthIndicator plugin) {
-        this.scheduler = plugin.getScheduler();
+        this.plugin = plugin;
     }
 
     public void cacheLivingEntityData() {
-        scheduler.runTask(null, () -> {
+        FoliaCompatUtil.runTask(this.plugin, (Object unused) -> {
             for (World world : Bukkit.getWorlds()) {
-                for (Entity entity : world.getEntities()) {
-                    if (entity instanceof LivingEntity) {
-                        addEntityToCache(entity);
-                    }
+                for (LivingEntity livingEntity : world.getLivingEntities()) {
+                    entityDataMap.putIfAbsent(livingEntity.getEntityId(), livingEntity);
                 }
             }
         });

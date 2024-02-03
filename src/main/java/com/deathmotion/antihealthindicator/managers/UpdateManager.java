@@ -3,9 +3,9 @@ package com.deathmotion.antihealthindicator.managers;
 import com.deathmotion.antihealthindicator.AntiHealthIndicator;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.events.UpdateNotifier;
-import com.deathmotion.antihealthindicator.schedulers.ServerScheduler;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.github.retrooper.packetevents.util.FoliaCompatUtil;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,12 +20,10 @@ public class UpdateManager {
     private final static String GITHUB_RELEASES_URL = "https://github.com/Bram1903/AntiHealthIndicator/releases/latest";
 
     private final AntiHealthIndicator plugin;
-    private final ServerScheduler scheduler;
     private final ConfigManager configManager;
 
     public UpdateManager(AntiHealthIndicator plugin) {
         this.plugin = plugin;
-        this.scheduler = plugin.getScheduler();
         this.configManager = plugin.getConfigManager();
 
         initializeUpdateCheck();
@@ -50,10 +48,11 @@ public class UpdateManager {
     }
 
     public void checkForUpdate(boolean printToConsole) {
-        scheduler.runTaskAsynchronously(() -> {
+        FoliaCompatUtil.runTaskAsync(this.plugin, () -> {
             try {
                 List<Integer> currentVersion = parseVersion(this.plugin.getDescription().getVersion());
                 List<Integer> latestVersion = getLatestGitHubVersion();
+
                 compareVersions(currentVersion, latestVersion, printToConsole);
             } catch (IOException e) {
                 LogUpdateError(e);
@@ -115,7 +114,7 @@ public class UpdateManager {
         }
 
         if (shouldNotifyInGame()) {
-            scheduler.runTask(null, () -> {
+            FoliaCompatUtil.runTask(this.plugin, (Object unused) -> {
                 plugin.getServer().getPluginManager().registerEvents(new UpdateNotifier(formattedVersion), plugin);
             });
         }

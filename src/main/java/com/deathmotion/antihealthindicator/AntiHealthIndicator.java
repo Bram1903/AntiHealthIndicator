@@ -4,8 +4,6 @@ import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.deathmotion.antihealthindicator.managers.PacketManager;
 import com.deathmotion.antihealthindicator.managers.UpdateManager;
-import com.deathmotion.antihealthindicator.schedulers.Scheduler;
-import com.deathmotion.antihealthindicator.schedulers.ServerScheduler;
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
@@ -16,7 +14,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class AntiHealthIndicator extends JavaPlugin {
 
     @Getter
-    private ServerScheduler scheduler;
     private ConfigManager configManager;
     private CacheManager cacheManager;
 
@@ -32,7 +29,6 @@ public class AntiHealthIndicator extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        scheduler = new Scheduler().getScheduler(this);
         configManager = new ConfigManager(this);
         cacheManager = new CacheManager(this);
 
