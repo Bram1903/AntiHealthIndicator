@@ -4,6 +4,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+/server/
+
 ### IntelliJ IDEA ###
 .idea/
 *.iws
