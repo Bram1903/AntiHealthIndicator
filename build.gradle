@@ -27,33 +27,42 @@ dependencies {
     implementation 'org.bstats:bstats-bukkit:3.0.0'
 }
 
-build {
-    dependsOn(shadowJar)
-}
-
-shadowJar {
-    minimize()
-    archiveFileName.set("${project.name}-${project.version}.jar")
-
-    relocate("io.github.retrooper.packetevents", "com.deathmotion.antihealthindicator.shaded.io.github.retrooper.packetevents")
-    relocate("com.github.retrooper.packetevents", "com.deathmotion.antihealthindicator.shaded.com.github.retrooper.packetevents")
-    relocate("net.kyori", "com.deathmotion.antihealthindicator.shaded.kyori")
-    relocate("com.google.gson", "com.deathmotion.antihealthindicator.shaded.gson")
-    relocate 'org.bstats', 'com.deathmotion.antihealthindicator'
-}
-
 tasks {
+    shadowJar {
+        minimize()
+        archiveFileName.set("${project.name}-${project.version}.jar")
+
+        relocate("io.github.retrooper.packetevents", "com.deathmotion.antihealthindicator.shaded.io.github.retrooper.packetevents")
+        relocate("com.github.retrooper.packetevents", "com.deathmotion.antihealthindicator.shaded.com.github.retrooper.packetevents")
+        relocate("net.kyori", "com.deathmotion.antihealthindicator.shaded.kyori")
+        relocate("com.google.gson", "com.deathmotion.antihealthindicator.shaded.gson")
+        relocate 'org.bstats', 'com.deathmotion.antihealthindicator'
+    }
+
+    build {
+        dependsOn(shadowJar)
+    }
+
     runServer {
-        minecraftVersion("1.8.8")
-        runDirectory.set(file("server/1.8.8"))
+        // The version of the server to run
+        def version = "1.20.4"
+
+        minecraftVersion(version)
+        runDirectory.set(file("server/$version"))
+
+        // 1.8.8 - 1.16.5 = Java 8
+        // 1.17           = Java 16
+        // 1.18 - 1.20.4  = Java 17
         javaLauncher.set(project.javaToolchains.launcherFor {
-            languageVersion.set(JavaLanguageVersion.of(8))
+            languageVersion.set(JavaLanguageVersion.of(17))
         })
+
         downloadPlugins {
             url("https://github.com/EssentialsX/Essentials/releases/download/2.20.1/EssentialsX-2.20.1.jar")
             url("https://ci.lucko.me/job/spark/400/artifact/spark-bukkit/build/libs/spark-1.10.59-bukkit.jar")
             url("https://download.luckperms.net/1530/bukkit/loader/LuckPerms-Bukkit-5.4.117.jar")
         }
+
         jvmArgs = [
                 "-Xms16384M",
                 "-Xmx16384M",
