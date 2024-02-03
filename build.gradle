@@ -1,0 +1,45 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group 'com.deathmotion.antihealthindicator'
+version '1.1.0'
+
+compileJava {
+    options.release.set(8)
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    disableAutoTargetJvm()
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.papermc.io/repository/maven-public/' }
+    maven { url 'https://repo.codemc.io/repository/maven-releases/' }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    implementation 'com.github.retrooper.packetevents:spigot:2.2.0'
+    implementation 'org.bstats:bstats-bukkit:3.0.0'
+}
+
+
+build {
+    dependsOn(shadowJar)
+}
+
+shadowJar {
+    minimize()
+    archiveFileName.set("${project.name}-${project.version}.jar")
+
+    relocate 'com.github.retrooper.packetevents', 'com.deathmotion.antihealthindicator.packetevents.api'
+    relocate 'io.github.retrooper.packetevents', 'com.deathmotion.antihealthindicator.packetevents.impl'
+    relocate 'net.kyori', 'com.deathmotion.antihealthindicator.packetevents.kyori'
+    relocate 'org.bstats', 'com.deathmotion.antihealthindicator'
+}
