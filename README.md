@@ -83,17 +83,17 @@ Players that are OP (Operators) have these permissions by default.
 
 > Prerequisites
 
-- Java 17
-- Maven
+- Java 1.8 or higher
+- Gradle
 
-To compile the jar from source, run the following command in the directory of your project root (i.e., where the pom.xml
-file resides).
+To compile the jar from source, run the following command in the directory of your project root (i.e., where the
+build.gradle file resides).
 
 ```bash
-mvn clean package
+gradle build
 ```
 
-The produced jar can be located in the /target/ directory within your project root.
+The produced jar can be located in the /build/libs/ directory within your project root.
 
 ## Credits
 
