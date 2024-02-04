@@ -1,5 +1,5 @@
 name: AntiHealthIndicator
-authors: [ Bram ]
+author: Bram
 description: Spoofs certain information sent by the server to other players to prevent them from deducing information about the player's health, armor, held item, etc.
 website: https://github.com/Bram1903/AntiHealthIndicator
 main: com.deathmotion.antihealthindicator.AntiHealthIndicator
