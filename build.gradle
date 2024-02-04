@@ -23,6 +23,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
     implementation 'com.github.retrooper.packetevents:spigot:2.2.0'
+    implementation "net.kyori:adventure-platform-bukkit:4.3.2"
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'org.bstats:bstats-bukkit:3.0.0'
 }

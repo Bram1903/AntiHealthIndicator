@@ -7,6 +7,7 @@ import com.deathmotion.antihealthindicator.managers.UpdateManager;
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -16,6 +17,7 @@ public class AntiHealthIndicator extends JavaPlugin {
     @Getter
     private ConfigManager configManager;
     private CacheManager cacheManager;
+    private BukkitAudiences adventure;
 
     @Override
     public void onLoad() {
@@ -31,6 +33,7 @@ public class AntiHealthIndicator extends JavaPlugin {
     public void onEnable() {
         configManager = new ConfigManager(this);
         cacheManager = new CacheManager(this);
+        adventure = BukkitAudiences.create(this);
 
         new UpdateManager(this);
         new PacketManager(this);
@@ -41,6 +44,7 @@ public class AntiHealthIndicator extends JavaPlugin {
     @Override
     public void onDisable() {
         PacketEvents.getAPI().terminate();
+        adventure.close();
         getLogger().info("Plugin has been uninitialized!");
     }
 

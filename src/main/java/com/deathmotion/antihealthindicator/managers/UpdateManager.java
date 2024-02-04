@@ -115,7 +115,7 @@ public class UpdateManager {
 
         if (shouldNotifyInGame()) {
             FoliaCompatUtil.runTask(this.plugin, (Object unused) -> {
-                plugin.getServer().getPluginManager().registerEvents(new UpdateNotifier(formattedVersion), plugin);
+                plugin.getServer().getPluginManager().registerEvents(new UpdateNotifier(this.plugin, formattedVersion), this.plugin);
             });
         }
     }
