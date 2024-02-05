@@ -4,26 +4,9 @@
 [![CodeQL](https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/codeql.yml/badge.svg)](https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/codeql.yml)
 ![GitHub Release](https://img.shields.io/github/release/Bram1903/AntiHealthIndicator.svg)
 
-## Introduction
+## Showcase
 
-Minecraft, by its very nature, sends a wide array of data packets to the player's client,
-many of which aren't used in typical gameplay.
-Unfortunately, some players take advantage of this extra information to gain an upper hand against others.
-
-### Gaining an Unfair Advantage
-
-Players can gain an unfair advantage by accessing details such as the health value of their opponents.
-This can help them identify the weakest or the strongest players in a fight.
-They can also gain insights into any enchantments on opponents' armor, or how durable their armor is,
-further enhancing their advantage.
-
-### Solving the Issue
-
-This is where this plugin comes in.
-The plugin is designed to prevent these unfair advantages.
-It achieves this by modifying these data packets so they no longer reveal this kind of information,
-while still keeping the client functioning as normal.
-By implementing this plugin, the gameplay can remain fair and true to its intended design.
+![Demo](showcase/AntiHealthIndicator.gif)
 
 ## Supported Versions
 
