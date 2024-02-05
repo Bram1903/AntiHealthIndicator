@@ -1,5 +1,7 @@
 # AntiHealthIndicator
 
+[![Build](https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/gradle.yml/badge.svg)](https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/gradle.yml)
+[![CodeQL](https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/codeql.yml/badge.svg)](https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/codeql.yml)
 ![GitHub Release](https://img.shields.io/github/release/Bram1903/AntiHealthIndicator.svg)
 
 ## Introduction
