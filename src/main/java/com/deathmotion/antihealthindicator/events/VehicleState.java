@@ -13,6 +13,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
@@ -20,18 +21,30 @@ import org.bukkit.event.vehicle.VehicleExitEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class to manage player events related to vehicle state
+ */
 public class VehicleState implements Listener {
 
     private final ConfigManager configManager;
-
     private final CacheManager cacheManager;
 
+    /**
+     * Constructor for VehicleState
+     *
+     * @param plugin AntiHealthIndicator plugin
+     */
     public VehicleState(AntiHealthIndicator plugin) {
         this.configManager = plugin.getConfigManager();
         this.cacheManager = plugin.getCacheManager();
     }
 
-    @EventHandler
+    /**
+     * EventHandler method triggered when a player enters a vehicle
+     *
+     * @param event VehicleEnterEvent
+     */
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onRide(VehicleEnterEvent event) {
         if (event.getEntered() instanceof Player && event.getVehicle() instanceof LivingEntity) {
             Player player = (Player) event.getEntered();
@@ -40,7 +53,12 @@ public class VehicleState implements Listener {
         }
     }
 
-    @EventHandler
+    /**
+     * EventHandler method triggered when a player exits a vehicle
+     *
+     * @param event VehicleExitEvent
+     */
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onExitRide(VehicleExitEvent event) {
         if (event.getExited() instanceof Player && event.getVehicle() instanceof LivingEntity) {
             Player player = (Player) event.getExited();
@@ -49,6 +67,14 @@ public class VehicleState implements Listener {
         }
     }
 
+    /**
+     * Handle player entering/exiting a vehicle event.
+     *
+     * @param player      The player involved in the event.
+     * @param vehicle     The vehicle involved in the event.
+     * @param healthValue The health value for the vehicle.
+     * @param isEntering  A boolean denoting whether the player is entering or exiting the vehicle.
+     */
     private void handleVehicleEvent(Player player, LivingEntity vehicle, float healthValue, boolean isEntering) {
         if (configManager.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED)) {
             if (player.hasPermission("AntiHealthIndicator.Bypass")) return;

@@ -6,6 +6,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
@@ -31,7 +32,7 @@ public class EntityState implements Listener {
      *
      * @param event the event
      */
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void entitySpawn(EntitySpawnEvent event) {
         createEntityDataMap(event.getEntity());
     }
@@ -41,7 +42,7 @@ public class EntityState implements Listener {
      *
      * @param event the event
      */
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void entityLoad(EntitiesLoadEvent event) {
         for (Entity entity : event.getEntities()) {
             createEntityDataMap(entity);
@@ -53,7 +54,7 @@ public class EntityState implements Listener {
      *
      * @param event the event
      */
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void playerJoin(PlayerJoinEvent event) {
         createEntityDataMap(event.getPlayer());
     }
@@ -63,7 +64,7 @@ public class EntityState implements Listener {
      *
      * @param event the event
      */
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void entityDeath(EntityDeathEvent event) {
         if (event.getEntity() instanceof Player) {
             return;
@@ -77,7 +78,7 @@ public class EntityState implements Listener {
      *
      * @param event the event
      */
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void entityUnload(EntitiesUnloadEvent event) {
         List<Entity> entityList = event.getEntities();
         for (Entity entity : entityList) {
@@ -92,7 +93,7 @@ public class EntityState implements Listener {
      *
      * @param event the event
      */
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void playerQuit(PlayerQuitEvent event) {
         this.cacheManager.removeEntityFromCache(event.getPlayer().getEntityId());
     }
