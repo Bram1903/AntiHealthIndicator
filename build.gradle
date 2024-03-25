@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.deathmotion.antihealthindicator'
-version '1.1.2'
+version '1.1.3-SNAPSHOT'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -46,7 +46,7 @@ tasks {
 
     runServer {
         // The version of the server to run
-        def version = "1.20.4"
+        def version = "1.8.8"
 
         minecraftVersion(version)
         runDirectory.set(file("server/$version"))
@@ -55,7 +55,7 @@ tasks {
         // 1.17           = Java 16
         // 1.18 - 1.20.4  = Java 17
         javaLauncher.set(project.javaToolchains.launcherFor {
-            languageVersion.set(JavaLanguageVersion.of(17))
+            languageVersion.set(JavaLanguageVersion.of(8))
         })
 
         downloadPlugins {

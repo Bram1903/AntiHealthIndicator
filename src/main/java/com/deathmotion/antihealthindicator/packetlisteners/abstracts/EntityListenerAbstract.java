@@ -1,6 +1,7 @@
 package com.deathmotion.antihealthindicator.packetlisteners.abstracts;
 
 import com.deathmotion.antihealthindicator.AntiHealthIndicator;
+import com.deathmotion.antihealthindicator.data.WolfData;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
@@ -14,17 +15,20 @@ import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import org.bukkit.entity.*;
 
 import java.util.List;
+import java.util.UUID;
 
 public abstract class EntityListenerAbstract extends PacketListenerAbstract {
     private final ConfigManager configManager;
     private final CacheManager cacheManager;
 
+    private final boolean useEntityCache;
     private final boolean healthTexturesSupported;
 
     public EntityListenerAbstract(AntiHealthIndicator plugin) {
         cacheManager = plugin.getCacheManager();
         configManager = plugin.getConfigManager();
 
+        useEntityCache = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18);
         healthTexturesSupported = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_15);
     }
 
@@ -130,12 +134,28 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
             return true;
         }
 
-        if (ignoreTamedWolves && wolf.isTamed()) {
+        boolean isTamed;
+        UUID ownerUniqueId = null;
+
+        if (useEntityCache) {
+            WolfData wolfData = cacheManager.getWolfDataFromCache(wolf.getEntityId());
+            if (wolfData == null) return false;
+
+            isTamed = wolfData.isTamed();
+            ownerUniqueId = wolfData.getOwnerUniqueId();
+        } else {
+            isTamed = wolf.isTamed();
+            if (wolf.getOwner() != null) {
+                ownerUniqueId = wolf.getOwner().getUniqueId();
+            }
+        }
+
+        if (ignoreTamedWolves && isTamed) {
             return true;
         }
 
         if (ignoreOwnedWolves) {
-            return wolf.isTamed() && wolf.getOwner() != null && wolf.getOwner().getUniqueId().equals(player.getUniqueId());
+            return isTamed && ownerUniqueId != null && ownerUniqueId.equals(player.getUniqueId());
         }
 
         return false;

@@ -1,15 +1,15 @@
 package com.deathmotion.antihealthindicator.events;
 
 import com.deathmotion.antihealthindicator.AntiHealthIndicator;
+import com.deathmotion.antihealthindicator.data.WolfData;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
@@ -34,7 +34,10 @@ public class EntityState implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void entitySpawn(EntitySpawnEvent event) {
-        createEntityDataMap(event.getEntity());
+        Entity entity = event.getEntity();
+
+        createEntityDataMap(entity);
+        createWolfDataMap(entity);
     }
 
     /**
@@ -46,6 +49,7 @@ public class EntityState implements Listener {
     public void entityLoad(EntitiesLoadEvent event) {
         for (Entity entity : event.getEntities()) {
             createEntityDataMap(entity);
+            createWolfDataMap(entity);
         }
     }
 
@@ -60,17 +64,40 @@ public class EntityState implements Listener {
     }
 
     /**
+     * Handles the EntityTameEvent, creating a new instance of WolfData for the tamed wolf.
+     *
+     * @param event the event
+     */
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void animalTamed(EntityTameEvent event) {
+        Entity entity = event.getEntity();
+
+        if (entity instanceof Wolf) {
+            AnimalTamer animalTamer = event.getOwner();
+
+            WolfData wolfData = new WolfData();
+            wolfData.setTamed(true);
+            wolfData.setOwnerUniqueId(animalTamer.getUniqueId());
+
+            this.cacheManager.updateWolfDataInCache(entity.getEntityId(), wolfData);
+        }
+    }
+
+    /**
      * Handles the EntityDeathEvent, removing the died entity from the entityDataMap.
      *
      * @param event the event
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void entityDeath(EntityDeathEvent event) {
-        if (event.getEntity() instanceof Player) {
+        Entity entity = event.getEntity();
+
+        if (entity instanceof Player) {
             return;
         }
 
         cacheManager.removeEntityFromCache(event.getEntity().getEntityId());
+        removeWolfDataMap(entity);
     }
 
     /**
@@ -81,9 +108,11 @@ public class EntityState implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void entityUnload(EntitiesUnloadEvent event) {
         List<Entity> entityList = event.getEntities();
+
         for (Entity entity : entityList) {
             if (entity instanceof LivingEntity) {
                 cacheManager.removeEntityFromCache(entity.getEntityId());
+                removeWolfDataMap(entity);
             }
         }
     }
@@ -109,5 +138,31 @@ public class EntityState implements Listener {
         }
 
         this.cacheManager.addEntityToCache(entity);
+    }
+
+    /**
+     * Create a map of WolfData instances.
+     *
+     * @param entity the entity for which the map to be created
+     */
+    private void createWolfDataMap(Entity entity) {
+        if (!(entity instanceof Wolf)) {
+            return;
+        }
+
+        this.cacheManager.addWolfDataToCache(entity.getEntityId(), (Wolf) entity);
+    }
+
+    /**
+     * Remove a map of WolfData instances.
+     *
+     * @param entity the entity for which the map to be removed
+     */
+    private void removeWolfDataMap(Entity entity) {
+        if (!(entity instanceof Wolf)) {
+            return;
+        }
+
+        this.cacheManager.removeWolfDataFromCache(entity.getEntityId());
     }
 }
