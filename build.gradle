@@ -46,7 +46,7 @@ tasks {
 
     runServer {
         // The version of the server to run
-        def version = "1.8.8"
+        def version = "1.20.4"
 
         minecraftVersion(version)
         runDirectory.set(file("server/$version"))
@@ -55,7 +55,7 @@ tasks {
         // 1.17           = Java 16
         // 1.18 - 1.20.4  = Java 17
         javaLauncher.set(project.javaToolchains.launcherFor {
-            languageVersion.set(JavaLanguageVersion.of(8))
+            languageVersion.set(JavaLanguageVersion.of(17))
         })
 
         downloadPlugins {
