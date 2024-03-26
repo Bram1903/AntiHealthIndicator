@@ -45,7 +45,17 @@ public class CacheManager {
     }
 
     public void addWolfDataToCache(Integer entityId, Wolf wolf) {
-        wolfData.computeIfAbsent(entityId, key -> createWolfData(wolf));
+        wolfData.computeIfAbsent(entityId, key -> {
+            WolfData wolfData = new WolfData();
+
+            wolfData.setTamed(wolf.isTamed());
+
+            if (wolf.isTamed() && wolf.getOwner() != null) {
+                wolfData.setOwnerUniqueId(wolf.getOwner().getUniqueId());
+            }
+
+            return wolfData;
+        });
     }
 
     public Entity getEntityFromCache(int entityId) {
@@ -78,17 +88,5 @@ public class CacheManager {
 
     public void removeVehicle(UUID playerUniqueId) {
         vehicles.remove(playerUniqueId);
-    }
-
-    private WolfData createWolfData(Wolf wolf) {
-        WolfData wolfData = new WolfData();
-
-        wolfData.setTamed(wolf.isTamed());
-
-        if (wolf.isTamed() && wolf.getOwner() != null) {
-            wolfData.setOwnerUniqueId(wolf.getOwner().getUniqueId());
-        }
-
-        return wolfData;
     }
 }

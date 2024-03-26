@@ -23,6 +23,13 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
 
     private final boolean useEntityCache;
     private final boolean healthTexturesSupported;
+    private final boolean allowBypassEnabled;
+    private final boolean ignoreVehiclesEnabled;
+    private final boolean ignoreWolvesEnabled;
+    private final boolean ignoreTamedWolves;
+    private final boolean ignoreOwnedWolves;
+    private final boolean ignoreIronGolemsEnabled;
+    private final boolean gradualIronGolemHealthEnabled;
 
     public EntityListenerAbstract(AntiHealthIndicator plugin) {
         cacheManager = plugin.getCacheManager();
@@ -30,6 +37,13 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
 
         useEntityCache = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18);
         healthTexturesSupported = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_15);
+        allowBypassEnabled = configManager.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
+        ignoreVehiclesEnabled = configManager.getConfigurationOption(ConfigOption.IGNORE_VEHICLES_ENABLED);
+        ignoreWolvesEnabled = configManager.getConfigurationOption(ConfigOption.IGNORE_WOLVES_ENABLED);
+        ignoreTamedWolves = configManager.getConfigurationOption(ConfigOption.FOR_TAMED_WOLVES_ENABLED);
+        ignoreOwnedWolves = configManager.getConfigurationOption(ConfigOption.FOR_OWNED_WOLVES_ENABLED);
+        ignoreIronGolemsEnabled = configManager.getConfigurationOption(ConfigOption.IGNORE_IRON_GOLEMS_ENABLED);
+        gradualIronGolemHealthEnabled = configManager.getConfigurationOption(ConfigOption.GRADUAL_IRON_GOLEM_HEALTH_ENABLED);
     }
 
     @Override
@@ -54,11 +68,11 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
     protected void handlePacket(Player player, int packetEntityId, List<EntityData> entityMetadata) {
         if (player.getEntityId() == packetEntityId) return;
 
-        if (configManager.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED)) {
+        if (allowBypassEnabled) {
             if (player.hasPermission("AntiHealthIndicator.Bypass")) return;
         }
 
-        if (configManager.getConfigurationOption(ConfigOption.IGNORE_VEHICLES_ENABLED)) {
+        if (ignoreVehiclesEnabled) {
             if (cacheManager.isPlayerVehicleInCache(player.getUniqueId(), packetEntityId)) return;
         }
 
@@ -69,12 +83,12 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
             return;
         }
 
-        if (entity instanceof Wolf && configManager.getConfigurationOption(ConfigOption.IGNORE_WOLVES_ENABLED)) {
+        if (entity instanceof Wolf && ignoreWolvesEnabled) {
             if (shouldIgnoreWolf(player, (Wolf) entity)) return;
         }
 
-        if (entity instanceof IronGolem && configManager.getConfigurationOption(ConfigOption.IGNORE_IRON_GOLEMS_ENABLED)) {
-            if (!configManager.getConfigurationOption(ConfigOption.GRADUAL_IRON_GOLEM_HEALTH_ENABLED)) return;
+        if (entity instanceof IronGolem && ignoreIronGolemsEnabled) {
+            if (!gradualIronGolemHealthEnabled) return;
             if (!healthTexturesSupported) return;
 
             entityMetadata.forEach(this::spoofIronGolemMetadata);
@@ -111,54 +125,42 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
     }
 
     /**
-     * This method checks if a Wolf should be ignored based on taming and ownership.
+     * Determines if a wolf should be ignored based on the player and wolf metadata.
+     * The method first checks whether ignoring tamed and owned wolves is enabled
+     * in the configuration.
+     * If both are disabled, all wolves are ignored.
+     * Then, it checks whether the entity cache is being used.
+     * If so, and if the wolf data found in the cache is not null,
+     * the method applies the same rules as before but based on the cached data.
+     * If not, or if the wolf data is null, it applies the same rules based on the actual wolf entity data.
      *
-     * @param player The Player for whom the check is being made.
-     * @param wolf   The Wolf that is being checked.
-     * @return boolean Returns true if the Wolf should be ignored, false otherwise.
-     * <p>
-     * Rules:
-     * 1. If the config options `FOR_TAMED_WOLVES_ENABLED` and
-     * `FOR_OWNED_WOLVES_ENABLED` are both set to false, the method will return true.
-     * 2. If the config option `FOR_TAMED_WOLVES_ENABLED` is true,
-     * and the Wolf is tamed, the method will return true.
-     * 3. If the config option `FOR_OWNED_WOLVES_ENABLED` is true,
-     * the method will return true only if the Wolf is tamed,
-     * has an owner, and the owner's UUID matches the Player's UUID.
+     * @param player The player entity to check the ownership of the wolf against.
+     * @param wolf   The wolf entity to check if it should be ignored.
+     * @return true, if the wolf should be ignored, otherwise false.
      */
     private boolean shouldIgnoreWolf(Player player, Wolf wolf) {
-        boolean ignoreTamedWolves = configManager.getConfigurationOption(ConfigOption.FOR_TAMED_WOLVES_ENABLED);
-        boolean ignoreOwnedWolves = configManager.getConfigurationOption(ConfigOption.FOR_OWNED_WOLVES_ENABLED);
+        boolean isTamed;
+        UUID ownerUniqueId;
 
         if (!ignoreTamedWolves && !ignoreOwnedWolves) {
             return true;
         }
 
-        boolean isTamed;
-        UUID ownerUniqueId = null;
-
         if (useEntityCache) {
             WolfData wolfData = cacheManager.getWolfDataFromCache(wolf.getEntityId());
-            if (wolfData == null) return false;
-
-            isTamed = wolfData.isTamed();
-            ownerUniqueId = wolfData.getOwnerUniqueId();
+            if (wolfData != null) {
+                isTamed = wolfData.isTamed();
+                ownerUniqueId = wolfData.getOwnerUniqueId();
+            } else {
+                return false;
+            }
         } else {
             isTamed = wolf.isTamed();
-            if (wolf.getOwner() != null) {
-                ownerUniqueId = wolf.getOwner().getUniqueId();
-            }
+            ownerUniqueId = wolf.getOwner() != null ? wolf.getOwner().getUniqueId() : null;
         }
 
-        if (ignoreTamedWolves && isTamed) {
-            return true;
-        }
-
-        if (ignoreOwnedWolves) {
-            return isTamed && ownerUniqueId != null && ownerUniqueId.equals(player.getUniqueId());
-        }
-
-        return false;
+        return (ignoreTamedWolves && isTamed) || (ignoreOwnedWolves && isTamed && ownerUniqueId != null
+                && ownerUniqueId.equals(player.getUniqueId()));
     }
 
     /**
