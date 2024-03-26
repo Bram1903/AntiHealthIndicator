@@ -64,21 +64,43 @@ Players that are OP (Operators) have these permissions by default.
 
 5. You're good to go!
 
+Certainly, here's a more professional version of the "Compiling Jar From Source" section:
+
 ## Compiling Jar From Source
 
-> Prerequisites
+### Prerequisites
 
-- Java 1.8 or higher
-- Gradle
+- Java Development Kit (JDK) version 8 or higher
 
-To compile the jar from source, run the following command in the directory of your project root (i.e., where the
-build.gradle file resides).
+### Steps:
 
-```bash
-gradle build
-```
+1. **Clone the Repository**:
+   Clone the repository containing the AntiHealthIndicator source code to your local machine using Git:
+   ```bash
+   git clone https://github.com/Bram1903/AntiHealthIndicator.git
+   ```
 
-The produced jar can be located in the /build/libs/ directory within your project root.
+2. **Navigate to Project Directory**:
+   Change your current directory to the root directory of the cloned project:
+   ```bash
+   cd AntiHealthIndicator
+   ```
+
+3. **Compile the Source Code**:
+   Use Gradle to compile the source code and generate the jar file:
+   ```bash
+   ./gradlew build
+   ```
+   or for Windows CMD:
+   ```cmd
+   .\gradlew build
+   ```
+
+4. **Locate the Jar File**:
+   Upon successful compilation,
+   the generated jar file can be found in the `build/libs/` directory within the project root.
+
+By following these steps, you will compile the AntiHealthIndicator plugin from its source code.
 
 ## Credits
 
