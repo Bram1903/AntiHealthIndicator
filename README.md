@@ -64,8 +64,6 @@ Players that are OP (Operators) have these permissions by default.
 
 5. You're good to go!
 
-Certainly, here's a more professional version of the "Compiling Jar From Source" section:
-
 ## Compiling Jar From Source
 
 ### Prerequisites
