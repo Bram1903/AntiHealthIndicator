@@ -2,7 +2,6 @@ package com.deathmotion.antihealthindicator.packetlisteners;
 
 import com.deathmotion.antihealthindicator.AntiHealthIndicator;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
-import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
@@ -20,9 +19,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class EntityEquipmentListener extends PacketListenerAbstract {
-    private final ConfigManager configManager;
-
     private final boolean useDamageableInterface;
+    private final boolean bypassPermissionEnabled;
+    private final boolean spoofStackAmount;
+    private final boolean spoofDurability;
+    private final boolean spoofEnchantments;
 
     /**
      * The enchantment list to spoof the item with
@@ -33,8 +34,11 @@ public class EntityEquipmentListener extends PacketListenerAbstract {
             .build());
 
     public EntityEquipmentListener(AntiHealthIndicator plugin) {
-        this.configManager = plugin.getConfigManager();
         this.useDamageableInterface = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13);
+        this.bypassPermissionEnabled = plugin.getConfigManager().getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
+        this.spoofStackAmount = plugin.getConfigManager().getConfigurationOption(ConfigOption.STACK_AMOUNT_ENABLED);
+        this.spoofDurability = plugin.getConfigManager().getConfigurationOption(ConfigOption.DURABILITY_ENABLED);
+        this.spoofEnchantments = plugin.getConfigManager().getConfigurationOption(ConfigOption.ENCHANTMENTS_ENABLED);
     }
 
     /**
@@ -48,7 +52,7 @@ public class EntityEquipmentListener extends PacketListenerAbstract {
             WrapperPlayServerEntityEquipment packet = new WrapperPlayServerEntityEquipment(event);
             Player player = (Player) event.getPlayer();
 
-            if (configManager.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED)) {
+            if (bypassPermissionEnabled) {
                 if (player.hasPermission("AntiHealthIndicator.Bypass")) return;
             }
 
@@ -57,14 +61,7 @@ public class EntityEquipmentListener extends PacketListenerAbstract {
                 return;
             }
 
-            if (configManager.getConfigurationOption(ConfigOption.STACK_AMOUNT_ENABLED))
-                spoofItemStackAmount(equipmentList);
-
-            if (configManager.getConfigurationOption(ConfigOption.DURABILITY_ENABLED))
-                spoofItemStackDurability(equipmentList);
-
-            if (configManager.getConfigurationOption(ConfigOption.ENCHANTMENTS_ENABLED))
-                spoofEnchantment(packet.getClientVersion(), equipmentList);
+            equipmentList.forEach(equipment -> handleEquipment(equipment, packet.getClientVersion()));
 
             packet.setEquipment(equipmentList);
             event.markForReEncode(true);
@@ -72,56 +69,38 @@ public class EntityEquipmentListener extends PacketListenerAbstract {
     }
 
     /**
-     * Spoof the amount of the item to 1
+     * Handles the modification of an equipment item as per configurations.
+     * If the spoofStackAmount is enabled and the item amount exceeds 1, the item amount is set to 1.
+     * If the spoofDurability is enabled and the item is damageable,
+     * the damage value on the item is set to 0 for non-legacy items
+     * and the legacy data on the item is set to 0 for legacy items.
+     * If the spoofEnchantments are enabled and the item is enchanted,
+     * the enchantments on the item are set to enchantmentList.
      *
-     * @param equipmentList the list of equipment
+     * @param equipment     a single piece of equipment
+     * @param clientVersion the player's client version
      */
-    private void spoofItemStackAmount(List<Equipment> equipmentList) {
-        equipmentList.forEach(equipment -> {
-            ItemStack itemStack = equipment.getItem();
+    private void handleEquipment(Equipment equipment, ClientVersion clientVersion) {
+        ItemStack itemStack = equipment.getItem();
+        if (itemStack == null) return;
 
-            if (itemStack.getAmount() > 1) {
-                itemStack.setAmount(1);
-                equipment.setItem(itemStack);
+        if (spoofStackAmount && itemStack.getAmount() > 1) {
+            itemStack.setAmount(1);
+            equipment.setItem(itemStack);
+        }
+
+        if (spoofDurability && itemStack.isDamageableItem()) {
+            if (useDamageableInterface) {
+                itemStack.setDamageValue(0);
+            } else {
+                itemStack.setLegacyData((short) 0);
             }
-        });
-    }
+            equipment.setItem(itemStack);
+        }
 
-    /**
-     * Spoof the durability items to appear as if they are new
-     *
-     * @param equipmentList the list of equipment
-     */
-    private void spoofItemStackDurability(List<Equipment> equipmentList) {
-        equipmentList.forEach(equipment -> {
-            ItemStack itemStack = equipment.getItem();
-
-            if (itemStack.isDamageableItem()) {
-                if (useDamageableInterface) {
-                    itemStack.setDamageValue(0);
-                } else {
-                    itemStack.setLegacyData((short) 0);
-                }
-
-                equipment.setItem(itemStack);
-            }
-        });
-    }
-
-    /**
-     * Spoof the enchantment level of the item to Fortune III (Xbox 360 Reference)
-     *
-     * @param clientVersion the player client version
-     * @param equipmentList the list of equipment
-     */
-    private void spoofEnchantment(ClientVersion clientVersion, List<Equipment> equipmentList) {
-        equipmentList.forEach(equipment -> {
-            ItemStack itemStack = equipment.getItem();
-
-            if (itemStack.isEnchanted(clientVersion)) {
-                itemStack.setEnchantments(enchantmentList, clientVersion);
-                equipment.setItem(itemStack);
-            }
-        });
+        if (spoofEnchantments && itemStack.isEnchanted(clientVersion)) {
+            itemStack.setEnchantments(enchantmentList, clientVersion);
+            equipment.setItem(itemStack);
+        }
     }
 }
