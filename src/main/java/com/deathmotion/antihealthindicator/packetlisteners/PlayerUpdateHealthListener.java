@@ -28,6 +28,7 @@ public class PlayerUpdateHealthListener extends PacketListenerAbstract {
 
             if (packet.getFoodSaturation() > 0) {
                 packet.setFoodSaturation(Float.NaN);
+                event.markForReEncode(true);
             }
         }
     }
