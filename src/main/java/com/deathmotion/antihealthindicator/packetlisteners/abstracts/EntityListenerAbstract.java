@@ -88,8 +88,10 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
         }
 
         if (entity instanceof IronGolem && ignoreIronGolemsEnabled) {
-            if (!gradualIronGolemHealthEnabled) return;
-            if (!healthTexturesSupported) return;
+            if (!gradualIronGolemHealthEnabled || !healthTexturesSupported) {
+                entityMetadata.forEach(this::spoofLivingEntityMetadata);
+                return;
+            }
 
             entityMetadata.forEach(this::spoofIronGolemMetadata);
             return;
