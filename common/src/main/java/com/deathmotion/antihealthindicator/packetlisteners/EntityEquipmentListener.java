@@ -1,6 +1,6 @@
 package com.deathmotion.antihealthindicator.packetlisteners;
 
-import com.deathmotion.antihealthindicator.AntiHealthIndicator;
+import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
@@ -13,12 +13,13 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
-import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
 
-public class EntityEquipmentListener extends PacketListenerAbstract {
+public class EntityEquipmentListener<P, S> extends PacketListenerAbstract {
+    private final AHIPlatform<P, S> platform;
+
     private final boolean useDamageableInterface;
     private final boolean bypassPermissionEnabled;
     private final boolean spoofStackAmount;
@@ -33,12 +34,14 @@ public class EntityEquipmentListener extends PacketListenerAbstract {
             .level(3)
             .build());
 
-    public EntityEquipmentListener(AntiHealthIndicator plugin) {
+    public EntityEquipmentListener(AHIPlatform<P, S> platform) {
+        this.platform = platform;
+
         this.useDamageableInterface = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13);
-        this.bypassPermissionEnabled = plugin.getConfigManager().getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
-        this.spoofStackAmount = plugin.getConfigManager().getConfigurationOption(ConfigOption.STACK_AMOUNT_ENABLED);
-        this.spoofDurability = plugin.getConfigManager().getConfigurationOption(ConfigOption.DURABILITY_ENABLED);
-        this.spoofEnchantments = plugin.getConfigManager().getConfigurationOption(ConfigOption.ENCHANTMENTS_ENABLED);
+        this.bypassPermissionEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
+        this.spoofStackAmount = platform.getConfigurationOption(ConfigOption.STACK_AMOUNT_ENABLED);
+        this.spoofDurability = platform.getConfigurationOption(ConfigOption.DURABILITY_ENABLED);
+        this.spoofEnchantments = platform.getConfigurationOption(ConfigOption.ENCHANTMENTS_ENABLED);
     }
 
     /**
@@ -53,7 +56,7 @@ public class EntityEquipmentListener extends PacketListenerAbstract {
             Player player = (Player) event.getPlayer();
 
             if (bypassPermissionEnabled) {
-                if (player.hasPermission("AntiHealthIndicator.Bypass")) return;
+                if (this.platform.hasPermission(?, "AntiHealthIndicator.Bypass"))
             }
 
             List<Equipment> equipmentList = packet.getEquipment();

@@ -1,20 +1,33 @@
 package com.deathmotion.antihealthindicator;
 
-/**
- * Represents a platform for the AntiHealthIndicator plugin.
- * @param <P> The platform type, for example, Bukkit its type is JavaPlugin.
- * @param <S> The sender type, for example, Bukkit its type is CommandSender.
- */
-public interface AHIPlatform<P, S> {
+public abstract class AHIPlatform<P, S> implements IAHIPlatform<P, S> {
 
-    boolean hasPermission(S sender, String permission);
+    protected final P platform;
 
-    P getPlatform();
+    protected AHIPlatform(P platform) {
+        this.platform = platform;
+    }
 
-    void onLoad();
+    @Override
+    public P getPlatform() {
+        return this.platform;
+    }
 
-    void onEnable();
+    @Override
+    public void onLoad() {
+        // Default implementation can be empty or you may place any logic that is common across all platforms.
+    }
 
-    void onDisable();
+    @Override
+    public void onEnable() {
+        // Default implementation can be empty or you may place any logic that is common across all platforms.
+    }
 
+    @Override
+    public void onDisable() {
+        // Default implementation can be empty or you may place any logic that is common across all platforms.
+    }
+
+    @Override
+    public abstract boolean hasPermission(S sender, String permission);
 }

@@ -1,14 +1,7 @@
 package com.deathmotion.antihealthindicator.managers;
 
-import com.deathmotion.antihealthindicator.AntiHealthIndicator;
 import com.deathmotion.antihealthindicator.data.WolfData;
-import io.github.retrooper.packetevents.util.FoliaCompatUtil;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Wolf;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;

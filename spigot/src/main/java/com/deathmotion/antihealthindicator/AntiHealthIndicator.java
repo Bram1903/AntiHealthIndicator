@@ -1,23 +1,39 @@
 package com.deathmotion.antihealthindicator;
 
-import com.deathmotion.antihealthindicator.managers.CacheManager;
+import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
-import com.deathmotion.antihealthindicator.managers.PacketManager;
-import com.deathmotion.antihealthindicator.managers.UpdateManager;
 import com.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
-public class AntiHealthIndicator extends JavaPlugin {
+public class AntiHealthIndicator implements IAHIPlatform<JavaPlugin, CommandSender> {
+
+    private final JavaPlugin plugin;
+
+    public AntiHealthIndicator(JavaPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Getter
     private ConfigManager configManager;
-    private CacheManager cacheManager;
-    private BukkitAudiences adventure;
+
+    @Override
+    public boolean hasPermission(CommandSender sender, String permission) {
+        return sender.hasPermission(permission);
+    }
+
+    @Override
+    public boolean getConfigurationOption(ConfigOption option) {
+        return this.configManager.getConfigurationOption(option);
+    }
+
+    @Override
+    public JavaPlugin getPlatform() {
+        return this.plugin;
+    }
 
     @Override
     public void onLoad() {
@@ -32,27 +48,20 @@ public class AntiHealthIndicator extends JavaPlugin {
     @Override
     public void onEnable() {
         configManager = new ConfigManager(this);
-        cacheManager = new CacheManager(this);
-        adventure = BukkitAudiences.create(this);
-
-        new UpdateManager(this);
-        new PacketManager(this);
-
         enableBStats();
     }
 
     @Override
     public void onDisable() {
         PacketEvents.getAPI().terminate();
-        adventure.close();
-        getLogger().info("Plugin has been uninitialized!");
+        this.plugin.getLogger().info("Plugin has been uninitialized!");
     }
 
     private void enableBStats() {
         try {
-            new Metrics(this, 20803);
+            new Metrics(this.plugin, 20803);
         } catch (Exception e) {
-            getLogger().warning("Something went wrong while enabling bStats.\n" + e.getMessage());
+            this.plugin.getLogger().warning("Something went wrong while enabling bStats.\n" + e.getMessage());
         }
     }
 }

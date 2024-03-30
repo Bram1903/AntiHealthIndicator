@@ -5,7 +5,6 @@ import com.deathmotion.antihealthindicator.packetlisteners.*;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.events.EntityState;
 import com.deathmotion.antihealthindicator.events.VehicleState;
-import com.deathmotion.antihealthindicator.packetlisteners.*;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 
