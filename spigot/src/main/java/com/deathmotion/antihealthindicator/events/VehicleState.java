@@ -1,9 +1,9 @@
 package com.deathmotion.antihealthindicator.events;
 
-import com.deathmotion.antihealthindicator.AntiHealthIndicator;
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
+import com.deathmotion.antihealthindicator.AntiHealthIndicator;
+import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;

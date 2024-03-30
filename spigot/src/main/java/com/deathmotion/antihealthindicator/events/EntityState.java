@@ -1,8 +1,8 @@
 package com.deathmotion.antihealthindicator.events;
 
+import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.AntiHealthIndicator;
 import com.deathmotion.antihealthindicator.data.WolfData;
-import com.deathmotion.antihealthindicator.managers.CacheManager;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
