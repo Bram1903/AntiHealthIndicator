@@ -36,7 +36,7 @@ public class PacketManager<P> {
             boolean ignoreVehicles = platform.getConfigurationOption(ConfigOption.IGNORE_VEHICLES_ENABLED);
 
             if (spoofHealth && ignoreVehicles) {
-                // TODO: Add a check if players should see the health of vehicles
+                // TODO: Add a check listener that keeps track of the entities that are riding vehicles
             }
 
             if (platform.getConfigurationOption(ConfigOption.ITEMS_ENABLED)) {
