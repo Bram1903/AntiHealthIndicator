@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class EntityData {
+public class EntityDataStore {
     public EntityType entityType;
 
     public boolean isTamed;

@@ -39,7 +39,7 @@ public class PacketManager<P> {
             boolean ignoreVehicles = platform.getConfigurationOption(ConfigOption.IGNORE_VEHICLES_ENABLED);
 
             if (spoofHealth && ignoreVehicles) {
-                this.plugin.getServer().getPluginManager().registerEvents(new VehicleState(this.plugin), this.plugin);
+                // TODO: Add a check if players should see the health of vehicles
             }
 
             if (platform.getConfigurationOption(ConfigOption.ITEMS_ENABLED)) {
@@ -62,6 +62,6 @@ public class PacketManager<P> {
 
     private void setupEntityCache() {
         PacketEvents.getAPI().getEventManager().registerListener(new EntityState<>(this.platform));
-        this.plugin.getCacheManager().cacheLivingEntityData();
+        //this.plugin.getCacheManager().cacheLivingEntityData();
     }
 }
