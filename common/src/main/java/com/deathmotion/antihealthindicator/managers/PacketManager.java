@@ -25,10 +25,7 @@ public class PacketManager<P> {
 
     private void setupEntityListeners() {
         if (platform.getConfigurationOption(ConfigOption.ENTITY_DATA_ENABLED)) {
-            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
-                setupEntityCache();
-            }
-
+            PacketEvents.getAPI().getEventManager().registerListener(new EntityState<>(this.platform));
             PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener<>(this.platform));
 
             if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_15)) {
@@ -58,10 +55,5 @@ public class PacketManager<P> {
         if (platform.getConfigurationOption(ConfigOption.ENCHANTMENTS_ENABLED)) {
             PacketEvents.getAPI().getEventManager().registerListener(new WindowItemsListener<>(this.platform));
         }
-    }
-
-    private void setupEntityCache() {
-        PacketEvents.getAPI().getEventManager().registerListener(new EntityState<>(this.platform));
-        //this.plugin.getCacheManager().cacheLivingEntityData();
     }
 }
