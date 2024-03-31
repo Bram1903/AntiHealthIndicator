@@ -44,16 +44,13 @@ public class AntiHealthIndicator extends AHIPlatform<JavaPlugin> {
     public void onEnable() {
         super.commonOnEnable();
 
-        configManager = new ConfigManager(this);
+        configManager = new ConfigManager(this.plugin);
         enableBStats();
     }
 
     @Override
     public void onDisable() {
         super.commonOnDisable();
-
-        PacketEvents.getAPI().terminate();
-        this.plugin.getLogger().info("Plugin has been uninitialized!");
     }
 
     @Override

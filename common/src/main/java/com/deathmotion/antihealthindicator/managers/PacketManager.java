@@ -1,11 +1,9 @@
 package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.AntiHealthIndicator;
-import com.deathmotion.antihealthindicator.packetlisteners.*;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
-import com.deathmotion.antihealthindicator.events.EntityState;
-import com.deathmotion.antihealthindicator.events.VehicleState;
+import com.deathmotion.antihealthindicator.packetlisteners.EntityState;
+import com.deathmotion.antihealthindicator.packetlisteners.spoofers.*;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 
@@ -39,6 +37,7 @@ public class PacketManager<P> {
 
             boolean spoofHealth = platform.getConfigurationOption(ConfigOption.HEALTH_ENABLED);
             boolean ignoreVehicles = platform.getConfigurationOption(ConfigOption.IGNORE_VEHICLES_ENABLED);
+
             if (spoofHealth && ignoreVehicles) {
                 this.plugin.getServer().getPluginManager().registerEvents(new VehicleState(this.plugin), this.plugin);
             }
@@ -62,7 +61,7 @@ public class PacketManager<P> {
     }
 
     private void setupEntityCache() {
-        this.plugin.getServer().getPluginManager().registerEvents(new EntityState(this.plugin), this.plugin);
+        PacketEvents.getAPI().getEventManager().registerListener(new EntityState<>(this.platform));
         this.plugin.getCacheManager().cacheLivingEntityData();
     }
 }

@@ -1,7 +1,7 @@
-package com.deathmotion.antihealthindicator.packetlisteners;
+package com.deathmotion.antihealthindicator.packetlisteners.spoofers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.packetlisteners.abstracts.EntityListenerAbstract;
+import com.deathmotion.antihealthindicator.packetlisteners.spoofers.abstracts.EntityListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;

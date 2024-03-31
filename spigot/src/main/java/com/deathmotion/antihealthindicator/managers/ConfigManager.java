@@ -1,16 +1,16 @@
 package com.deathmotion.antihealthindicator.managers;
 
-import com.deathmotion.antihealthindicator.AntiHealthIndicator;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.EnumMap;
 import java.util.Map;
 
 public class ConfigManager {
-    private final AntiHealthIndicator plugin;
+    private final JavaPlugin plugin;
     private final Map<ConfigOption, Object> configurationOptions = new EnumMap<>(ConfigOption.class);
 
-    public ConfigManager(AntiHealthIndicator plugin) {
+    public ConfigManager(JavaPlugin plugin) {
         this.plugin = plugin;
 
         saveDefaultConfiguration();

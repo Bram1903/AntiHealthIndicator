@@ -1,4 +1,4 @@
-package com.deathmotion.antihealthindicator.packetlisteners;
+package com.deathmotion.antihealthindicator.packetlisteners.spoofers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;

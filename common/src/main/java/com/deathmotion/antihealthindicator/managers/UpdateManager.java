@@ -1,8 +1,12 @@
 package com.deathmotion.antihealthindicator.managers;
 
+import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.AntiHealthIndicator;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.events.UpdateNotifier;
+import com.deathmotion.antihealthindicator.packetlisteners.PlayerJoin;
+import com.deathmotion.antihealthindicator.packetlisteners.spoofers.EntityMetadataListener;
+import com.github.retrooper.packetevents.PacketEvents;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.retrooper.packetevents.util.FoliaCompatUtil;
@@ -15,16 +19,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UpdateManager {
+public class UpdateManager<P> {
     private final static String GITHUB_API_URL = "https://api.github.com/repos/Bram1903/AntiHealthIndicator/releases/latest";
     private final static String GITHUB_RELEASES_URL = "https://github.com/Bram1903/AntiHealthIndicator/releases/latest";
 
-    private final AntiHealthIndicator plugin;
-    private final ConfigManager configManager;
+    private final AHIPlatform<P> platform;
 
-    public UpdateManager(AntiHealthIndicator plugin) {
-        this.plugin = plugin;
-        this.configManager = plugin.getConfigManager();
+    public UpdateManager(AHIPlatform<P> platform) {
+        this.platform = platform;
 
         initializeUpdateCheck();
     }
@@ -36,15 +38,15 @@ public class UpdateManager {
     }
 
     private boolean isUpdateCheckerEnabled() {
-        return configManager.getConfigurationOption(ConfigOption.UPDATE_CHECKER_ENABLED);
+        return platform.getConfigurationOption(ConfigOption.UPDATE_CHECKER_ENABLED);
     }
 
     private boolean shouldPrintUpdateToConsole() {
-        return configManager.getConfigurationOption(ConfigOption.UPDATE_CHECKER_PRINT_TO_CONSOLE);
+        return platform.getConfigurationOption(ConfigOption.UPDATE_CHECKER_PRINT_TO_CONSOLE);
     }
 
     private boolean shouldNotifyInGame() {
-        return configManager.getConfigurationOption(ConfigOption.NOTIFY_IN_GAME);
+        return platform.getConfigurationOption(ConfigOption.NOTIFY_IN_GAME);
     }
 
     public void checkForUpdate(boolean printToConsole) {
@@ -115,7 +117,7 @@ public class UpdateManager {
 
         if (shouldNotifyInGame()) {
             FoliaCompatUtil.runTask(this.plugin, (Object unused) -> {
-                plugin.getServer().getPluginManager().registerEvents(new UpdateNotifier(this.plugin, formattedVersion), this.plugin);
+                PacketEvents.getAPI().getEventManager().registerListener(new PlayerJoin<>(this.platform));
             });
         }
     }

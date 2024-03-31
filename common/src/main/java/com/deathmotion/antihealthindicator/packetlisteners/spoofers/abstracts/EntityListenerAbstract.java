@@ -1,7 +1,6 @@
-package com.deathmotion.antihealthindicator.packetlisteners.abstracts;
+package com.deathmotion.antihealthindicator.packetlisteners.spoofers.abstracts;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.data.WolfData;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
