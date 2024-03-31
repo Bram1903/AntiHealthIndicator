@@ -29,9 +29,9 @@ public class WindowItemsListener<P> extends PacketListenerAbstract {
 
             WrapperPlayServerWindowItems wrapper = new WrapperPlayServerWindowItems(event);
 
-            // TODO: Tofaa, would this be a spigot only check?
-            if (user.getOpenInventory().getType().equals(InventoryType.ENCHANTING) && wrapper.getStateId() == 3)
-                event.setCancelled(true);
+            // TODO: I have no idea how I can fix this platform independent
+            //if (user.getOpenInventory().getType().equals(InventoryType.ENCHANTING) && wrapper.getStateId() == 3)
+            //event.setCancelled(true);
         }
     }
 }

@@ -10,9 +10,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRe
 
 public class WorldSeedListener<P> extends PacketListenerAbstract {
 
-    private final AHIPlatform<P> platform;
-
     protected final boolean bypassPermissionEnabled;
+    private final AHIPlatform<P> platform;
 
     public WorldSeedListener(AHIPlatform<P> platform) {
         this.platform = platform;

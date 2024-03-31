@@ -66,6 +66,11 @@ public class AntiHealthIndicator extends AHIPlatform<JavaPlugin> {
         return this.configManager.getConfigurationOption(option);
     }
 
+    @Override
+    public String getPluginVersion() {
+        return this.plugin.getDescription().getVersion();
+    }
+
     private void enableBStats() {
         try {
             new Metrics(this.plugin, 20803);

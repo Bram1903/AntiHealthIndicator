@@ -37,4 +37,6 @@ public abstract class AHIPlatform<P> {
     public abstract boolean hasPermission(UUID sender, String permission);
 
     public abstract boolean getConfigurationOption(ConfigOption option);
+
+    public abstract String getPluginVersion();
 }

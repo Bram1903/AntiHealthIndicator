@@ -1,15 +1,11 @@
 package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.AntiHealthIndicator;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
-import com.deathmotion.antihealthindicator.events.UpdateNotifier;
 import com.deathmotion.antihealthindicator.packetlisteners.PlayerJoin;
-import com.deathmotion.antihealthindicator.packetlisteners.spoofers.EntityMetadataListener;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import io.github.retrooper.packetevents.util.FoliaCompatUtil;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -52,7 +48,7 @@ public class UpdateManager<P> {
     public void checkForUpdate(boolean printToConsole) {
         FoliaCompatUtil.runTaskAsync(this.plugin, () -> {
             try {
-                List<Integer> currentVersion = parseVersion(this.plugin.getDescription().getVersion());
+                List<Integer> currentVersion = parseVersion(this.platform.getPluginVersion());
                 List<Integer> latestVersion = getLatestGitHubVersion();
 
                 compareVersions(currentVersion, latestVersion, printToConsole);

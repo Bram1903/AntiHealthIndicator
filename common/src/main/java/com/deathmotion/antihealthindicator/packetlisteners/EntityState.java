@@ -9,6 +9,7 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
 
@@ -31,7 +32,11 @@ public class EntityState<P> extends PacketListenerAbstract {
             handleSpawnPlayer(new WrapperPlayServerSpawnEntity(event));
         }
 
-        if (PacketType.Play.Server.DESTROY_ENTITIES == event.getPacketType()) {
+        if (PacketType.Play.Server.ENTITY_METADATA == event.getPacketType()) {
+            handleEntityMetadata(new WrapperPlayServerEntityMetadata(event));
+        }
+
+        if (PacketType.Play.Server.ENTITY_METADATA == event.getPacketType()) {
             handleEntityDestroy(new WrapperPlayServerDestroyEntities(event));
         }
     }
@@ -65,7 +70,28 @@ public class EntityState<P> extends PacketListenerAbstract {
         this.cacheManager.addEntity(packet.getEntityId(), entityData);
     }
 
-    public void handleEntityDestroy(WrapperPlayServerDestroyEntities packet) {
+    private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet) {
+        int entityId = packet.getEntityId();
+        EntityDataStore entityData = this.cacheManager.getEntityDataById(entityId);
+
+        if (entityData == null) return;
+
+        EntityType entityType = entityData.getEntityType();
+
+        if (entityType == EntityTypes.WOLF) {
+            packet.getEntityMetadata().forEach(wolfEntityData -> {
+                if (wolfEntityData.getIndex() == 17) {
+                    entityData.setTamed(((Byte) wolfEntityData.getValue() & 0x04) != 0);
+                }
+
+                if (wolfEntityData.getIndex() == 18) {
+                    entityData.setOwnerUUID((UUID) wolfEntityData.getValue());
+                }
+            });
+        }
+    }
+
+    private void handleEntityDestroy(WrapperPlayServerDestroyEntities packet) {
         int[] entityIds = packet.getEntityIds();
 
         for (int entityId : entityIds) {
