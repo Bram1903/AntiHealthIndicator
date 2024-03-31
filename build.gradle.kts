@@ -37,8 +37,7 @@ allprojects {
             minimize()
             archiveFileName.set("${project.name}-${project.version}.jar")
 
-            relocate("io.github.retrooper.packetevents", "com.deathmotion.antihealthindicator.shaded.io.github.retrooper.packetevents")
-            relocate("com.github.retrooper.packetevents", "com.deathmotion.antihealthindicator.shaded.com.github.retrooper.packetevents")
+            relocate("net.kyori", "com.deathmotion.antihealthindicator.shaded.kyori")
             relocate("com.google.gson", "com.deathmotion.antihealthindicator.shaded.gson")
             relocate("org.bstats", "com.deathmotion.antihealthindicator")
         }
