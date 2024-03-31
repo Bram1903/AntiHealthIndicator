@@ -1,33 +1,36 @@
 package com.deathmotion.antihealthindicator.packetlisteners;
 
-import com.deathmotion.antihealthindicator.AntiHealthIndicator;
+import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
 
-public class WindowItemsListener extends PacketListenerAbstract {
+public class WindowItemsListener<P> extends PacketListenerAbstract {
+
     protected final boolean bypassPermissionEnabled;
+    private final AHIPlatform<P> platform;
 
-    public WindowItemsListener(AntiHealthIndicator plugin) {
-        this.bypassPermissionEnabled = plugin.getConfigManager().getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
+    public WindowItemsListener(AHIPlatform<P> platform) {
+        this.platform = platform;
+        this.bypassPermissionEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
     }
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() == PacketType.Play.Server.WINDOW_ITEMS) {
-            Player player = (Player) event.getPlayer();
+            User user = event.getUser();
 
             if (bypassPermissionEnabled) {
-                if (player.hasPermission("AntiHealthIndicator.Bypass")) return;
+                if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
             }
 
             WrapperPlayServerWindowItems wrapper = new WrapperPlayServerWindowItems(event);
 
-            if (player.getOpenInventory().getType().equals(InventoryType.ENCHANTING) && wrapper.getStateId() == 3)
+            // TODO: Tofaa, would this be a spigot only check?
+            if (user.getOpenInventory().getType().equals(InventoryType.ENCHANTING) && wrapper.getStateId() == 3)
                 event.setCancelled(true);
         }
     }

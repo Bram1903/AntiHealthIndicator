@@ -1,33 +1,19 @@
 package com.deathmotion.antihealthindicator;
 
-public abstract class AHIPlatform<P, S> implements IAHIPlatform<P, S> {
+import com.deathmotion.antihealthindicator.enums.ConfigOption;
 
-    protected final P platform;
+import java.util.UUID;
 
-    protected AHIPlatform(P platform) {
-        this.platform = platform;
-    }
+public abstract class AHIPlatform<P> extends CommonAHIPlatform {
+    public abstract P getPlatform();
 
-    @Override
-    public P getPlatform() {
-        return this.platform;
-    }
+    public abstract void onLoad();
 
-    @Override
-    public void onLoad() {
-        // Default implementation can be empty or you may place any logic that is common across all platforms.
-    }
+    public abstract void onEnable();
 
-    @Override
-    public void onEnable() {
-        // Default implementation can be empty or you may place any logic that is common across all platforms.
-    }
+    public abstract void onDisable();
 
-    @Override
-    public void onDisable() {
-        // Default implementation can be empty or you may place any logic that is common across all platforms.
-    }
+    public abstract boolean hasPermission(UUID sender, String permission);
 
-    @Override
-    public abstract boolean hasPermission(S sender, String permission);
+    public abstract boolean getConfigurationOption(ConfigOption option);
 }

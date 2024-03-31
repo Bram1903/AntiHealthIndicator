@@ -1,5 +1,6 @@
 package com.deathmotion.antihealthindicator.managers;
 
+import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.AntiHealthIndicator;
 import com.deathmotion.antihealthindicator.packetlisteners.*;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
@@ -8,13 +9,11 @@ import com.deathmotion.antihealthindicator.events.VehicleState;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 
-public class PacketManager {
-    private final AntiHealthIndicator plugin;
-    private final ConfigManager config;
+public class PacketManager<P> {
+    private final AHIPlatform<P> platform;
 
-    public PacketManager(AntiHealthIndicator plugin) {
-        this.plugin = plugin;
-        this.config = plugin.getConfigManager();
+    public PacketManager(AHIPlatform<P> platform) {
+        this.platform = platform;
 
         setupPacketListeners();
     }
@@ -27,38 +26,38 @@ public class PacketManager {
     }
 
     private void setupEntityListeners() {
-        if (config.getConfigurationOption(ConfigOption.ENTITY_DATA_ENABLED)) {
+        if (platform.getConfigurationOption(ConfigOption.ENTITY_DATA_ENABLED)) {
             if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
                 setupEntityCache();
             }
 
-            PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener(this.plugin));
+            PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener<>(this.platform));
 
             if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_15)) {
-                PacketEvents.getAPI().getEventManager().registerListener(new SpawnLivingEntityListener(this.plugin));
+                PacketEvents.getAPI().getEventManager().registerListener(new SpawnLivingEntityListener<>(this.platform));
             }
 
-            boolean spoofHealth = config.getConfigurationOption(ConfigOption.HEALTH_ENABLED);
-            boolean ignoreVehicles = config.getConfigurationOption(ConfigOption.IGNORE_VEHICLES_ENABLED);
+            boolean spoofHealth = platform.getConfigurationOption(ConfigOption.HEALTH_ENABLED);
+            boolean ignoreVehicles = platform.getConfigurationOption(ConfigOption.IGNORE_VEHICLES_ENABLED);
             if (spoofHealth && ignoreVehicles) {
                 this.plugin.getServer().getPluginManager().registerEvents(new VehicleState(this.plugin), this.plugin);
             }
 
-            if (config.getConfigurationOption(ConfigOption.ITEMS_ENABLED)) {
-                PacketEvents.getAPI().getEventManager().registerListener(new EntityEquipmentListener(this.plugin));
+            if (platform.getConfigurationOption(ConfigOption.ITEMS_ENABLED)) {
+                PacketEvents.getAPI().getEventManager().registerListener(new EntityEquipmentListener<>(this.platform));
             }
         }
     }
 
     private void setupAdditionalListeners() {
-        if (config.getConfigurationOption(ConfigOption.SPOOF_FOOD_SATURATION_ENABLED)) {
-            PacketEvents.getAPI().getEventManager().registerListener(new PlayerUpdateHealthListener(this.plugin));
+        if (platform.getConfigurationOption(ConfigOption.SPOOF_FOOD_SATURATION_ENABLED)) {
+            PacketEvents.getAPI().getEventManager().registerListener(new PlayerUpdateHealthListener<>(this.platform));
         }
-        if (config.getConfigurationOption(ConfigOption.SPOOF_WORLD_SEED_ENABLED)) {
-            PacketEvents.getAPI().getEventManager().registerListener(new WorldSeedListener(this.plugin));
+        if (platform.getConfigurationOption(ConfigOption.SPOOF_WORLD_SEED_ENABLED)) {
+            PacketEvents.getAPI().getEventManager().registerListener(new WorldSeedListener<>(this.platform));
         }
-        if (config.getConfigurationOption(ConfigOption.ENCHANTMENTS_ENABLED)) {
-            PacketEvents.getAPI().getEventManager().registerListener(new WindowItemsListener(this.plugin));
+        if (platform.getConfigurationOption(ConfigOption.ENCHANTMENTS_ENABLED)) {
+            PacketEvents.getAPI().getEventManager().registerListener(new WindowItemsListener<>(this.platform));
         }
     }
 

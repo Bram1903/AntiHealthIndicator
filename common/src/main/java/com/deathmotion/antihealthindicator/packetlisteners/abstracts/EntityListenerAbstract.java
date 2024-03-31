@@ -1,24 +1,22 @@
 package com.deathmotion.antihealthindicator.packetlisteners.abstracts;
 
-import com.deathmotion.antihealthindicator.AntiHealthIndicator;
-import com.deathmotion.antihealthindicator.managers.CacheManager;
-import com.deathmotion.antihealthindicator.managers.ConfigManager;
-import com.deathmotion.antihealthindicator.util.MetadataIndex;
+import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.WolfData;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import com.deathmotion.antihealthindicator.managers.CacheManager;
+import com.deathmotion.antihealthindicator.util.MetadataIndex;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
-import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
-import org.bukkit.entity.*;
+import com.github.retrooper.packetevents.protocol.player.User;
 
 import java.util.List;
 import java.util.UUID;
 
-public abstract class EntityListenerAbstract extends PacketListenerAbstract {
-    private final ConfigManager configManager;
+public abstract class EntityListenerAbstract<P> extends PacketListenerAbstract {
+    private final AHIPlatform<P> platform;
     private final CacheManager cacheManager;
 
     private final boolean useEntityCache;
@@ -30,20 +28,28 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
     private final boolean ignoreOwnedWolves;
     private final boolean ignoreIronGolemsEnabled;
     private final boolean gradualIronGolemHealthEnabled;
+    private final boolean healthEnabled;
+    private final boolean airTicksEnabled;
+    private final boolean absorptionEnabled;
+    private final boolean xpEnabled;
 
-    public EntityListenerAbstract(AntiHealthIndicator plugin) {
-        cacheManager = plugin.getCacheManager();
-        configManager = plugin.getConfigManager();
+    public EntityListenerAbstract(AHIPlatform<P> platform) {
+        this.platform = platform;
+        cacheManager = platform.getCacheManager();
 
         useEntityCache = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18);
         healthTexturesSupported = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_15);
-        allowBypassEnabled = configManager.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
-        ignoreVehiclesEnabled = configManager.getConfigurationOption(ConfigOption.IGNORE_VEHICLES_ENABLED);
-        ignoreWolvesEnabled = configManager.getConfigurationOption(ConfigOption.IGNORE_WOLVES_ENABLED);
-        ignoreTamedWolves = configManager.getConfigurationOption(ConfigOption.FOR_TAMED_WOLVES_ENABLED);
-        ignoreOwnedWolves = configManager.getConfigurationOption(ConfigOption.FOR_OWNED_WOLVES_ENABLED);
-        ignoreIronGolemsEnabled = configManager.getConfigurationOption(ConfigOption.IGNORE_IRON_GOLEMS_ENABLED);
-        gradualIronGolemHealthEnabled = configManager.getConfigurationOption(ConfigOption.GRADUAL_IRON_GOLEM_HEALTH_ENABLED);
+        allowBypassEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
+        ignoreVehiclesEnabled = platform.getConfigurationOption(ConfigOption.IGNORE_VEHICLES_ENABLED);
+        ignoreWolvesEnabled = platform.getConfigurationOption(ConfigOption.IGNORE_WOLVES_ENABLED);
+        ignoreTamedWolves = platform.getConfigurationOption(ConfigOption.FOR_TAMED_WOLVES_ENABLED);
+        ignoreOwnedWolves = platform.getConfigurationOption(ConfigOption.FOR_OWNED_WOLVES_ENABLED);
+        ignoreIronGolemsEnabled = platform.getConfigurationOption(ConfigOption.IGNORE_IRON_GOLEMS_ENABLED);
+        gradualIronGolemHealthEnabled = platform.getConfigurationOption(ConfigOption.GRADUAL_IRON_GOLEM_HEALTH_ENABLED);
+        healthEnabled = platform.getConfigurationOption(ConfigOption.HEALTH_ENABLED);
+        airTicksEnabled = platform.getConfigurationOption(ConfigOption.AIR_TICKS_ENABLED);
+        absorptionEnabled = platform.getConfigurationOption(ConfigOption.ABSORPTION_ENABLED);
+        xpEnabled = platform.getConfigurationOption(ConfigOption.XP_ENABLED);
     }
 
     @Override
@@ -61,15 +67,15 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
      * as provided in the spoofLivingEntityMetadata()
      * method.
      *
-     * @param player         The player to whom the packet is being sent.
+     * @param user           The user to whom the packet is being sent.
      * @param packetEntityId The ID linked with an entity in the packet.
      * @param entityMetadata The list of metadata associated with the current entity.
      */
-    protected void handlePacket(Player player, int packetEntityId, List<EntityData> entityMetadata) {
-        if (player.getEntityId() == packetEntityId) return;
+    protected void handlePacket(User user, int packetEntityId, List<EntityData> entityMetadata) {
+        if (user.getEntityId() == packetEntityId) return;
 
         if (allowBypassEnabled) {
-            if (player.hasPermission("AntiHealthIndicator.Bypass")) return;
+            if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
         }
 
         if (ignoreVehiclesEnabled) {
@@ -175,12 +181,12 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
      */
     private void spoofIronGolemMetadata(EntityData obj) {
         // Checks if the metadata index is related to air ticks and if the configuration option for it is enabled
-        if (obj.getIndex() == MetadataIndex.AIR_TICKS && configManager.getConfigurationOption(ConfigOption.AIR_TICKS_ENABLED)) {
+        if (obj.getIndex() == MetadataIndex.AIR_TICKS && airTicksEnabled) {
             // Sets a dynamic value for air ticks
             setDynamicValue(obj, 1);
         }
         // Checks if the metadata index is related to health and if the configuration option for it is enabled
-        if (obj.getIndex() == MetadataIndex.HEALTH && configManager.getConfigurationOption(ConfigOption.HEALTH_ENABLED)) {
+        if (obj.getIndex() == MetadataIndex.HEALTH && healthEnabled) {
             // Retrieves the current health of the Iron Golem
             float health = (float) obj.getValue();
 
@@ -206,10 +212,10 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
      * @param obj the Living Entity's data.
      */
     private void spoofLivingEntityMetadata(EntityData obj) {
-        if (obj.getIndex() == MetadataIndex.AIR_TICKS && configManager.getConfigurationOption(ConfigOption.AIR_TICKS_ENABLED)) {
+        if (obj.getIndex() == MetadataIndex.AIR_TICKS && airTicksEnabled) {
             setDynamicValue(obj, 1);
         }
-        if (obj.getIndex() == MetadataIndex.HEALTH && configManager.getConfigurationOption(ConfigOption.HEALTH_ENABLED)) {
+        if (obj.getIndex() == MetadataIndex.HEALTH && healthEnabled) {
             if (((Float) obj.getValue()) > 0) {
                 obj.setValue(0.5f);
             }
@@ -225,10 +231,10 @@ public abstract class EntityListenerAbstract extends PacketListenerAbstract {
      * @param obj the Player's data.
      */
     private void spoofPlayerMetadata(EntityData obj) {
-        if (obj.getIndex() == MetadataIndex.ABSORPTION && configManager.getConfigurationOption(ConfigOption.ABSORPTION_ENABLED)) {
+        if (obj.getIndex() == MetadataIndex.ABSORPTION && absorptionEnabled) {
             setDynamicValue(obj, 0);
         }
-        if (obj.getIndex() == MetadataIndex.XP && configManager.getConfigurationOption(ConfigOption.XP_ENABLED)) {
+        if (obj.getIndex() == MetadataIndex.XP && xpEnabled) {
             setDynamicValue(obj, 0);
         }
     }

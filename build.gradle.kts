@@ -12,7 +12,7 @@ allprojects {
     apply(plugin = "java-library")
 
     group = "com.deathmotion.antihealthindicator"
-    version = "1.1.3"
+    version = "2.0.0"
 
     java {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -39,7 +39,6 @@ allprojects {
 
             relocate("io.github.retrooper.packetevents", "com.deathmotion.antihealthindicator.shaded.io.github.retrooper.packetevents")
             relocate("com.github.retrooper.packetevents", "com.deathmotion.antihealthindicator.shaded.com.github.retrooper.packetevents")
-            relocate("net.kyori", "com.deathmotion.antihealthindicator.shaded.kyori")
             relocate("com.google.gson", "com.deathmotion.antihealthindicator.shaded.gson")
             relocate("org.bstats", "com.deathmotion.antihealthindicator")
         }

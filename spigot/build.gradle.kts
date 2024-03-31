@@ -4,7 +4,6 @@ dependencies {
     implementation("org.bstats:bstats-bukkit:3.0.2")
 }
 
-
 tasks {
 
     runServer {

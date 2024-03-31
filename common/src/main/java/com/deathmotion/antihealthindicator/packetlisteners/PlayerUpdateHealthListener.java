@@ -1,27 +1,28 @@
 package com.deathmotion.antihealthindicator.packetlisteners;
 
-import com.deathmotion.antihealthindicator.AntiHealthIndicator;
+import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateHealth;
-import org.bukkit.entity.Player;
 
-public class PlayerUpdateHealthListener extends PacketListenerAbstract {
+public class PlayerUpdateHealthListener<P> extends PacketListenerAbstract {
 
-    protected final boolean bypassPermissionEnabled;
 
-    public PlayerUpdateHealthListener(AntiHealthIndicator plugin) {
-        this.bypassPermissionEnabled = plugin.getConfigManager().getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
+    private final AHIPlatform<P> platform;
+    private final boolean bypassPermissionEnabled;
+
+    public PlayerUpdateHealthListener(AHIPlatform<P> platform) {
+        this.platform = platform;
+        this.bypassPermissionEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
     }
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() == PacketType.Play.Server.UPDATE_HEALTH) {
             if (bypassPermissionEnabled) {
-                Player player = (Player) event.getPlayer();
-                if (player.hasPermission("AntiHealthIndicator.Bypass")) return;
+                if (platform.hasPermission(event.getUser().getUUID(), "AntiHealthIndicator.Bypass")) return;
             }
 
             WrapperPlayServerUpdateHealth packet = new WrapperPlayServerUpdateHealth(event);

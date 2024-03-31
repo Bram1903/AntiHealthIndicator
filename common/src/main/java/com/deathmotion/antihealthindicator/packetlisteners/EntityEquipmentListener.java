@@ -17,8 +17,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import java.util.Collections;
 import java.util.List;
 
-public class EntityEquipmentListener<P, S> extends PacketListenerAbstract {
-    private final AHIPlatform<P, S> platform;
+public class EntityEquipmentListener<P> extends PacketListenerAbstract {
+    private final AHIPlatform<P> platform;
 
     private final boolean useDamageableInterface;
     private final boolean bypassPermissionEnabled;
@@ -34,7 +34,7 @@ public class EntityEquipmentListener<P, S> extends PacketListenerAbstract {
             .level(3)
             .build());
 
-    public EntityEquipmentListener(AHIPlatform<P, S> platform) {
+    public EntityEquipmentListener(AHIPlatform<P> platform) {
         this.platform = platform;
 
         this.useDamageableInterface = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13);
@@ -53,10 +53,9 @@ public class EntityEquipmentListener<P, S> extends PacketListenerAbstract {
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() == PacketType.Play.Server.ENTITY_EQUIPMENT) {
             WrapperPlayServerEntityEquipment packet = new WrapperPlayServerEntityEquipment(event);
-            Player player = (Player) event.getPlayer();
 
             if (bypassPermissionEnabled) {
-                if (this.platform.hasPermission(?, "AntiHealthIndicator.Bypass"))
+                if (this.platform.hasPermission(event.getUser().getUUID(), "AntiHealthIndicator.Bypass")) return;
             }
 
             List<Equipment> equipmentList = packet.getEquipment();
