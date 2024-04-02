@@ -2,11 +2,8 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
-import com.deathmotion.antihealthindicator.scheduler.SchedulerAdapter;
-import com.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
+import io.github.retrooper.packetevents.bstats.Metrics;
 import lombok.Getter;
-import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,42 +12,12 @@ import java.util.UUID;
 
 @Getter
 public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
-    private JavaPlugin plugin;
+    private final JavaPlugin plugin;
+    private final ConfigManager configManager;
 
-    private ConfigManager configManager;
-
-    @Getter
-    public class AHIPlugin extends JavaPlugin {
-        private SpigotAntiHealthIndicator ahi;
-
-        public void onLoad() {
-            ahi = new SpigotAntiHealthIndicator();
-            plugin = this;
-            ahi.commonOnLoad();
-
-            PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
-            PacketEvents.getAPI().getSettings().reEncodeByDefault(false)
-                    .checkForUpdates(false)
-                    .bStats(true);
-
-            PacketEvents.getAPI().load();
-        }
-
-        @Override
-        public void onEnable() {
-            new SchedulerAdapter();
-
-            ahi.commonOnEnable();
-
-            configManager = new ConfigManager(this);
-            enableBStats();
-        }
-
-        @Override
-        public void onDisable() {
-            ahi.commonOnDisable();
-        }
-
+    public SpigotAntiHealthIndicator(JavaPlugin plugin) {
+        this.plugin = plugin;
+        this.configManager = new ConfigManager(plugin);
     }
 
     @Override
@@ -76,7 +43,7 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
         return this.plugin.getDescription().getVersion();
     }
 
-    private void enableBStats() {
+    public void enableBStats() {
         try {
             new Metrics(this.plugin, 20803);
         } catch (Exception e) {
