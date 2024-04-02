@@ -14,47 +14,48 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.UUID;
 
 @Getter
-public class AntiHealthIndicator extends AHIPlatform<JavaPlugin> {
+public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
+    private JavaPlugin plugin;
 
-    private final JavaPlugin plugin;
-
-    public AntiHealthIndicator(JavaPlugin plugin) {
-        this.plugin = plugin;
-    }
+    private ConfigManager configManager;
 
     @Getter
-    private ConfigManager configManager;
+    public class AHIPlugin extends JavaPlugin {
+        private SpigotAntiHealthIndicator ahi;
+
+        public void onLoad() {
+            ahi = new SpigotAntiHealthIndicator();
+            plugin = this;
+            ahi.commonOnLoad();
+
+            PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+            PacketEvents.getAPI().getSettings().reEncodeByDefault(false)
+                    .checkForUpdates(false)
+                    .bStats(true);
+
+            PacketEvents.getAPI().load();
+        }
+
+        @Override
+        public void onEnable() {
+            new SchedulerAdapter();
+
+            ahi.commonOnEnable();
+
+            configManager = new ConfigManager(this);
+            enableBStats();
+        }
+
+        @Override
+        public void onDisable() {
+            ahi.commonOnDisable();
+        }
+
+    }
 
     @Override
     public JavaPlugin getPlatform() {
         return this.plugin;
-    }
-
-    @Override
-    public void onLoad() {
-        super.commonOnLoad();
-
-        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this.plugin));
-        PacketEvents.getAPI().getSettings().reEncodeByDefault(false)
-                .checkForUpdates(false)
-                .bStats(true);
-
-        PacketEvents.getAPI().load();
-    }
-
-    @Override
-    public void onEnable() {
-        new SchedulerAdapter();
-
-        super.commonOnEnable();
-
-        configManager = new ConfigManager(this.plugin);
-        enableBStats();
-    }
-
-    @Override
-    public void onDisable() {
-        super.commonOnDisable();
     }
 
     @Override

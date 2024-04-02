@@ -18,10 +18,12 @@ public abstract class AHIPlatform<P> {
     private CacheManager<P> cacheManager;
 
     public void commonOnLoad() {
-        System.out.println("Default loading behavior.");
+        // Load common stuff
     }
 
     public void commonOnEnable() {
+        loggerWrapper.info("Enabling AntiHealthIndicator v" + getPluginVersion() + "...");
+
         cacheManager = new CacheManager<>(this);
 
         new UpdateManager<>(this);
@@ -29,6 +31,8 @@ public abstract class AHIPlatform<P> {
     }
 
     public void commonOnDisable() {
+        loggerWrapper.info("Disabling AntiHealthIndicator v" + getPluginVersion() + "...");
+
         PacketEvents.getAPI().terminate();
     }
 
