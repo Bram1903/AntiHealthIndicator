@@ -2,6 +2,7 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
+import com.deathmotion.antihealthindicator.scheduler.SchedulerAdapter;
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
@@ -43,6 +44,8 @@ public class AntiHealthIndicator extends AHIPlatform<JavaPlugin> {
 
     @Override
     public void onEnable() {
+        new SchedulerAdapter();
+
         super.commonOnEnable();
 
         configManager = new ConfigManager(this.plugin);
