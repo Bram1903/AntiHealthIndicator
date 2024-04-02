@@ -1,23 +1,24 @@
 plugins {
     java
+    id("java-library")
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("xyz.jpenilla.run-paper") version "2.2.3"
-    id("java-library")
 }
 
 allprojects {
     apply(plugin = "java")
+    apply(plugin = "java-library")
     apply(plugin = "com.github.johnrengelman.shadow")
     apply(plugin = "xyz.jpenilla.run-paper")
-    apply(plugin = "java-library")
 
     group = "com.deathmotion.antihealthindicator"
     version = "2.0.0"
 
-    java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
+    // Java 8 seems to break the folia api when building the gradle configuration
+//    java {
+//        sourceCompatibility = JavaVersion.VERSION_1_8
+//        targetCompatibility = JavaVersion.VERSION_1_8
+//    }
 
     repositories {
         mavenCentral()

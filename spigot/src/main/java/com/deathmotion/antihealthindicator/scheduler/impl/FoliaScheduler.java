@@ -1,7 +1,8 @@
 package com.deathmotion.antihealthindicator.scheduler.impl;
 
 import com.deathmotion.antihealthindicator.wrappers.interfaces.Scheduler;
+import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler;
 
 public class FoliaScheduler implements Scheduler {
-    GlobalScheduler globalScheduler = new GlobalScheduler();
+    GlobalRegionScheduler globalScheduler = new GlobalRegionScheduler();
 }
