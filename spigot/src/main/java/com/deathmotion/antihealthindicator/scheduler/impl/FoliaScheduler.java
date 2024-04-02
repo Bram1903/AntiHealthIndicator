@@ -1,8 +1,25 @@
 package com.deathmotion.antihealthindicator.scheduler.impl;
 
-import com.deathmotion.antihealthindicator.wrappers.interfaces.Scheduler;
-import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler;
 
-public class FoliaScheduler implements Scheduler {
-    GlobalRegionScheduler globalScheduler = new GlobalRegionScheduler();
+public class FoliaScheduler {
+    public Object runTask(Runnable task) {
+        GlobalScheduler.runTask(task);
+        return null;
+    }
+
+    public Object runTaskAsynchronously(Runnable task) {
+        return null;
+    }
+
+    public Object runTaskLater(Runnable task, long delay) {
+        return null;
+    }
+
+    public Object runTaskTimer(Runnable task, long delay, long period) {
+        return null;
+    }
+
+    public Object runTaskTimerAsynchronously(Runnable task, long delay, long period) {
+        return null;
+    }
 }

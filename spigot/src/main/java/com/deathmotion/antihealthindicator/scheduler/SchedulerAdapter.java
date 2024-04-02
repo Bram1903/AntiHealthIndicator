@@ -1,17 +1,8 @@
 package com.deathmotion.antihealthindicator.scheduler;
 
-import com.deathmotion.antihealthindicator.scheduler.impl.FoliaScheduler;
-import com.deathmotion.antihealthindicator.scheduler.impl.SpigotAdapter;
 import com.deathmotion.antihealthindicator.wrappers.interfaces.Scheduler;
 
-public class SchedulerAdapter {
-    public Scheduler getScheduler() {
-        if (isFolia()) {
-            return new FoliaScheduler();
-        } else {
-            return new SpigotAdapter();
-        }
-    }
+public class SchedulerAdapter implements Scheduler {
 
     private static boolean isFolia() {
         try {
@@ -20,5 +11,30 @@ public class SchedulerAdapter {
         } catch (ClassNotFoundException e) {
             return false;
         }
+    }
+
+    @Override
+    public Object runTask(Runnable task) {
+        return null;
+    }
+
+    @Override
+    public Object runTaskAsynchronously(Runnable task) {
+        return null;
+    }
+
+    @Override
+    public Object runTaskLater(Runnable task, long delay) {
+        return null;
+    }
+
+    @Override
+    public Object runTaskTimer(Runnable task, long delay, long period) {
+        return null;
+    }
+
+    @Override
+    public Object runTaskTimerAsynchronously(Runnable task, long delay, long period) {
+        return null;
     }
 }
