@@ -33,7 +33,9 @@ allprojects {
 
         withType<JavaCompile> {
             options.encoding = "UTF-8"
+            options.release.set(8)
         }
+
         shadowJar {
             minimize()
             archiveFileName.set("${project.name}-${project.version}.jar")
