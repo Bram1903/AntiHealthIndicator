@@ -14,11 +14,10 @@ allprojects {
     group = "com.deathmotion.antihealthindicator"
     version = "2.0.0"
 
-    // Java 8 seems to break the folia api when building the gradle configuration
-//    java {
-//        sourceCompatibility = JavaVersion.VERSION_1_8
-//        targetCompatibility = JavaVersion.VERSION_1_8
-//    }
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
 
     repositories {
         mavenCentral()
