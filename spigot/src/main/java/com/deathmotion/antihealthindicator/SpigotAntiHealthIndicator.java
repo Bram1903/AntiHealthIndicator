@@ -2,8 +2,10 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
+import com.deathmotion.antihealthindicator.schedulers.SchedulerAbstract;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,12 +14,16 @@ import java.util.UUID;
 
 @Getter
 public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
+
     private final JavaPlugin plugin;
-    private final ConfigManager configManager;
+
+    @Setter
+    private ConfigManager configManager;
+    @Setter
+    private SchedulerAbstract scheduler;
 
     public SpigotAntiHealthIndicator(JavaPlugin plugin) {
         this.plugin = plugin;
-        this.configManager = new ConfigManager(plugin);
     }
 
     @Override

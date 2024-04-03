@@ -31,14 +31,12 @@ allprojects {
 
         withType<JavaCompile> {
             options.encoding = "UTF-8"
-            options.release.set(8)
         }
 
         shadowJar {
             minimize()
             archiveFileName.set("${project.name}-${project.version}.jar")
 
-            relocate("net.kyori", "com.deathmotion.antihealthindicator.shaded.kyori")
             relocate("com.google.gson", "com.deathmotion.antihealthindicator.shaded.gson")
             relocate("org.bstats", "com.deathmotion.antihealthindicator")
         }

@@ -112,9 +112,7 @@ public class UpdateManager<P> {
         }
 
         if (shouldNotifyInGame()) {
-            FoliaCompatUtil.runTask(this.plugin, (Object unused) -> {
-                PacketEvents.getAPI().getEventManager().registerListener(new PlayerJoin<>(this.platform, formattedVersion));
-            });
+            PacketEvents.getAPI().getEventManager().registerListener(new PlayerJoin<>(this.platform, formattedVersion));
         }
     }
 
