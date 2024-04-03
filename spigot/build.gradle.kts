@@ -1,8 +1,8 @@
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    //compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
-    compileOnly("dev.folia:folia-api:1.20.4-R0.1-SNAPSHOT")
+    //compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
+    //compileOnly("dev.folia:folia-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("com.github.retrooper.packetevents:spigot:2.2.1")
     implementation(project(":common"))
 }

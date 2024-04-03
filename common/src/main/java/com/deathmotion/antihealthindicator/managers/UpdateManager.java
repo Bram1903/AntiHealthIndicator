@@ -46,7 +46,7 @@ public class UpdateManager<P> {
     }
 
     public void checkForUpdate(boolean printToConsole) {
-        FoliaCompatUtil.runTaskAsync(this.plugin, () -> {
+        platform.getScheduler().runAsyncTask(() -> {
             try {
                 List<Integer> currentVersion = parseVersion(this.platform.getPluginVersion());
                 List<Integer> latestVersion = getLatestGitHubVersion();
