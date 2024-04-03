@@ -7,6 +7,8 @@ dependencies {
 
 tasks {
 
+
+
     runServer {
         // The version of the server to run
         val version = "1.20.4"
