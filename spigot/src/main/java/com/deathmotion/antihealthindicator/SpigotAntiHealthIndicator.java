@@ -2,13 +2,15 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
-import com.deathmotion.antihealthindicator.schedulers.SchedulerAbstract;
+import com.deathmotion.antihealthindicator.schedulers.SchedulerCheck;
+import com.deathmotion.antihealthindicator.wrappers.interfaces.Scheduler;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.UUID;
 
@@ -20,7 +22,7 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
     @Setter
     private ConfigManager configManager;
     @Setter
-    private SchedulerAbstract scheduler;
+    private Scheduler<BukkitTask> scheduler;
 
     public SpigotAntiHealthIndicator(JavaPlugin plugin) {
         this.plugin = plugin;

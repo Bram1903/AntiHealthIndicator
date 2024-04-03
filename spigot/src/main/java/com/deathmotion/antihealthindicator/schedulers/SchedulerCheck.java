@@ -1,25 +1,19 @@
 package com.deathmotion.antihealthindicator.schedulers;
 
+import com.deathmotion.antihealthindicator.AHIPlugin;
 import com.deathmotion.antihealthindicator.schedulers.impl.SpigotScheduler;
 import com.deathmotion.antihealthindicator.schedulers.impl.FoliaScheduler;
 import com.deathmotion.antihealthindicator.wrappers.interfaces.Scheduler;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
-public class SchedulerAbstract implements Scheduler {
-    private final SpigotScheduler spigotScheduler;
-    private final FoliaScheduler foliaScheduler;
+public final class SchedulerCheck {
 
-    public SchedulerAbstract(JavaPlugin plugin) {
-        this.spigotScheduler = new SpigotScheduler(plugin);
-        this.foliaScheduler = new FoliaScheduler(plugin);
-    }
-
-    @Override
-    public Object runAsyncTask(Runnable runnable) {
+    public static Scheduler<BukkitTask> createNew(AHIPlugin plugin) {
         if (isFolia()) {
-            return foliaScheduler.runAsyncTask(runnable);
-        } else {
-            return spigotScheduler.runAsyncTask(runnable);
+            return new FoliaScheduler(plugin);
+        }
+        else {
+            return new SpigotScheduler(plugin);
         }
     }
 

@@ -14,14 +14,18 @@ allprojects {
     group = "com.deathmotion.antihealthindicator"
     version = "2.0.0"
 
-    java.sourceCompatibility = JavaVersion.VERSION_17
-    java.targetCompatibility = JavaVersion.VERSION_17
+//    java.sourceCompatibility = JavaVersion.VERSION_17
+//    java.targetCompatibility = JavaVersion.VERSION_17
+    java {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+    }
 
     repositories {
         mavenCentral()
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.codemc.io/repository/maven-releases/")
+        maven("https://repo.papermc.io/repository/maven-public/")
     }
 
     tasks {

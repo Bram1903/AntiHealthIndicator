@@ -1,7 +1,7 @@
 package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
-import com.deathmotion.antihealthindicator.schedulers.SchedulerAbstract;
+import com.deathmotion.antihealthindicator.schedulers.SchedulerCheck;
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,7 +22,7 @@ public class AHIPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        ahi.setScheduler(new SchedulerAbstract(this));
+        ahi.setScheduler(SchedulerCheck.createNew(this));
         ahi.setConfigManager(new ConfigManager(this));
 
         ahi.commonOnEnable();
