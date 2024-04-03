@@ -1,4 +1,3 @@
-
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("com.github.retrooper.packetevents:spigot:2.2.1")
@@ -6,9 +5,6 @@ dependencies {
 }
 
 tasks {
-
-
-
     runServer {
         // The version of the server to run
         val version = "1.20.4"
@@ -24,6 +20,7 @@ tasks {
         })
 
         downloadPlugins {
+            url("https://github.com/retrooper/packetevents/releases/download/v2.2.1/packetevents-spigot-2.2.1.jar")
             url("https://github.com/EssentialsX/Essentials/releases/download/2.20.1/EssentialsX-2.20.1.jar")
             url("https://ci.lucko.me/job/spark/400/artifact/spark-bukkit/build/libs/spark-1.10.59-bukkit.jar")
             url("https://download.luckperms.net/1530/bukkit/loader/LuckPerms-Bukkit-5.4.117.jar")

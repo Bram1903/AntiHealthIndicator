@@ -14,10 +14,5 @@ permissions:
   AntiHealthIndicator.Bypass:
     description: "This permission prevents the player from receiving spoofed data."
     default: op
-softdepend:
-  - ProtocolLib
-  - ProtocolSupport
-  - ViaVersion
-  - ViaBackwards
-  - ViaRewind
-  - Geyser-Spigot
+depend:
+  - packetevents

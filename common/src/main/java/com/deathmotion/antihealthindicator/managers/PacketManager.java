@@ -25,6 +25,8 @@ public class PacketManager<P> {
 
     private void setupEntityListeners() {
         if (platform.getConfigurationOption(ConfigOption.ENTITY_DATA_ENABLED)) {
+            platform.getLoggerWrapper().info("Entity data spoofing is enabled.");
+
             PacketEvents.getAPI().getEventManager().registerListener(new EntityState<>(this.platform));
             PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener<>(this.platform));
 

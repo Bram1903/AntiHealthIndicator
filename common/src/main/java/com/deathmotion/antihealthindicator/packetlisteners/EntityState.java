@@ -8,10 +8,8 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 
 import java.util.UUID;
 
@@ -24,19 +22,21 @@ public class EntityState<P> extends PacketListenerAbstract {
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
-        if (PacketType.Play.Server.SPAWN_LIVING_ENTITY == event.getPacketType()) {
+        final PacketTypeCommon type = event.getPacketType();
+
+        if (PacketType.Play.Server.SPAWN_LIVING_ENTITY == type) {
             handleSpawnLivingEntity(new WrapperPlayServerSpawnLivingEntity(event));
         }
 
-        if (PacketType.Play.Server.SPAWN_PLAYER == event.getPacketType()) {
-            handleSpawnPlayer(new WrapperPlayServerSpawnEntity(event));
+        if (PacketType.Play.Server.SPAWN_PLAYER == type) {
+            handleSpawnPlayer(new WrapperPlayServerSpawnPlayer(event));
         }
 
-        if (PacketType.Play.Server.ENTITY_METADATA == event.getPacketType()) {
+        if (PacketType.Play.Server.ENTITY_METADATA == type) {
             handleEntityMetadata(new WrapperPlayServerEntityMetadata(event));
         }
 
-        if (PacketType.Play.Server.ENTITY_METADATA == event.getPacketType()) {
+        if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
             handleEntityDestroy(new WrapperPlayServerDestroyEntities(event));
         }
     }
@@ -63,7 +63,7 @@ public class EntityState<P> extends PacketListenerAbstract {
         }
     }
 
-    private void handleSpawnPlayer(WrapperPlayServerSpawnEntity packet) {
+    private void handleSpawnPlayer(WrapperPlayServerSpawnPlayer packet) {
         EntityDataStore entityData = new EntityDataStore();
         entityData.setEntityType(EntityTypes.PLAYER);
 
