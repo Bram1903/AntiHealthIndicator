@@ -32,6 +32,7 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
 
     @Override
     public Scheduler<BukkitTask> getScheduler() {
+        //noinspection unchecked
         return (Scheduler<BukkitTask>) scheduler;
     }
 
