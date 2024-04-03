@@ -3,6 +3,7 @@ package com.deathmotion.antihealthindicator.packetlisteners;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import net.kyori.adventure.text.Component;
@@ -31,13 +32,15 @@ public class PlayerJoin<P> extends PacketListenerAbstract {
     }
 
     @Override
-    public void onPacketReceive(PacketReceiveEvent event) {
+    public void onPacketSend(PacketSendEvent event) {
         if (PacketType.Play.Server.JOIN_GAME == event.getPacketType()) {
             User user = event.getUser();
 
-            if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Notify")) {
-                user.sendMessage(updateComponent);
-            }
+            platform.getScheduler().runAsyncTaskLater(() -> {
+                if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Notify")) {
+                    user.sendMessage(updateComponent);
+                }
+            }, 60L);
         }
     }
 }

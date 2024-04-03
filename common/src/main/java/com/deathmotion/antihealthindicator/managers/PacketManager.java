@@ -3,6 +3,7 @@ package com.deathmotion.antihealthindicator.managers;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.packetlisteners.EntityState;
+import com.deathmotion.antihealthindicator.packetlisteners.PlayerJoin;
 import com.deathmotion.antihealthindicator.packetlisteners.spoofers.*;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
@@ -25,8 +26,6 @@ public class PacketManager<P> {
 
     private void setupEntityListeners() {
         if (platform.getConfigurationOption(ConfigOption.ENTITY_DATA_ENABLED)) {
-            platform.getLoggerWrapper().info("Entity data spoofing is enabled.");
-
             PacketEvents.getAPI().getEventManager().registerListener(new EntityState<>(this.platform));
             PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener<>(this.platform));
 
@@ -40,14 +39,14 @@ public class PacketManager<P> {
             if (spoofHealth && ignoreVehicles) {
                 // TODO: Add a check listener that keeps track of the entities that are riding vehicles
             }
-
-            if (platform.getConfigurationOption(ConfigOption.ITEMS_ENABLED)) {
-                PacketEvents.getAPI().getEventManager().registerListener(new EntityEquipmentListener<>(this.platform));
-            }
         }
     }
 
     private void setupAdditionalListeners() {
+        if (platform.getConfigurationOption(ConfigOption.ITEMS_ENABLED)) {
+            PacketEvents.getAPI().getEventManager().registerListener(new EntityEquipmentListener<>(this.platform));
+        }
+
         if (platform.getConfigurationOption(ConfigOption.SPOOF_FOOD_SATURATION_ENABLED)) {
             PacketEvents.getAPI().getEventManager().registerListener(new PlayerUpdateHealthListener<>(this.platform));
         }
