@@ -1,11 +1,13 @@
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
-    compileOnly("com.github.retrooper.packetevents:spigot:2.2.1")
+    //compileOnly("com.github.retrooper.packetevents:spigot:2.2.1")
+    compileOnly(files("../libs/PacketEvents-Spigot.jar"))
     implementation(project(":common"))
 }
 
 tasks {
     runServer {
+
         // The version of the server to run
         val version = "1.20.4"
 
