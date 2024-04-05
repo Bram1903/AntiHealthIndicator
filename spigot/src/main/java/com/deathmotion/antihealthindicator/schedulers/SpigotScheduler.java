@@ -32,11 +32,7 @@ public final class SpigotScheduler implements Scheduler<TaskWrapper> {
 
     @Override
     public TaskWrapper runAsyncTask(Runnable runnable) {
-        TaskWrapper test = FoliaCompatUtil.runTaskAsync(plugin, (o) -> runnable.run());
-        plugin.getLogger().info("TaskWrapper: " + test.getOwner());
-        plugin.getLogger().info("TaskWrapper: " + test.isCancelled());
-        test.cancel();
-        return test;
+        return FoliaCompatUtil.runTaskAsync(plugin, (o) -> runnable.run());
     }
 
     @Override
