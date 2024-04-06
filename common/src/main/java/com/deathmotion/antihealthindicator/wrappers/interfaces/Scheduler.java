@@ -3,13 +3,11 @@ package com.deathmotion.antihealthindicator.wrappers.interfaces;
 import org.jetbrains.annotations.Nullable;
 
 public interface Scheduler<T> {
+        T runTask(Runnable runnable);
 
         T runTaskLater(Runnable runnable, long delay);
 
         T runTaskTimer(Runnable runnable, long delay, long period);
-
-        T runTask(Runnable runnable);
-
 
         T runAsyncTask(Runnable runnable);
 

@@ -14,6 +14,10 @@ public class PacketManager<P> {
     public PacketManager(AHIPlatform<P> platform) {
         this.platform = platform;
 
+        platform.getScheduler().runTaskLater(() -> {
+            System.out.println("test");
+        }, 20L);
+
         setupPacketListeners();
     }
 
