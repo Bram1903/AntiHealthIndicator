@@ -2,12 +2,12 @@ package com.deathmotion.antihealthindicator.schedulers;
 
 import com.deathmotion.antihealthindicator.AHIPlugin;
 import com.deathmotion.antihealthindicator.wrappers.interfaces.Scheduler;
-import io.github.retrooper.packetevents.util.folia.FoliaCompatUtil;
-import io.github.retrooper.packetevents.util.folia.TaskWrapper;
+import io.github.retrooper.packetevents.util.FoliaCompatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.scheduler.BukkitTask;
 
-public final class SpigotScheduler implements Scheduler<TaskWrapper> {
+public final class SpigotScheduler implements Scheduler<BukkitTask> {
 
     private final AHIPlugin plugin;
 
@@ -16,38 +16,40 @@ public final class SpigotScheduler implements Scheduler<TaskWrapper> {
     }
 
     @Override
-    public TaskWrapper runTaskLater(Runnable runnable, long delay) {
-        return new TaskWrapper(Bukkit.getScheduler().runTaskLater(plugin, runnable, delay));
+    public BukkitTask runTaskLater(Runnable runnable, long delay) {
+        return Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
     }
 
     @Override
-    public TaskWrapper runTaskTimer(Runnable runnable, long delay, long period) {
-        return new TaskWrapper(Bukkit.getScheduler().runTaskTimer(plugin, runnable, delay, period));
+    public BukkitTask runTaskTimer(Runnable runnable, long delay, long period) {
+        return Bukkit.getScheduler().runTaskTimer(plugin, runnable, delay, period);
     }
 
     @Override
-    public TaskWrapper runTask(Runnable runnable) {
-        return new TaskWrapper(Bukkit.getScheduler().runTask(plugin, runnable));
+    public BukkitTask runTask(Runnable runnable) {
+        return Bukkit.getScheduler().runTask(plugin, runnable);
     }
 
     @Override
-    public TaskWrapper runAsyncTask(Runnable runnable) {
-        return FoliaCompatUtil.runTaskAsync(plugin, (o) -> runnable.run());
+    public BukkitTask runAsyncTask(Runnable runnable) {
+        FoliaCompatUtil.runTaskAsync(plugin, runnable);
+        return null;
     }
 
     @Override
-    public TaskWrapper runAsyncTaskLater(Object entity, Runnable runnable, long delay) {
+    public BukkitTask runAsyncTaskLater(Object entity, Runnable runnable, long delay) {
         if (entity == null) {
-            return new TaskWrapper(Bukkit.getScheduler().runTaskLater(plugin, runnable, delay));
+            return Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
         } else {
-            return FoliaCompatUtil.runTaskForEntity((Entity) entity, plugin, runnable, () -> {
-            }, delay);
+            FoliaCompatUtil.runTaskForEntity((Entity) entity, plugin, runnable, () -> {}, delay);
+            return null;
         }
     }
 
     @Override
-    public TaskWrapper runAsyncTaskTimer(Runnable runnable, long delay, long period) {
-        return FoliaCompatUtil.runTaskTimerAsync(plugin, (o) -> runnable.run(), delay, period);
+    public BukkitTask runAsyncTaskTimer(Runnable runnable, long delay, long period) {
+        FoliaCompatUtil.runTaskTimerAsync(plugin, (o) -> runnable.run(), delay, period);
+        return null;
     }
 
 }
