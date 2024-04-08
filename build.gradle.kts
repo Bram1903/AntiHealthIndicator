@@ -26,7 +26,7 @@ allprojects {
 
 tasks {
     build {
-        dependsOn("shadowJar")
+        dependsOn(shadowJar)
     }
 
     withType<JavaCompile> {
@@ -37,12 +37,10 @@ tasks {
         minimize()
         archiveFileName.set("${project.name}-${project.version}.jar")
 
-        // include all files from all subprojects
         subprojects.forEach { subproject ->
             from(project(subproject.path).sourceSets.main.get().output)
         }
 
         relocate("com.google.gson", "com.deathmotion.antihealthindicator.shaded.gson")
-        relocate("org.bstats", "com.deathmotion.antihealthindicator")
     }
 }

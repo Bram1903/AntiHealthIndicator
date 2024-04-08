@@ -3,7 +3,6 @@ package com.deathmotion.antihealthindicator.managers;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.packetlisteners.EntityState;
-import com.deathmotion.antihealthindicator.packetlisteners.PlayerJoin;
 import com.deathmotion.antihealthindicator.packetlisteners.spoofers.*;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
@@ -13,10 +12,6 @@ public class PacketManager<P> {
 
     public PacketManager(AHIPlatform<P> platform) {
         this.platform = platform;
-
-        platform.getScheduler().runTaskLater(() -> {
-            System.out.println("test");
-        }, 20L);
 
         setupPacketListeners();
     }
