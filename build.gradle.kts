@@ -22,22 +22,27 @@ allprojects {
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.codemc.io/repository/maven-releases/")
     }
+}
 
-    tasks {
-        build {
-            dependsOn("shadowJar")
+tasks {
+    build {
+        dependsOn("shadowJar")
+    }
+
+    withType<JavaCompile> {
+        options.encoding = "UTF-8"
+    }
+
+    shadowJar {
+        minimize()
+        archiveFileName.set("${project.name}-${project.version}.jar")
+
+        // include all files from all subprojects
+        subprojects.forEach { subproject ->
+            from(project(subproject.path).sourceSets.main.get().output)
         }
 
-        withType<JavaCompile> {
-            options.encoding = "UTF-8"
-        }
-
-        shadowJar {
-            minimize()
-            archiveFileName.set("${project.name}-${project.version}.jar")
-
-            relocate("com.google.gson", "com.deathmotion.antihealthindicator.shaded.gson")
-            relocate("org.bstats", "com.deathmotion.antihealthindicator")
-        }
+        relocate("com.google.gson", "com.deathmotion.antihealthindicator.shaded.gson")
+        relocate("org.bstats", "com.deathmotion.antihealthindicator")
     }
 }

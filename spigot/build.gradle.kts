@@ -1,7 +1,7 @@
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     //compileOnly("com.github.retrooper.packetevents:spigot:2.2.1")
-    implementation(files("../libs/packetevents.jar"))
+    compileOnly(files("../libs/packetevents.jar"))
     implementation(project(":common"))
 }
 
