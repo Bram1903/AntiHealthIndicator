@@ -17,6 +17,10 @@ public class MetadataIndex {
 
     public static final int XP;
 
+    // TODO: Needs to be researched and applied correctly
+    public static final int TAMABLE_TAMED;
+    public static final int TAMABLE_OWNER;
+
     static {
         ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
 
