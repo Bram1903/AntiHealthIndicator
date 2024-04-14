@@ -92,6 +92,7 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
                 }
 
                 spoofLivingEntityMetadata(entityData);
+
                 return;
             }
 
@@ -101,6 +102,8 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
                 spoofPlayerMetadata(entityData);
             }
         });
+
+        event.markForReEncode(true);
     }
 
     private boolean shouldIgnoreWolf(User user, List<EntityData> entityDataList) {
