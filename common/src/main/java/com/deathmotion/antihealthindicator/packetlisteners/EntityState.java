@@ -29,25 +29,21 @@ public class EntityState<P> extends PacketListenerAbstract {
 
         if (PacketType.Play.Server.SPAWN_LIVING_ENTITY == type) {
             handleSpawnLivingEntity(new WrapperPlayServerSpawnLivingEntity(event));
-
             return;
         }
 
         if (PacketType.Play.Server.SPAWN_ENTITY == type) {
             handleSpawnEntity(new WrapperPlayServerSpawnEntity(event));
-
             return;
         }
 
         if (PacketType.Play.Server.SPAWN_PLAYER == type) {
             handleSpawnPlayer(new WrapperPlayServerSpawnPlayer(event));
-
             return;
         }
 
         if (PacketType.Play.Server.ENTITY_METADATA == type) {
             handleEntityMetadata(new WrapperPlayServerEntityMetadata(event));
-
             return;
         }
 
