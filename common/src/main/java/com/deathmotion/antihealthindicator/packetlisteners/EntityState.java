@@ -10,10 +10,7 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnPlayer;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 
 import java.util.UUID;
 
@@ -31,14 +28,18 @@ public class EntityState<P> extends PacketListenerAbstract {
         final PacketTypeCommon type = event.getPacketType();
 
         if (PacketType.Play.Server.SPAWN_LIVING_ENTITY == type) {
-            logger.info("Received spawn living entity");
             handleSpawnLivingEntity(new WrapperPlayServerSpawnLivingEntity(event));
 
             return;
         }
 
+        if (PacketType.Play.Server.SPAWN_ENTITY == type) {
+            handleSpawnEntity(new WrapperPlayServerSpawnEntity(event));
+
+            return;
+        }
+
         if (PacketType.Play.Server.SPAWN_PLAYER == type) {
-            logger.info("Received spawn player entity");
             handleSpawnPlayer(new WrapperPlayServerSpawnPlayer(event));
 
             return;
@@ -75,8 +76,14 @@ public class EntityState<P> extends PacketListenerAbstract {
         } else {
             this.cacheManager.addEntity(packet.getEntityId(), entityData);
         }
+    }
 
-        logger.info("Cached spawn living entity");
+    private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet) {
+        EntityType entityType = packet.getEntityType();
+
+        if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.LIVINGENTITY)) {
+            this.logger.info("Received entity packet of living entity");
+        }
     }
 
     private void handleSpawnPlayer(WrapperPlayServerSpawnPlayer packet) {
@@ -84,8 +91,6 @@ public class EntityState<P> extends PacketListenerAbstract {
         entityData.setEntityType(EntityTypes.PLAYER);
 
         this.cacheManager.addEntity(packet.getEntityId(), entityData);
-
-        logger.info("Cached spawn player entity");
     }
 
     private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet) {
