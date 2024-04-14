@@ -114,16 +114,13 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         AtomicBoolean isWolfOwned = new AtomicBoolean(false);
 
         entityDataList.forEach(wolfEntityData -> {
-            if (wolfEntityData.getIndex() == 17) {
+            if (wolfEntityData.getIndex() == MetadataIndex.TAMABLE_TAMED) {
                 isWolfTamed.set(((Byte) wolfEntityData.getValue() & 0x04) != 0);
             }
 
-            if (wolfEntityData.getIndex() == 18) {
+            if (wolfEntityData.getIndex() == MetadataIndex.TAMABLE_OWNER) {
                 Optional<UUID> ownerUUID = (Optional<UUID>) wolfEntityData.getValue();
-
-                ownerUUID.ifPresent(UUID -> {
-                    isWolfOwned.set(user.getUUID().equals(UUID));
-                });
+                ownerUUID.ifPresent(UUID -> isWolfOwned.set(user.getUUID().equals(UUID)));
             }
         });
 
