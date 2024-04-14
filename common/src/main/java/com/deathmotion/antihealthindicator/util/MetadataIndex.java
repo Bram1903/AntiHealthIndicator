@@ -63,5 +63,13 @@ public class MetadataIndex {
         } else {
             XP = 18;
         }
+
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+            TAMABLE_TAMED = 17;
+            TAMABLE_OWNER = 18;
+        } else {
+            TAMABLE_TAMED = 16;
+            TAMABLE_OWNER = 17;
+        }
     }
 }
