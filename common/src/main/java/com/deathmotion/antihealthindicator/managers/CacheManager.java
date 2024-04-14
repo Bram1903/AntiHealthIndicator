@@ -8,17 +8,17 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class CacheManager {
 
-    private final ConcurrentHashMap<Integer, EntityType> entityData = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, EntityType> entityType = new ConcurrentHashMap<>();
 
     public void addEntity(int entityId, EntityType entityType) {
-        this.entityData.putIfAbsent(entityId, entityType);
+        this.entityType.putIfAbsent(entityId, entityType);
     }
 
     public void removeEntity(int entityId) {
-        this.entityData.remove(entityId);
+        this.entityType.remove(entityId);
     }
 
-    public EntityType getEntityDataById(int entityId) {
-        return this.entityData.get(entityId);
+    public EntityType getEntityTypeById(int entityId) {
+        return this.entityType.get(entityId);
     }
 }

@@ -73,7 +73,7 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
             //if (cacheManager.isPlayerVehicleInCache(player.getUniqueId(), packetEntityId)) return;
         }
 
-        EntityType entityType = this.cacheManager.getEntityDataById(packet.getEntityId());
+        EntityType entityType = this.cacheManager.getEntityTypeById(packet.getEntityId());
         if (entityType == null) return;
 
         if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) {
