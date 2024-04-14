@@ -5,7 +5,6 @@ import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.packetlisteners.EntityState;
 import com.deathmotion.antihealthindicator.packetlisteners.spoofers.*;
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 
 public class PacketManager<P> {
     private final AHIPlatform<P> platform;
@@ -27,10 +26,6 @@ public class PacketManager<P> {
         if (platform.getConfigurationOption(ConfigOption.ENTITY_DATA_ENABLED)) {
             PacketEvents.getAPI().getEventManager().registerListener(new EntityState<>(this.platform));
             PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener<>(this.platform));
-
-            if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_15)) {
-                PacketEvents.getAPI().getEventManager().registerListener(new SpawnLivingEntityListener<>(this.platform));
-            }
 
             boolean spoofHealth = platform.getConfigurationOption(ConfigOption.HEALTH_ENABLED);
             boolean ignoreVehicles = platform.getConfigurationOption(ConfigOption.IGNORE_VEHICLES_ENABLED);

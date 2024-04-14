@@ -1,6 +1,6 @@
 package com.deathmotion.antihealthindicator.managers;
 
-import com.deathmotion.antihealthindicator.data.EntityDataStore;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import lombok.Getter;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,21 +8,17 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class CacheManager {
 
-    private final ConcurrentHashMap<Integer, EntityDataStore> entityData = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, EntityType> entityData = new ConcurrentHashMap<>();
 
-    public void addEntity(int entityId, EntityDataStore entityData) {
-        this.entityData.putIfAbsent(entityId, entityData);
-    }
-
-    public void updateEntity(int entityId, EntityDataStore entityData) {
-        this.entityData.put(entityId, entityData);
+    public void addEntity(int entityId, EntityType entityType) {
+        this.entityData.putIfAbsent(entityId, entityType);
     }
 
     public void removeEntity(int entityId) {
         this.entityData.remove(entityId);
     }
 
-    public EntityDataStore getEntityDataById(int entityId) {
+    public EntityType getEntityDataById(int entityId) {
         return this.entityData.get(entityId);
     }
 }
