@@ -18,7 +18,7 @@ import java.util.List;
 
 public abstract class EntityListenerAbstract<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
-    private final CacheManager<P> cacheManager;
+    private final CacheManager cacheManager;
 
     private final boolean healthTexturesSupported;
     private final boolean allowBypassEnabled;

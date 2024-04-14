@@ -16,14 +16,14 @@ public abstract class AHIPlatform<P> {
 
     private final PlatformLoggerWrapperImpl loggerWrapper = new PlatformLoggerWrapperImpl();
     protected Scheduler scheduler;
-    private CacheManager<P> cacheManager;
+    private CacheManager cacheManager;
 
     public void commonOnLoad() {
         // Load common stuff
     }
 
     public void commonOnEnable() {
-        cacheManager = new CacheManager<>(this);
+        cacheManager = new CacheManager();
 
         new UpdateManager<>(this);
         new PacketManager<>(this);
