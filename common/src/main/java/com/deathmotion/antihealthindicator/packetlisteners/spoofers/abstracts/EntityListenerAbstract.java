@@ -116,8 +116,10 @@ public abstract class EntityListenerAbstract<P> extends PacketListenerAbstract {
             return true;
         }
 
-        return (ignoreTamedWolves && wolf.isTamed()) || (ignoreOwnedWolves && wolf.isTamed() && wolf.getOwnerUUID() != null
-                && wolf.getOwnerUUID().equals(user.getUUID()));
+        boolean isWolfTamed = wolf.isTamed();
+        boolean isWolfOwned = isWolfTamed && wolf.getOwnerUUID().isPresent() && wolf.getOwnerUUID().get().equals(user.getUUID());
+
+        return (ignoreTamedWolves && isWolfTamed) || (ignoreOwnedWolves && isWolfOwned);
     }
 
     private void spoofIronGolemMetadata(EntityData obj) {

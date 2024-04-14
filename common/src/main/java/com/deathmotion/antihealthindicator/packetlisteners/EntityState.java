@@ -6,12 +6,15 @@ import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.wrappers.PlatformLoggerWrapperImpl;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class EntityState<P> extends PacketListenerAbstract {
@@ -53,32 +56,25 @@ public class EntityState<P> extends PacketListenerAbstract {
     }
 
     private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet) {
+        int entityId = packet.getEntityId();
+
         EntityType entityType = packet.getEntityType();
         EntityDataStore entityData = new EntityDataStore();
         entityData.setEntityType(entityType);
 
-        if (entityType == EntityTypes.WOLF) {
-            packet.getEntityMetadata().forEach(wolfEntityData -> {
-                if (wolfEntityData.getIndex() == 17) {
-                    entityData.setTamed(((Byte) wolfEntityData.getValue() & 0x04) != 0);
-                }
+        EntityDataStore updatedEntityData = handleWolfMetaData(entityData, entityType, packet.getEntityMetadata());
 
-                if (wolfEntityData.getIndex() == 18) {
-                    entityData.setOwnerUUID((UUID) wolfEntityData.getValue());
-                }
-            });
-
-            this.cacheManager.addEntity(packet.getEntityId(), entityData);
-        } else {
-            this.cacheManager.addEntity(packet.getEntityId(), entityData);
-        }
+        this.cacheManager.addEntity(entityId, updatedEntityData);
     }
 
     private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet) {
         EntityType entityType = packet.getEntityType();
 
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.LIVINGENTITY)) {
-            this.logger.info("Received entity packet of living entity");
+            EntityDataStore entityData = new EntityDataStore();
+            entityData.setEntityType(entityType);
+
+            this.cacheManager.addEntity(packet.getEntityId(), entityData);
         }
     }
 
@@ -92,22 +88,30 @@ public class EntityState<P> extends PacketListenerAbstract {
     private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet) {
         int entityId = packet.getEntityId();
         EntityDataStore entityData = this.cacheManager.getEntityDataById(entityId);
-
         if (entityData == null) return;
 
         EntityType entityType = entityData.getEntityType();
+        EntityDataStore updatedEntityData = handleWolfMetaData(entityData, entityType, packet.getEntityMetadata());
 
+        this.cacheManager.updateEntity(entityId, updatedEntityData);
+    }
+
+    private EntityDataStore handleWolfMetaData(EntityDataStore entityData, EntityType entityType, List<EntityData> entityMetadata) {
         if (entityType == EntityTypes.WOLF) {
-            packet.getEntityMetadata().forEach(wolfEntityData -> {
+            entityMetadata.forEach(wolfEntityData -> {
                 if (wolfEntityData.getIndex() == 17) {
                     entityData.setTamed(((Byte) wolfEntityData.getValue() & 0x04) != 0);
                 }
 
                 if (wolfEntityData.getIndex() == 18) {
-                    entityData.setOwnerUUID((UUID) wolfEntityData.getValue());
+                    Optional<UUID> ownerUUID = (Optional<UUID>) wolfEntityData.getValue();
+
+                    ownerUUID.ifPresent(entityData::setOwnerUUID);
                 }
             });
         }
+
+        return entityData;
     }
 
     private void handleEntityDestroy(WrapperPlayServerDestroyEntities packet) {

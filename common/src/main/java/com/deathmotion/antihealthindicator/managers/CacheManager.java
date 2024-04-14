@@ -14,6 +14,10 @@ public class CacheManager {
         this.entityData.putIfAbsent(entityId, entityData);
     }
 
+    public void updateEntity(int entityId, EntityDataStore entityData) {
+        this.entityData.put(entityId, entityData);
+    }
+
     public void removeEntity(int entityId) {
         this.entityData.remove(entityId);
     }
