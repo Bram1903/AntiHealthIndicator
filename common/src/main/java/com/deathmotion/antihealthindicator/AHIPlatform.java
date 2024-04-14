@@ -15,8 +15,8 @@ import java.util.UUID;
 public abstract class AHIPlatform<P> {
 
     private final PlatformLoggerWrapperImpl loggerWrapper = new PlatformLoggerWrapperImpl();
-    private CacheManager<P> cacheManager;
     protected Scheduler scheduler;
+    private CacheManager<P> cacheManager;
 
     public void commonOnLoad() {
         // Load common stuff

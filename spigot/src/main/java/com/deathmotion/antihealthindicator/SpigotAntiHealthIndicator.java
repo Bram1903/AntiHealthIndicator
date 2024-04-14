@@ -22,10 +22,6 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
         this.plugin = plugin;
     }
 
-    void setScheduler(Scheduler scheduler) {
-        this.scheduler = scheduler;
-    }
-
     void setConfigManager(ConfigManager configManager) {
         this.configManager = configManager;
     }
@@ -33,6 +29,10 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
     @Override
     public Scheduler getScheduler() {
         return scheduler;
+    }
+
+    void setScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
     }
 
     @Override
