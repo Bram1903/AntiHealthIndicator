@@ -88,8 +88,7 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
             if (entityType == EntityTypes.IRON_GOLEM && ignoreIronGolemsEnabled) {
                 if (!gradualIronGolemHealthEnabled || !healthTexturesSupported) {
                     spoofLivingEntityMetadata(entityData);
-                }
-                else {
+                } else {
                     spoofIronGolemMetadata(entityData);
                 }
 

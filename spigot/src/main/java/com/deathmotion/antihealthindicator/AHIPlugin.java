@@ -2,8 +2,6 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.deathmotion.antihealthindicator.schedulers.SpigotScheduler;
-import com.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class AHIPlugin extends JavaPlugin {
@@ -11,13 +9,6 @@ public class AHIPlugin extends JavaPlugin {
 
     public void onLoad() {
         ahi.commonOnLoad();
-
-        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
-        PacketEvents.getAPI().getSettings().reEncodeByDefault(false)
-                .checkForUpdates(false)
-                .bStats(true);
-
-        PacketEvents.getAPI().load();
     }
 
     @Override

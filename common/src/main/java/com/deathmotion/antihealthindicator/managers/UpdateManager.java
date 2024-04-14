@@ -4,9 +4,10 @@ import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.packetlisteners.PlayerJoin;
 import com.github.retrooper.packetevents.PacketEvents;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -65,19 +66,14 @@ public class UpdateManager<P> {
     }
 
     private List<Integer> getLatestGitHubVersion() throws IOException {
-        URL api = new URL(GITHUB_API_URL);
-        URLConnection con = getConnection(api);
+        URLConnection connection = new URL(GITHUB_API_URL).openConnection();
+        connection.addRequestProperty("User-Agent", "Mozilla/4.0");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String jsonResponse = reader.readLine();
+        reader.close();
+        JsonObject jsonObject = new Gson().fromJson(jsonResponse, JsonObject.class);
 
-        JsonObject json = JsonParser.parseReader(new InputStreamReader(con.getInputStream())).getAsJsonObject();
-
-        return parseVersion(json.get("tag_name").getAsString().replaceFirst("^[vV]", ""));
-    }
-
-    private URLConnection getConnection(URL api) throws IOException {
-        URLConnection con = api.openConnection();
-        con.setConnectTimeout(15000);
-        con.setReadTimeout(15000);
-        return con;
+        return parseVersion(jsonObject.get("tag_name").getAsString().replaceFirst("^[vV]", ""));
     }
 
     private void compareVersions(List<Integer> currentVersion, List<Integer> latestVersion, boolean printToConsole) {
