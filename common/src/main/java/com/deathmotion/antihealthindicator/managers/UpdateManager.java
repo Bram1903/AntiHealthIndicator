@@ -46,7 +46,7 @@ public class UpdateManager<P> {
     }
 
     public void checkForUpdate(boolean printToConsole) {
-        platform.getScheduler().runAsyncTask(() -> {
+        platform.getScheduler().runAsyncTask((o) -> {
             try {
                 List<Integer> currentVersion = parseVersion(this.platform.getPluginVersion());
                 List<Integer> latestVersion = getLatestGitHubVersion();

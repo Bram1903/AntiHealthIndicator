@@ -1,21 +1,10 @@
 package com.deathmotion.antihealthindicator.wrappers.interfaces;
 
-import org.jetbrains.annotations.Nullable;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
-public interface Scheduler<T> {
-        T runTask(Runnable runnable);
+public interface Scheduler {
+    void runAsyncTask(Consumer<Object> task);
 
-        T runTaskLater(Runnable runnable, long delay);
-
-        T runTaskTimer(Runnable runnable, long delay, long period);
-
-        T runAsyncTask(Runnable runnable);
-
-        T runAsyncTaskLater(@Nullable Object entity, Runnable runnable, long delay);
-
-        default T runAsyncTaskLater(Runnable runnable, long delay) {
-                return runAsyncTaskLater(null, runnable, delay);
-        }
-
-        T runAsyncTaskTimer(Runnable runnable, long delay, long period);
+    void rynAsyncTaskDelayed(Consumer<Object> task, long delay, TimeUnit timeUnit);
 }

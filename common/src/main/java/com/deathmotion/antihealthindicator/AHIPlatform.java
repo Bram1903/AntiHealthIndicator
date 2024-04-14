@@ -16,7 +16,7 @@ public abstract class AHIPlatform<P> {
 
     private final PlatformLoggerWrapperImpl loggerWrapper = new PlatformLoggerWrapperImpl();
     private CacheManager<P> cacheManager;
-    protected Scheduler<?> scheduler;
+    protected Scheduler scheduler;
 
     public void commonOnLoad() {
         // Load common stuff

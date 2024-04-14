@@ -8,7 +8,6 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.UUID;
 
@@ -23,7 +22,7 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
         this.plugin = plugin;
     }
 
-    void setScheduler(Scheduler<?> scheduler) {
+    void setScheduler(Scheduler scheduler) {
         this.scheduler = scheduler;
     }
 
@@ -32,9 +31,8 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
     }
 
     @Override
-    public Scheduler<BukkitTask> getScheduler() {
-        //noinspection unchecked
-        return (Scheduler<BukkitTask>) scheduler;
+    public Scheduler getScheduler() {
+        return scheduler;
     }
 
     @Override

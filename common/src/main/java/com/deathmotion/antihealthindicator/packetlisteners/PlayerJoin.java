@@ -2,7 +2,6 @@ package com.deathmotion.antihealthindicator.packetlisteners;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -11,6 +10,8 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+
+import java.util.concurrent.TimeUnit;
 
 public class PlayerJoin<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
@@ -36,11 +37,11 @@ public class PlayerJoin<P> extends PacketListenerAbstract {
         if (PacketType.Play.Server.JOIN_GAME == event.getPacketType()) {
             User user = event.getUser();
 
-            platform.getScheduler().runAsyncTaskLater(() -> {
+            platform.getScheduler().rynAsyncTaskDelayed((o) -> {
                 if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Notify")) {
                     user.sendMessage(updateComponent);
                 }
-            }, 60L);
+            }, 2, TimeUnit.SECONDS);
         }
     }
 }
