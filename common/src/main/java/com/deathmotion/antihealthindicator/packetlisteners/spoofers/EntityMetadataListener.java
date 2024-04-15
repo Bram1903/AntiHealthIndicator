@@ -72,10 +72,12 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         }
 
         if (ignoreVehiclesEnabled) {
-            //if (cacheManager.isPlayerVehicleInCache(player.getUniqueId(), packetEntityId)) return;
+            if (this.cacheManager.isUserPassenger(packet.getEntityId(), user.getEntityId())) return;
         }
 
-        EntityType entityType = this.cacheManager.getEntityTypeById(packet.getEntityId());
+        int entityId = packet.getEntityId();
+
+        EntityType entityType = this.cacheManager.getEntityTypeById(entityId);
         if (entityType == null) return;
 
         if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) {
@@ -87,6 +89,14 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         }
 
         entityMetadataList.forEach(entityData -> {
+            if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.ABSTRACT_HORSE)) {
+                if (entityData.getIndex() == MetadataIndex.HEALTH) {
+                    // Update the health in our cache
+                    // to send the proper health of a vehicle when entering another method
+                    this.cacheManager.updateVehicleHealth(entityId, (float) entityData.getValue());
+                }
+            }
+
             if (entityType == EntityTypes.IRON_GOLEM && ignoreIronGolemsEnabled) {
                 if (!gradualIronGolemHealthEnabled || !healthTexturesSupported) {
                     spoofLivingEntityMetadata(entityData);
