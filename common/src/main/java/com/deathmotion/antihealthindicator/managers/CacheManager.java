@@ -4,60 +4,52 @@ import com.deathmotion.antihealthindicator.data.VehicleData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import lombok.Getter;
 
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class CacheManager {
-
-    private final ConcurrentHashMap<Integer, EntityType> entityType = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer, VehicleData> vehicleData = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, EntityType> entityTypeCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, VehicleData> vehicleDataCache = new ConcurrentHashMap<>();
 
     public void addEntity(int entityId, EntityType entityType) {
-        this.entityType.putIfAbsent(entityId, entityType);
+        entityTypeCache.putIfAbsent(entityId, entityType);
     }
 
     public void addVehicleData(int entityId, VehicleData vehicleData) {
-        this.vehicleData.put(entityId, vehicleData);
+        vehicleDataCache.put(entityId, vehicleData);
     }
 
     public void removeEntity(int entityId) {
-        this.entityType.remove(entityId);
+        entityTypeCache.remove(entityId);
+        vehicleDataCache.remove(entityId);
+    }
+
+    public Optional<VehicleData> getVehicleData(int entityId) {
+        return Optional.ofNullable(vehicleDataCache.get(entityId));
     }
 
     public void updateVehicleHealth(int entityId, float health) {
-        VehicleData vehicleData = this.vehicleData.get(entityId);
-        if (vehicleData == null) {
-            return;
-        }
-        vehicleData.setHealth(health);
+        getVehicleData(entityId).ifPresent(vehicleData -> vehicleData.setHealth(health));
     }
 
     public void updateVehiclePassenger(int entityId, int passengerId) {
-        VehicleData vehicleData = this.vehicleData.get(entityId);
-        if (vehicleData == null) {
-            return;
-        }
-        vehicleData.setPassengerId(passengerId);
+        getVehicleData(entityId).ifPresent(vehicleData -> vehicleData.setPassengerId(passengerId));
     }
 
     public float getVehicleHealth(int entityId) {
-        VehicleData vehicleData = this.vehicleData.get(entityId);
-        if (vehicleData == null) {
-            return 0;
-        }
-        return vehicleData.getHealth();
+        return getVehicleData(entityId).map(VehicleData::getHealth).orElse(0f);
     }
 
     public EntityType getEntityTypeById(int entityId) {
-        return this.entityType.get(entityId);
+        return entityTypeCache.get(entityId);
     }
 
     public boolean isUserPassenger(int entityId, int userId) {
-        VehicleData vehicleData = this.vehicleData.get(entityId);
-        if (vehicleData == null) {
-            return false;
-        }
+        return getVehicleData(entityId).map(vehicleData -> vehicleData.getPassengerId() == userId).orElse(false);
+    }
 
-        return vehicleData.getPassengerId() == userId;
+    public int getPassengerId(int entityId) {
+        return getVehicleData(entityId).map(VehicleData::getPassengerId).orElse(0);
     }
 }

@@ -133,8 +133,7 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
                 if (serverVersion.isOlderThan(ServerVersion.V_1_12)) {
                     String ownerUUID = (String) wolfEntityData.getValue();
                     isWolfOwned.set(user.getUUID().toString().equals(ownerUUID));
-                }
-                else {
+                } else {
                     Optional<UUID> ownerUUID = (Optional<UUID>) wolfEntityData.getValue();
                     ownerUUID.ifPresent(UUID -> isWolfOwned.set(user.getUUID().equals(UUID)));
                 }

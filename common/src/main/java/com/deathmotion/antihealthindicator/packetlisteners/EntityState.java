@@ -2,6 +2,7 @@ package com.deathmotion.antihealthindicator.packetlisteners;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.VehicleData;
+import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
@@ -19,10 +20,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EntityState<P> extends PacketListenerAbstract {
+    private final AHIPlatform<P> platform;
     private final CacheManager cacheManager;
 
+    private final boolean isBypassEnabled;
+
     public EntityState(AHIPlatform<P> platform) {
+        this.platform = platform;
         this.cacheManager = platform.getCacheManager();
+
+        this.isBypassEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
     }
 
     @Override
@@ -78,7 +85,14 @@ public class EntityState<P> extends PacketListenerAbstract {
             int vehicleId = packet.getEntityId();
 
             this.cacheManager.updateVehiclePassenger(vehicleId, passengers[0]);
-            handlePassengerEvent(user, vehicleId, this.cacheManager.getVehicleHealth(vehicleId));
+            handlePassengerEvent(user, vehicleId, this.cacheManager.getVehicleHealth(vehicleId), true);
+        } else {
+            int passengerId = this.cacheManager.getPassengerId(packet.getEntityId());
+            this.cacheManager.updateVehiclePassenger(packet.getEntityId(), -1);
+
+            if (user.getEntityId() == passengerId) {
+                handlePassengerEvent(user, packet.getEntityId(), 0.5F, false);
+            }
         }
     }
 
@@ -90,9 +104,19 @@ public class EntityState<P> extends PacketListenerAbstract {
         }
     }
 
-    private void handlePassengerEvent(User user, int vehicleId, float healthValue) {
-        List<EntityData> metadata = new ArrayList<>();
-        metadata.add(new EntityData(MetadataIndex.HEALTH, EntityDataTypes.FLOAT, healthValue));
-        user.writePacket(new WrapperPlayServerEntityMetadata(vehicleId, metadata));
+    private void handlePassengerEvent(User user, int vehicleId, float healthValue, boolean entering) {
+        if (entering) {
+            List<EntityData> metadata = new ArrayList<>();
+            metadata.add(new EntityData(MetadataIndex.HEALTH, EntityDataTypes.FLOAT, healthValue));
+            user.writePacket(new WrapperPlayServerEntityMetadata(vehicleId, metadata));
+        } else {
+            if (isBypassEnabled) {
+                this.platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass");
+            }
+
+            List<EntityData> metadata = new ArrayList<>();
+            metadata.add(new EntityData(MetadataIndex.HEALTH, EntityDataTypes.FLOAT, healthValue));
+            user.sendPacketSilently(new WrapperPlayServerEntityMetadata(vehicleId, metadata));
+        }
     }
 }
