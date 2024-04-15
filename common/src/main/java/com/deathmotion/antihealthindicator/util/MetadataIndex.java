@@ -17,8 +17,8 @@ public class MetadataIndex {
 
     public static final int XP;
 
-    // TODO: Needs to be researched and applied correctly
     public static final int TAMABLE_TAMED;
+
     public static final int TAMABLE_OWNER;
 
     static {
@@ -64,9 +64,18 @@ public class MetadataIndex {
             XP = 18;
         }
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
             TAMABLE_TAMED = 17;
             TAMABLE_OWNER = 18;
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
+            TAMABLE_TAMED = 16;
+            TAMABLE_OWNER = 17;
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
+            TAMABLE_TAMED = 15;
+            TAMABLE_OWNER = 16;
+        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12)) {
+            TAMABLE_TAMED = 13;
+            TAMABLE_OWNER = 14;
         } else {
             TAMABLE_TAMED = 16;
             TAMABLE_OWNER = 17;

@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class EntityMetadataListener<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
     private final CacheManager cacheManager;
+    private final ServerVersion serverVersion;
 
     private final boolean healthTexturesSupported;
     private final boolean allowBypassEnabled;
@@ -40,6 +41,7 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
     public EntityMetadataListener(AHIPlatform<P> platform) {
         this.platform = platform;
         this.cacheManager = platform.getCacheManager();
+        this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
 
         healthTexturesSupported = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_15);
         allowBypassEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
@@ -117,10 +119,15 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
             if (wolfEntityData.getIndex() == MetadataIndex.TAMABLE_TAMED) {
                 isWolfTamed.set(((Byte) wolfEntityData.getValue() & 0x04) != 0);
             }
-
             if (wolfEntityData.getIndex() == MetadataIndex.TAMABLE_OWNER) {
-                Optional<UUID> ownerUUID = (Optional<UUID>) wolfEntityData.getValue();
-                ownerUUID.ifPresent(UUID -> isWolfOwned.set(user.getUUID().equals(UUID)));
+                if (serverVersion.isOlderThan(ServerVersion.V_1_12)) {
+                    String ownerUUID = (String) wolfEntityData.getValue();
+                    isWolfOwned.set(user.getUUID().toString().equals(ownerUUID));
+                }
+                else {
+                    Optional<UUID> ownerUUID = (Optional<UUID>) wolfEntityData.getValue();
+                    ownerUUID.ifPresent(UUID -> isWolfOwned.set(user.getUUID().equals(UUID)));
+                }
             }
         });
 
