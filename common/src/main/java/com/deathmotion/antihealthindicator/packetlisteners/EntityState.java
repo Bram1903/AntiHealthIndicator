@@ -51,6 +51,10 @@ public class EntityState<P> extends PacketListenerAbstract {
             return;
         }
 
+        if (PacketType.Play.Server.ATTACH_ENTITY == type) {
+            handleAttachEntity(new WrapperPlayServerAttachEntity(event), event.getUser());
+        }
+
         if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
             handleEntityDestroy(new WrapperPlayServerDestroyEntities(event));
         }
@@ -79,19 +83,39 @@ public class EntityState<P> extends PacketListenerAbstract {
     }
 
     private void handleSetPassengers(WrapperPlayServerSetPassengers packet, User user) {
+        int entityId = packet.getEntityId();
         int[] passengers = packet.getPassengers();
 
         if (passengers.length > 0) {
-            int vehicleId = packet.getEntityId();
-
-            this.cacheManager.updateVehiclePassenger(vehicleId, passengers[0]);
-            handlePassengerEvent(user, vehicleId, this.cacheManager.getVehicleHealth(vehicleId), true);
+            this.cacheManager.updateVehiclePassenger(entityId, passengers[0]);
+            handlePassengerEvent(user, entityId, this.cacheManager.getVehicleHealth(entityId), true);
         } else {
-            int passengerId = this.cacheManager.getPassengerId(packet.getEntityId());
-            this.cacheManager.updateVehiclePassenger(packet.getEntityId(), -1);
+            int passengerId = this.cacheManager.getPassengerId(entityId);
+            this.cacheManager.updateVehiclePassenger(entityId, -1);
 
             if (user.getEntityId() == passengerId) {
-                handlePassengerEvent(user, packet.getEntityId(), 0.5F, false);
+                handlePassengerEvent(user, entityId, 0.5F, false);
+            }
+        }
+    }
+
+    private void handleAttachEntity(WrapperPlayServerAttachEntity packet, User user) {
+        int entityId = packet.getHoldingId();
+        int passengerId = packet.getAttachedId();
+
+        System.out.println("Horse ID: " + entityId);
+        System.out.println("Passenger ID: " + passengerId);
+        System.out.println("User Entity ID: " + user.getEntityId());
+
+        if (entityId > 0) {
+            this.cacheManager.updateVehiclePassenger(entityId, passengerId);
+            handlePassengerEvent(user, entityId, this.cacheManager.getVehicleHealth(entityId), true);
+        }
+        else {
+            this.cacheManager.updateVehiclePassenger(entityId, -1);
+
+            if (user.getEntityId() == passengerId) {
+                handlePassengerEvent(user, entityId, 0.5F, false);
             }
         }
     }
