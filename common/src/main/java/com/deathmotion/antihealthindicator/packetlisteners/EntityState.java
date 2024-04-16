@@ -46,8 +46,8 @@ public class EntityState<P> extends PacketListenerAbstract {
             return;
         }
 
-        if (PacketType.Play.Server.SPAWN_PLAYER == type) {
-            handleSpawnPlayer(new WrapperPlayServerSpawnPlayer(event));
+        if (PacketType.Play.Server.JOIN_GAME == type) {
+            handleJoinGame(new WrapperPlayServerJoinGame(event));
             return;
         }
 
@@ -87,7 +87,7 @@ public class EntityState<P> extends PacketListenerAbstract {
         }
     }
 
-    private void handleSpawnPlayer(WrapperPlayServerSpawnPlayer packet) {
+    private void handleJoinGame(WrapperPlayServerJoinGame packet) {
         this.cacheManager.addEntity(packet.getEntityId(), EntityTypes.PLAYER);
     }
 
@@ -140,7 +140,7 @@ public class EntityState<P> extends PacketListenerAbstract {
 
         if (!entering) {
             if (isBypassEnabled) {
-                this.platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass");
+                if (this.platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
             }
         }
 
