@@ -58,6 +58,7 @@ public class EntityState<P> extends PacketListenerAbstract {
 
         if (PacketType.Play.Server.ATTACH_ENTITY == type) {
             handleAttachEntity(new WrapperPlayServerAttachEntity(event), event.getUser());
+            return;
         }
 
         if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
