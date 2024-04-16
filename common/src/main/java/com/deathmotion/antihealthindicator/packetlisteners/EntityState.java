@@ -46,6 +46,11 @@ public class EntityState<P> extends PacketListenerAbstract {
             return;
         }
 
+        if (PacketType.Play.Server.SPAWN_PLAYER == type) {
+            handleSpawnPlayer(new WrapperPlayServerSpawnPlayer(event));
+            return;
+        }
+
         if (PacketType.Play.Server.SET_PASSENGERS == type) {
             handleSetPassengers(new WrapperPlayServerSetPassengers(event), event.getUser());
             return;
@@ -82,6 +87,10 @@ public class EntityState<P> extends PacketListenerAbstract {
         }
     }
 
+    private void handleSpawnPlayer(WrapperPlayServerSpawnPlayer packet) {
+        this.cacheManager.addEntity(packet.getEntityId(), EntityTypes.PLAYER);
+    }
+
     private void handleSetPassengers(WrapperPlayServerSetPassengers packet, User user) {
         int entityId = packet.getEntityId();
         int[] passengers = packet.getPassengers();
@@ -103,19 +112,17 @@ public class EntityState<P> extends PacketListenerAbstract {
         int entityId = packet.getHoldingId();
         int passengerId = packet.getAttachedId();
 
-        System.out.println("Horse ID: " + entityId);
-        System.out.println("Passenger ID: " + passengerId);
-        System.out.println("User Entity ID: " + user.getEntityId());
-
         if (entityId > 0) {
             this.cacheManager.updateVehiclePassenger(entityId, passengerId);
             handlePassengerEvent(user, entityId, this.cacheManager.getVehicleHealth(entityId), true);
-        }
-        else {
-            this.cacheManager.updateVehiclePassenger(entityId, -1);
+        } else {
+            // With the Entity Attach packet, the entity ID is set to -1 when the entity is detached;
+            // Thus we need to retrieve the vehicle we stepped of by using a reverse lookup by passenger ID
+            int reversedEntityId = this.cacheManager.getEntityIdByPassengerId(passengerId);
+            this.cacheManager.updateVehiclePassenger(reversedEntityId, -1);
 
             if (user.getEntityId() == passengerId) {
-                handlePassengerEvent(user, entityId, 0.5F, false);
+                handlePassengerEvent(user, reversedEntityId, 0.5F, false);
             }
         }
     }
@@ -129,18 +136,15 @@ public class EntityState<P> extends PacketListenerAbstract {
     }
 
     private void handlePassengerEvent(User user, int vehicleId, float healthValue, boolean entering) {
-        if (entering) {
-            List<EntityData> metadata = new ArrayList<>();
-            metadata.add(new EntityData(MetadataIndex.HEALTH, EntityDataTypes.FLOAT, healthValue));
-            user.writePacket(new WrapperPlayServerEntityMetadata(vehicleId, metadata));
-        } else {
+        List<EntityData> metadata = new ArrayList<>();
+
+        if (!entering) {
             if (isBypassEnabled) {
                 this.platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass");
             }
-
-            List<EntityData> metadata = new ArrayList<>();
-            metadata.add(new EntityData(MetadataIndex.HEALTH, EntityDataTypes.FLOAT, healthValue));
-            user.sendPacketSilently(new WrapperPlayServerEntityMetadata(vehicleId, metadata));
         }
+
+        metadata.add(new EntityData(MetadataIndex.HEALTH, EntityDataTypes.FLOAT, healthValue));
+        user.sendPacketSilently(new WrapperPlayServerEntityMetadata(vehicleId, metadata));
     }
 }

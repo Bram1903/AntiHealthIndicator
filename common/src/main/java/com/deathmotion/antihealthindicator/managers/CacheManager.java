@@ -4,6 +4,7 @@ import com.deathmotion.antihealthindicator.data.VehicleData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import lombok.Getter;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -51,5 +52,13 @@ public class CacheManager {
 
     public int getPassengerId(int entityId) {
         return getVehicleData(entityId).map(VehicleData::getPassengerId).orElse(0);
+    }
+
+    public int getEntityIdByPassengerId(int passengerId) {
+        return vehicleDataCache.entrySet().stream()
+                .filter(entry -> entry.getValue().getPassengerId() == passengerId)
+                .mapToInt(Map.Entry::getKey)
+                .findFirst()
+                .orElse(0);
     }
 }
