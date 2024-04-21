@@ -7,7 +7,6 @@ import com.deathmotion.antihealthindicator.managers.UpdateManager;
 import com.deathmotion.antihealthindicator.wrappers.PlatformLoggerWrapperImpl;
 import com.deathmotion.antihealthindicator.wrappers.interfaces.Scheduler;
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.protocol.world.Dimension;
 import lombok.Getter;
 
 import java.util.UUID;

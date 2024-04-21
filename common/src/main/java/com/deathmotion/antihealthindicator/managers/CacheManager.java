@@ -21,6 +21,10 @@ public class CacheManager {
         return Optional.ofNullable(vehicleDataCache.get(entityId));
     }
 
+    public boolean isLivingEntityCached(int entityId) {
+        return livingEntityDataCache.containsKey(entityId);
+    }
+
     public void addLivingEntity(int entityId, LivingEntityData livingEntityData) {
         livingEntityDataCache.putIfAbsent(entityId, livingEntityData);
     }

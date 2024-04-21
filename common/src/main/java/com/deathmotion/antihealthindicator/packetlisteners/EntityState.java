@@ -15,7 +15,6 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 
 import java.util.ArrayList;
@@ -175,8 +174,10 @@ public class EntityState<P> extends PacketListenerAbstract {
         int[] entityIds = packet.getEntityIds();
 
         for (int entityId : entityIds) {
-            if (this.platform.isEntityRemoved(entityId, player)) {
-                this.cacheManager.removeLivingEntity(entityId);
+            if (this.cacheManager.isLivingEntityCached(entityId)) {
+                if (this.platform.isEntityRemoved(entityId, player)) {
+                    this.cacheManager.removeLivingEntity(entityId);
+                }
             }
         }
     }
