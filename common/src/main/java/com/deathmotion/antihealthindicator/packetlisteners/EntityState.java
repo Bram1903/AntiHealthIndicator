@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EntityState<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
@@ -119,32 +118,26 @@ public class EntityState<P> extends PacketListenerAbstract {
         LivingEntityData livingEntityData = this.cacheManager.getLivingEntityData(entityId).orElse(null);
         if (livingEntityData == null || livingEntityData.getEntityType() != EntityTypes.WOLF) return;
 
-        AtomicBoolean isWolfTamed = new AtomicBoolean(false);
-        AtomicBoolean isWolfOwned = new AtomicBoolean(false);
-
         packet.getEntityMetadata().forEach(wolfEntityData -> {
             if (wolfEntityData.getIndex() == MetadataIndex.TAMABLE_TAMED) {
-                isWolfTamed.set(((Byte) wolfEntityData.getValue() & 0x04) != 0);
-            }
-            if (wolfEntityData.getIndex() == MetadataIndex.TAMABLE_OWNER) {
+                livingEntityData.setTamed(((Byte) wolfEntityData.getValue() & 0x04) != 0);
+            } else if (wolfEntityData.getIndex() == MetadataIndex.TAMABLE_OWNER) {
+                UUID ownerUUID = null;
+
                 if (serverVersion.isOlderThan(ServerVersion.V_1_12)) {
-                    String ownerUUID = (String) wolfEntityData.getValue();
-                    isWolfOwned.set(user.getUUID().toString().equals(ownerUUID));
+                    String value = (String) wolfEntityData.getValue();
+                    if (user.getUUID().toString().equals(value)) {
+                        ownerUUID = user.getUUID();
+                    }
                 } else {
-                    Optional<UUID> ownerUUID = (Optional<UUID>) wolfEntityData.getValue();
-                    ownerUUID.ifPresent(UUID -> isWolfOwned.set(user.getUUID().equals(UUID)));
+                    ownerUUID = ((Optional<UUID>) wolfEntityData.getValue())
+                            .filter(uuid -> uuid.equals(user.getUUID()))
+                            .orElse(null);
                 }
+
+                livingEntityData.setOwnerUUID(ownerUUID);
             }
         });
-
-        if (isWolfTamed.get() || isWolfOwned.get()) {
-            if (isWolfTamed.get()) {
-                livingEntityData.setTamed(true);
-            }
-            if (isWolfOwned.get()) {
-                livingEntityData.setOwnerUUID(user.getUUID());
-            }
-        }
     }
 
     private void handleSetPassengers(WrapperPlayServerSetPassengers packet, User user) {
