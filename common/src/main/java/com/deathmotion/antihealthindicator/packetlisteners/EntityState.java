@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class EntityState<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
@@ -171,13 +172,14 @@ public class EntityState<P> extends PacketListenerAbstract {
     }
 
     private void handleEntityDestroy(WrapperPlayServerDestroyEntities packet, Object player) {
-        int[] entityIds = packet.getEntityIds();
-
-        for (int entityId : entityIds) {
+        for (int entityId : packet.getEntityIds()) {
             if (this.cacheManager.isLivingEntityCached(entityId)) {
-                if (this.platform.isEntityRemoved(entityId, player)) {
-                    this.cacheManager.removeLivingEntity(entityId);
-                }
+                // Schedule this 2 ticks later because Bukkit updates intervals 1 tick later
+                this.platform.getScheduler().rynAsyncTaskDelayed(task -> {
+                    if (this.platform.isEntityRemoved(entityId, player)) {
+                        this.cacheManager.removeLivingEntity(entityId);
+                    }
+                }, 100, TimeUnit.MILLISECONDS);
             }
         }
     }
