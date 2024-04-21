@@ -84,7 +84,7 @@ public class EntityState<P> extends PacketListenerAbstract {
         LivingEntityData livingEntityData = new LivingEntityData();
         livingEntityData.setEntityType(entityType);
 
-        this.cacheManager.addEntity(packet.getEntityId(), livingEntityData);
+        this.cacheManager.addLivingEntity(packet.getEntityId(), livingEntityData);
 
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.ABSTRACT_HORSE)) {
             this.cacheManager.addVehicleData(packet.getEntityId(), new VehicleData());
@@ -98,7 +98,7 @@ public class EntityState<P> extends PacketListenerAbstract {
             LivingEntityData livingEntityData = new LivingEntityData();
             livingEntityData.setEntityType(entityType);
 
-            this.cacheManager.addEntity(packet.getEntityId(), livingEntityData);
+            this.cacheManager.addLivingEntity(packet.getEntityId(), livingEntityData);
 
             if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.ABSTRACT_HORSE)) {
                 this.cacheManager.addVehicleData(packet.getEntityId(), new VehicleData());
@@ -110,7 +110,7 @@ public class EntityState<P> extends PacketListenerAbstract {
         LivingEntityData livingEntityData = new LivingEntityData();
         livingEntityData.setEntityType(EntityTypes.PLAYER);
 
-        this.cacheManager.addEntity(packet.getEntityId(), livingEntityData);
+        this.cacheManager.addLivingEntity(packet.getEntityId(), livingEntityData);
     }
 
     private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, User user) {
@@ -187,7 +187,7 @@ public class EntityState<P> extends PacketListenerAbstract {
         int[] entityIds = packet.getEntityIds();
 
         for (int entityId : entityIds) {
-            this.cacheManager.removeEntity(entityId);
+            this.cacheManager.removeLivingEntity(entityId);
         }
     }
 

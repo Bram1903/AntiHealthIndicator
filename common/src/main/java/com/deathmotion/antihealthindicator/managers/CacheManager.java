@@ -21,7 +21,7 @@ public class CacheManager {
         return Optional.ofNullable(vehicleDataCache.get(entityId));
     }
 
-    public void addEntity(int entityId, LivingEntityData livingEntityData) {
+    public void addLivingEntity(int entityId, LivingEntityData livingEntityData) {
         livingEntityDataCache.putIfAbsent(entityId, livingEntityData);
     }
 
@@ -29,7 +29,7 @@ public class CacheManager {
         vehicleDataCache.put(entityId, vehicleData);
     }
 
-    public void removeEntity(int entityId) {
+    public void removeLivingEntity(int entityId) {
         livingEntityDataCache.remove(entityId);
         vehicleDataCache.remove(entityId);
     }
