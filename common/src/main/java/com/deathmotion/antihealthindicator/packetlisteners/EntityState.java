@@ -6,10 +6,8 @@ import com.deathmotion.antihealthindicator.data.VehicleData;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
@@ -28,14 +26,12 @@ public class EntityState<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
     private final CacheManager cacheManager;
 
-    private final ServerVersion serverVersion;
     private final boolean isBypassEnabled;
 
     public EntityState(AHIPlatform<P> platform) {
         this.platform = platform;
         this.cacheManager = platform.getCacheManager();
 
-        this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
         this.isBypassEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
     }
 
@@ -122,18 +118,16 @@ public class EntityState<P> extends PacketListenerAbstract {
             if (wolfEntityData.getIndex() == MetadataIndex.TAMABLE_TAMED) {
                 livingEntityData.setTamed(((Byte) wolfEntityData.getValue() & 0x04) != 0);
             } else if (wolfEntityData.getIndex() == MetadataIndex.TAMABLE_OWNER) {
-                UUID ownerUUID = null;
+                Object value = wolfEntityData.getValue();
 
-                if (serverVersion.isOlderThan(ServerVersion.V_1_12)) {
-                    String value = (String) wolfEntityData.getValue();
-                    if (user.getUUID().toString().equals(value)) {
-                        ownerUUID = user.getUUID();
-                    }
-                } else {
-                    ownerUUID = ((Optional<UUID>) wolfEntityData.getValue())
-                            .filter(uuid -> uuid.equals(user.getUUID()))
-                            .orElse(null);
-                }
+                UUID ownerUUID = value instanceof String
+                        ? Optional.ofNullable((String) value)
+                        .filter(user.getUUID().toString()::equals)
+                        .map(UUID::fromString)
+                        .orElse(null)
+                        : ((Optional<UUID>) value)
+                        .filter(user.getUUID()::equals)
+                        .orElse(null);
 
                 livingEntityData.setOwnerUUID(ownerUUID);
             }
