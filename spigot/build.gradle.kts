@@ -27,7 +27,7 @@ tasks {
         }
 
         jvmArgs = listOf(
-                "-Dcom.mojang.eula.agree=true"
+            "-Dcom.mojang.eula.agree=true"
         )
     }
 }

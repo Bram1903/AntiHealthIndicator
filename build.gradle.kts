@@ -40,7 +40,5 @@ tasks {
         subprojects.forEach { subproject ->
             from(project(subproject.path).sourceSets.main.get().output)
         }
-
-        relocate("com.google.gson", "com.deathmotion.antihealthindicator.shaded.gson")
     }
 }
