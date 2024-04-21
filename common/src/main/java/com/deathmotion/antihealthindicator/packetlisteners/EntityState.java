@@ -15,6 +15,7 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 
 import java.util.ArrayList;
@@ -69,7 +70,7 @@ public class EntityState<P> extends PacketListenerAbstract {
         }
 
         if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
-            handleEntityDestroy(new WrapperPlayServerDestroyEntities(event));
+            handleEntityDestroy(new WrapperPlayServerDestroyEntities(event), event.getPlayer());
         }
     }
 
@@ -170,11 +171,13 @@ public class EntityState<P> extends PacketListenerAbstract {
         }
     }
 
-    private void handleEntityDestroy(WrapperPlayServerDestroyEntities packet) {
+    private void handleEntityDestroy(WrapperPlayServerDestroyEntities packet, Object player) {
         int[] entityIds = packet.getEntityIds();
 
         for (int entityId : entityIds) {
-            this.cacheManager.removeLivingEntity(entityId);
+            if (this.platform.isEntityRemoved(entityId, player)) {
+                this.cacheManager.removeLivingEntity(entityId);
+            }
         }
     }
 

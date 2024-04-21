@@ -3,10 +3,16 @@ package com.deathmotion.antihealthindicator;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.deathmotion.antihealthindicator.wrappers.interfaces.Scheduler;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
 import io.github.retrooper.packetevents.bstats.Metrics;
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.UUID;
@@ -46,6 +52,12 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
         if (commandSender == null) return false;
 
         return commandSender.hasPermission(permission);
+    }
+
+    @Override
+    public boolean isEntityRemoved(int entityId, Object playerObject) {
+        Player player = (Player) playerObject;
+        return SpigotConversionUtil.getEntityById(player.getWorld(), entityId) == null;
     }
 
     @Override

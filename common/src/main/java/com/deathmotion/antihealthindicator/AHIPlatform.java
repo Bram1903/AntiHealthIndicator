@@ -7,6 +7,7 @@ import com.deathmotion.antihealthindicator.managers.UpdateManager;
 import com.deathmotion.antihealthindicator.wrappers.PlatformLoggerWrapperImpl;
 import com.deathmotion.antihealthindicator.wrappers.interfaces.Scheduler;
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.world.Dimension;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -36,6 +37,8 @@ public abstract class AHIPlatform<P> {
     public abstract P getPlatform();
 
     public abstract boolean hasPermission(UUID sender, String permission);
+
+    public abstract boolean isEntityRemoved(int entityId, Object player);
 
     public abstract boolean getConfigurationOption(ConfigOption option);
 
