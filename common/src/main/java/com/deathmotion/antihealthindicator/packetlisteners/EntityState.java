@@ -116,6 +116,9 @@ public class EntityState<P> extends PacketListenerAbstract {
     private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, User user) {
         int entityId = packet.getEntityId();
 
+        LivingEntityData livingEntityData = this.cacheManager.getLivingEntityData(entityId).orElse(null);
+        if (livingEntityData == null || livingEntityData.getEntityType() != EntityTypes.WOLF) return;
+
         AtomicBoolean isWolfTamed = new AtomicBoolean(false);
         AtomicBoolean isWolfOwned = new AtomicBoolean(false);
 
@@ -135,9 +138,6 @@ public class EntityState<P> extends PacketListenerAbstract {
         });
 
         if (isWolfTamed.get() || isWolfOwned.get()) {
-            LivingEntityData livingEntityData = this.cacheManager.getLivingEntityData(entityId).orElse(null);
-            if (livingEntityData == null) return;
-
             if (isWolfTamed.get()) {
                 livingEntityData.setTamed(true);
             }
