@@ -1,7 +1,7 @@
 package com.deathmotion.antihealthindicator.managers;
 
+import com.deathmotion.antihealthindicator.data.LivingEntityData;
 import com.deathmotion.antihealthindicator.data.VehicleData;
-import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import lombok.Getter;
 
 import java.util.Map;
@@ -10,11 +10,19 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class CacheManager {
-    private final ConcurrentHashMap<Integer, EntityType> entityTypeCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, LivingEntityData> livingEntityDataCache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, VehicleData> vehicleDataCache = new ConcurrentHashMap<>();
 
-    public void addEntity(int entityId, EntityType entityType) {
-        entityTypeCache.putIfAbsent(entityId, entityType);
+    public Optional<LivingEntityData> getLivingEntityData(int entityId) {
+        return Optional.ofNullable(livingEntityDataCache.get(entityId));
+    }
+
+    public Optional<VehicleData> getVehicleData(int entityId) {
+        return Optional.ofNullable(vehicleDataCache.get(entityId));
+    }
+
+    public void addEntity(int entityId, LivingEntityData livingEntityData) {
+        livingEntityDataCache.putIfAbsent(entityId, livingEntityData);
     }
 
     public void addVehicleData(int entityId, VehicleData vehicleData) {
@@ -22,12 +30,8 @@ public class CacheManager {
     }
 
     public void removeEntity(int entityId) {
-        entityTypeCache.remove(entityId);
+        livingEntityDataCache.remove(entityId);
         vehicleDataCache.remove(entityId);
-    }
-
-    public Optional<VehicleData> getVehicleData(int entityId) {
-        return Optional.ofNullable(vehicleDataCache.get(entityId));
     }
 
     public void updateVehicleHealth(int entityId, float health) {
@@ -40,10 +44,6 @@ public class CacheManager {
 
     public float getVehicleHealth(int entityId) {
         return getVehicleData(entityId).map(VehicleData::getHealth).orElse(0f);
-    }
-
-    public EntityType getEntityTypeById(int entityId) {
-        return entityTypeCache.get(entityId);
     }
 
     public boolean isUserPassenger(int entityId, int userId) {

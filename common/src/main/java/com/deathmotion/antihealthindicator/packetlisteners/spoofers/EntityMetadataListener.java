@@ -1,6 +1,7 @@
 package com.deathmotion.antihealthindicator.packetlisteners.spoofers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.deathmotion.antihealthindicator.data.LivingEntityData;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
@@ -16,14 +17,10 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EntityMetadataListener<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
     private final CacheManager cacheManager;
-    private final ServerVersion serverVersion;
 
     private final boolean healthTexturesSupported;
     private final boolean allowBypassEnabled;
@@ -41,7 +38,6 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
     public EntityMetadataListener(AHIPlatform<P> platform) {
         this.platform = platform;
         this.cacheManager = platform.getCacheManager();
-        this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
 
         healthTexturesSupported = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_15);
         allowBypassEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
@@ -77,15 +73,16 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
 
         int entityId = packet.getEntityId();
 
-        EntityType entityType = this.cacheManager.getEntityTypeById(entityId);
-        if (entityType == null) return;
+        LivingEntityData livingEntityData = this.cacheManager.getLivingEntityData(entityId).orElse(null);
+        if (livingEntityData == null) return;
+        EntityType entityType = livingEntityData.getEntityType();
 
         if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) {
             return;
         }
 
         if (entityType == EntityTypes.WOLF && ignoreWolvesEnabled) {
-            if (shouldIgnoreWolf(user, entityMetadataList)) return;
+            if (shouldIgnoreWolf(user, livingEntityData)) return;
         }
 
         entityMetadataList.forEach(entityData -> {
@@ -117,30 +114,12 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         event.markForReEncode(true);
     }
 
-    private boolean shouldIgnoreWolf(User user, List<EntityData> entityDataList) {
+    private boolean shouldIgnoreWolf(User user, LivingEntityData livingEntityData) {
         if (!ignoreTamedWolves && !ignoreOwnedWolves) {
             return true;
         }
 
-        AtomicBoolean isWolfTamed = new AtomicBoolean(false);
-        AtomicBoolean isWolfOwned = new AtomicBoolean(false);
-
-        entityDataList.forEach(wolfEntityData -> {
-            if (wolfEntityData.getIndex() == MetadataIndex.TAMABLE_TAMED) {
-                isWolfTamed.set(((Byte) wolfEntityData.getValue() & 0x04) != 0);
-            }
-            if (wolfEntityData.getIndex() == MetadataIndex.TAMABLE_OWNER) {
-                if (serverVersion.isOlderThan(ServerVersion.V_1_12)) {
-                    String ownerUUID = (String) wolfEntityData.getValue();
-                    isWolfOwned.set(user.getUUID().toString().equals(ownerUUID));
-                } else {
-                    Optional<UUID> ownerUUID = (Optional<UUID>) wolfEntityData.getValue();
-                    ownerUUID.ifPresent(UUID -> isWolfOwned.set(user.getUUID().equals(UUID)));
-                }
-            }
-        });
-
-        return (ignoreTamedWolves && isWolfTamed.get()) || (ignoreOwnedWolves && isWolfOwned.get());
+        return (ignoreTamedWolves && livingEntityData.isTamed()) || (ignoreOwnedWolves && livingEntityData.isOwnerPresent() && livingEntityData.getOwnerUUID().equals(user.getUUID()));
     }
 
     private void spoofIronGolemMetadata(EntityData obj) {

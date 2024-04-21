@@ -1,12 +1,15 @@
 package com.deathmotion.antihealthindicator.packetlisteners;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.deathmotion.antihealthindicator.data.LivingEntityData;
 import com.deathmotion.antihealthindicator.data.VehicleData;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
@@ -18,17 +21,22 @@ import com.github.retrooper.packetevents.wrapper.play.server.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EntityState<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
     private final CacheManager cacheManager;
 
+    private final ServerVersion serverVersion;
     private final boolean isBypassEnabled;
 
     public EntityState(AHIPlatform<P> platform) {
         this.platform = platform;
         this.cacheManager = platform.getCacheManager();
 
+        this.serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
         this.isBypassEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
     }
 
@@ -51,6 +59,10 @@ public class EntityState<P> extends PacketListenerAbstract {
             return;
         }
 
+        if (PacketType.Play.Server.ENTITY_METADATA == type) {
+            handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), event.getUser());
+        }
+
         if (PacketType.Play.Server.SET_PASSENGERS == type) {
             handleSetPassengers(new WrapperPlayServerSetPassengers(event), event.getUser());
             return;
@@ -69,7 +81,10 @@ public class EntityState<P> extends PacketListenerAbstract {
     private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet) {
         EntityType entityType = packet.getEntityType();
 
-        this.cacheManager.addEntity(packet.getEntityId(), entityType);
+        LivingEntityData livingEntityData = new LivingEntityData();
+        livingEntityData.setEntityType(entityType);
+
+        this.cacheManager.addEntity(packet.getEntityId(), livingEntityData);
 
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.ABSTRACT_HORSE)) {
             this.cacheManager.addVehicleData(packet.getEntityId(), new VehicleData());
@@ -80,7 +95,10 @@ public class EntityState<P> extends PacketListenerAbstract {
         EntityType entityType = packet.getEntityType();
 
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.LIVINGENTITY)) {
-            this.cacheManager.addEntity(packet.getEntityId(), entityType);
+            LivingEntityData livingEntityData = new LivingEntityData();
+            livingEntityData.setEntityType(entityType);
+
+            this.cacheManager.addEntity(packet.getEntityId(), livingEntityData);
 
             if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.ABSTRACT_HORSE)) {
                 this.cacheManager.addVehicleData(packet.getEntityId(), new VehicleData());
@@ -89,7 +107,44 @@ public class EntityState<P> extends PacketListenerAbstract {
     }
 
     private void handleJoinGame(WrapperPlayServerJoinGame packet) {
-        this.cacheManager.addEntity(packet.getEntityId(), EntityTypes.PLAYER);
+        LivingEntityData livingEntityData = new LivingEntityData();
+        livingEntityData.setEntityType(EntityTypes.PLAYER);
+
+        this.cacheManager.addEntity(packet.getEntityId(), livingEntityData);
+    }
+
+    private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, User user) {
+        int entityId = packet.getEntityId();
+
+        AtomicBoolean isWolfTamed = new AtomicBoolean(false);
+        AtomicBoolean isWolfOwned = new AtomicBoolean(false);
+
+        packet.getEntityMetadata().forEach(wolfEntityData -> {
+            if (wolfEntityData.getIndex() == MetadataIndex.TAMABLE_TAMED) {
+                isWolfTamed.set(((Byte) wolfEntityData.getValue() & 0x04) != 0);
+            }
+            if (wolfEntityData.getIndex() == MetadataIndex.TAMABLE_OWNER) {
+                if (serverVersion.isOlderThan(ServerVersion.V_1_12)) {
+                    String ownerUUID = (String) wolfEntityData.getValue();
+                    isWolfOwned.set(user.getUUID().toString().equals(ownerUUID));
+                } else {
+                    Optional<UUID> ownerUUID = (Optional<UUID>) wolfEntityData.getValue();
+                    ownerUUID.ifPresent(UUID -> isWolfOwned.set(user.getUUID().equals(UUID)));
+                }
+            }
+        });
+
+        if (isWolfTamed.get() || isWolfOwned.get()) {
+            LivingEntityData livingEntityData = this.cacheManager.getLivingEntityData(entityId).orElse(null);
+            if (livingEntityData == null) return;
+
+            if (isWolfTamed.get()) {
+                livingEntityData.setTamed(true);
+            }
+            if (isWolfOwned.get()) {
+                livingEntityData.setOwnerUUID(user.getUUID());
+            }
+        }
     }
 
     private void handleSetPassengers(WrapperPlayServerSetPassengers packet, User user) {
