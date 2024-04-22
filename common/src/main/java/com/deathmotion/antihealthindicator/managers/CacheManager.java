@@ -20,8 +20,8 @@
 
 package com.deathmotion.antihealthindicator.managers;
 
-import com.deathmotion.antihealthindicator.data.LivingEntityData;
-import com.deathmotion.antihealthindicator.data.RidableEntityData;
+import com.deathmotion.antihealthindicator.data.cache.LivingEntityData;
+import com.deathmotion.antihealthindicator.data.cache.RidableEntityData;
 import lombok.Getter;
 
 import java.util.Map;

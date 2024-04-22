@@ -21,8 +21,8 @@
 package com.deathmotion.antihealthindicator.packetlisteners.spoofers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.data.LivingEntityData;
-import com.deathmotion.antihealthindicator.data.WolfData;
+import com.deathmotion.antihealthindicator.data.cache.LivingEntityData;
+import com.deathmotion.antihealthindicator.data.cache.WolfData;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;

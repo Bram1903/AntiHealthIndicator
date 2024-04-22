@@ -20,17 +20,33 @@
 
 package com.deathmotion.antihealthindicator.data;
 
-import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
-import com.github.retrooper.packetevents.protocol.player.User;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-@Getter
-@Setter
-public class LivingEntityData {
-    private EntityType entityType;
+import static com.github.retrooper.packetevents.protocol.entity.type.EntityTypes.*;
 
-    public void processMetaData(EntityData metaData, User user) {
+/**
+ * Class representing entities that are ridable.
+ * This class provides a constant list of the entity types that are ridable.
+ */
+public class RidableEntities {
+    public static final List<EntityType> RIDABLE_ENTITY_TYPES;
+
+    static {
+        List<EntityType> entities = Arrays.asList(
+                CAMEL,
+                CHESTED_HORSE,
+                DONKEY,
+                HORSE,
+                MULE,
+                PIG,
+                SKELETON_HORSE,
+                STRIDER,
+                ZOMBIE_HORSE
+        );
+
+        RIDABLE_ENTITY_TYPES = Collections.unmodifiableList(entities);
     }
 }
