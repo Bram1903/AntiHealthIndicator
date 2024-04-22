@@ -41,16 +41,8 @@ public class CacheManager {
     }
 
     public Optional<RidableEntityData> getVehicleData(int entityId) {
-        Optional<LivingEntityData> livingEntityData = getLivingEntityData(entityId);
-
-        if (livingEntityData.isPresent()) {
-            LivingEntityData entityData = livingEntityData.get();
-            if (entityData instanceof RidableEntityData) {
-                return Optional.of((RidableEntityData) entityData);
-            }
-        }
-
-        return Optional.empty();
+        return getLivingEntityData(entityId).filter(entityData -> entityData instanceof RidableEntityData)
+                .map(entityData -> (RidableEntityData) entityData);
     }
 
     public boolean isLivingEntityCached(int entityId) {
