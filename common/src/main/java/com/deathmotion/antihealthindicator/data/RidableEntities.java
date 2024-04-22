@@ -21,12 +21,11 @@
 package com.deathmotion.antihealthindicator.data;
 
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import static com.github.retrooper.packetevents.protocol.entity.type.EntityTypes.*;
 
 /**
  * Class representing entities that are ridable.
@@ -36,18 +35,16 @@ public class RidableEntities {
     public static final List<EntityType> RIDABLE_ENTITY_TYPES;
 
     static {
-        List<EntityType> entities = Arrays.asList(
-                CAMEL,
-                CHESTED_HORSE,
-                DONKEY,
-                HORSE,
-                MULE,
-                PIG,
-                SKELETON_HORSE,
-                STRIDER,
-                ZOMBIE_HORSE
-        );
-
-        RIDABLE_ENTITY_TYPES = Collections.unmodifiableList(entities);
+        RIDABLE_ENTITY_TYPES = Collections.unmodifiableList(Arrays.asList(
+                EntityTypes.CAMEL,
+                EntityTypes.CHESTED_HORSE,
+                EntityTypes.DONKEY,
+                EntityTypes.HORSE,
+                EntityTypes.MULE,
+                EntityTypes.PIG,
+                EntityTypes.SKELETON_HORSE,
+                EntityTypes.STRIDER,
+                EntityTypes.ZOMBIE_HORSE
+        ));
     }
 }
