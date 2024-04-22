@@ -30,7 +30,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class CacheManager {
-    private final ConcurrentHashMap<Integer, LivingEntityData> livingEntityDataCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, LivingEntityData> livingEntityDataCache;
+
+    public CacheManager() {
+        livingEntityDataCache = new ConcurrentHashMap<>();
+    }
 
     public Optional<LivingEntityData> getLivingEntityData(int entityId) {
         return Optional.ofNullable(livingEntityDataCache.get(entityId));
