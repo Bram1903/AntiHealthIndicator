@@ -20,12 +20,22 @@
 
 package com.deathmotion.antihealthindicator.data;
 
+import com.deathmotion.antihealthindicator.util.MetadataIndex;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.player.User;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class VehicleData {
-    float health;
-    int passengerId;
+public class RidableEntityData extends LivingEntityData {
+    private float health;
+    private int passengerId;
+
+    @Override
+    public void processMetaData(EntityData metaData, User user) {
+        if (metaData.getIndex() == MetadataIndex.HEALTH) {
+            setHealth((float) metaData.getValue());
+        }
+    }
 }

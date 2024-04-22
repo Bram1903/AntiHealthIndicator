@@ -21,7 +21,7 @@
 package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.data.LivingEntityData;
-import com.deathmotion.antihealthindicator.data.VehicleData;
+import com.deathmotion.antihealthindicator.data.RidableEntityData;
 import lombok.Getter;
 
 import java.util.Map;
@@ -31,14 +31,22 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class CacheManager {
     private final ConcurrentHashMap<Integer, LivingEntityData> livingEntityDataCache = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer, VehicleData> vehicleDataCache = new ConcurrentHashMap<>();
 
     public Optional<LivingEntityData> getLivingEntityData(int entityId) {
         return Optional.ofNullable(livingEntityDataCache.get(entityId));
     }
 
-    public Optional<VehicleData> getVehicleData(int entityId) {
-        return Optional.ofNullable(vehicleDataCache.get(entityId));
+    public Optional<RidableEntityData> getVehicleData(int entityId) {
+        Optional<LivingEntityData> livingEntityData = getLivingEntityData(entityId);
+
+        if (livingEntityData.isPresent()) {
+            LivingEntityData entityData = livingEntityData.get();
+            if (entityData instanceof RidableEntityData) {
+                return Optional.of((RidableEntityData) entityData);
+            }
+        }
+
+        return Optional.empty();
     }
 
     public boolean isLivingEntityCached(int entityId) {
@@ -49,38 +57,29 @@ public class CacheManager {
         livingEntityDataCache.putIfAbsent(entityId, livingEntityData);
     }
 
-    public void addVehicleData(int entityId, VehicleData vehicleData) {
-        vehicleDataCache.put(entityId, vehicleData);
-    }
-
     public void removeLivingEntity(int entityId) {
         livingEntityDataCache.remove(entityId);
-        vehicleDataCache.remove(entityId);
-    }
-
-    public void updateVehicleHealth(int entityId, float health) {
-        getVehicleData(entityId).ifPresent(vehicleData -> vehicleData.setHealth(health));
     }
 
     public void updateVehiclePassenger(int entityId, int passengerId) {
-        getVehicleData(entityId).ifPresent(vehicleData -> vehicleData.setPassengerId(passengerId));
+        getVehicleData(entityId).ifPresent(ridableEntityData -> ridableEntityData.setPassengerId(passengerId));
     }
 
     public float getVehicleHealth(int entityId) {
-        return getVehicleData(entityId).map(VehicleData::getHealth).orElse(0f);
+        return getVehicleData(entityId).map(RidableEntityData::getHealth).orElse(0f);
     }
 
     public boolean isUserPassenger(int entityId, int userId) {
-        return getVehicleData(entityId).map(vehicleData -> vehicleData.getPassengerId() == userId).orElse(false);
+        return getVehicleData(entityId).map(ridableEntityData -> ridableEntityData.getPassengerId() == userId).orElse(false);
     }
 
     public int getPassengerId(int entityId) {
-        return getVehicleData(entityId).map(VehicleData::getPassengerId).orElse(0);
+        return getVehicleData(entityId).map(RidableEntityData::getPassengerId).orElse(0);
     }
 
     public int getEntityIdByPassengerId(int passengerId) {
-        return vehicleDataCache.entrySet().stream()
-                .filter(entry -> entry.getValue().getPassengerId() == passengerId)
+        return livingEntityDataCache.entrySet().stream()
+                .filter(entry -> entry.getValue() instanceof RidableEntityData && ((RidableEntityData) entry.getValue()).getPassengerId() == passengerId)
                 .mapToInt(Map.Entry::getKey)
                 .findFirst()
                 .orElse(0);

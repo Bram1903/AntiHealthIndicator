@@ -22,6 +22,7 @@ package com.deathmotion.antihealthindicator.packetlisteners.spoofers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.LivingEntityData;
+import com.deathmotion.antihealthindicator.data.WolfData;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
@@ -35,8 +36,6 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
-
-import java.util.List;
 
 public class EntityMetadataListener<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
@@ -79,7 +78,6 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
 
         WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata(event);
         User user = event.getUser();
-        List<EntityData> entityMetadataList = packet.getEntityMetadata();
 
         if (event.getUser().getEntityId() == packet.getEntityId()) return;
 
@@ -105,15 +103,7 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
             if (shouldIgnoreWolf(user, livingEntityData)) return;
         }
 
-        entityMetadataList.forEach(entityData -> {
-            if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.ABSTRACT_HORSE)) {
-                if (entityData.getIndex() == MetadataIndex.HEALTH) {
-                    // Update the health in our cache
-                    // to send the proper health of a vehicle when entering another method
-                    this.cacheManager.updateVehicleHealth(entityId, (float) entityData.getValue());
-                }
-            }
-
+        packet.getEntityMetadata().forEach(entityData -> {
             if (entityType == EntityTypes.IRON_GOLEM && ignoreIronGolemsEnabled) {
                 if (!gradualIronGolemHealthEnabled || !healthTexturesSupported) {
                     spoofLivingEntityMetadata(entityData);
@@ -139,7 +129,9 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
             return true;
         }
 
-        return (ignoreTamedWolves && livingEntityData.isTamed()) || (ignoreOwnedWolves && livingEntityData.isOwnerPresent() && livingEntityData.getOwnerUUID().equals(user.getUUID()));
+        WolfData wolfData = (WolfData) livingEntityData;
+
+        return (ignoreTamedWolves && wolfData.isTamed()) || (ignoreOwnedWolves && wolfData.isOwnerPresent() && wolfData.getOwnerUUID().equals(user.getUUID()));
     }
 
     private void spoofIronGolemMetadata(EntityData obj) {

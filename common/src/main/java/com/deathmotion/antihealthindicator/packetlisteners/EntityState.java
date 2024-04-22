@@ -22,7 +22,8 @@ package com.deathmotion.antihealthindicator.packetlisteners;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.LivingEntityData;
-import com.deathmotion.antihealthindicator.data.VehicleData;
+import com.deathmotion.antihealthindicator.data.RidableEntityData;
+import com.deathmotion.antihealthindicator.data.WolfData;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
@@ -39,8 +40,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class EntityState<P> extends PacketListenerAbstract {
@@ -95,30 +94,19 @@ public class EntityState<P> extends PacketListenerAbstract {
     }
 
     private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet) {
+        int entityId = packet.getEntityId();
         EntityType entityType = packet.getEntityType();
-
-        LivingEntityData livingEntityData = new LivingEntityData();
-        livingEntityData.setEntityType(entityType);
-
-        this.cacheManager.addLivingEntity(packet.getEntityId(), livingEntityData);
-
-        if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.ABSTRACT_HORSE)) {
-            this.cacheManager.addVehicleData(packet.getEntityId(), new VehicleData());
-        }
+        LivingEntityData entityData = createLivingEntity(entityType);
+        this.cacheManager.addLivingEntity(entityId, entityData);
     }
 
     private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet) {
+        int entityId = packet.getEntityId();
         EntityType entityType = packet.getEntityType();
 
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.LIVINGENTITY)) {
-            LivingEntityData livingEntityData = new LivingEntityData();
-            livingEntityData.setEntityType(entityType);
-
-            this.cacheManager.addLivingEntity(packet.getEntityId(), livingEntityData);
-
-            if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.ABSTRACT_HORSE)) {
-                this.cacheManager.addVehicleData(packet.getEntityId(), new VehicleData());
-            }
+            LivingEntityData entityData = createLivingEntity(entityType);
+            this.cacheManager.addLivingEntity(entityId, entityData);
         }
     }
 
@@ -132,26 +120,11 @@ public class EntityState<P> extends PacketListenerAbstract {
     private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, User user) {
         int entityId = packet.getEntityId();
 
-        LivingEntityData livingEntityData = this.cacheManager.getLivingEntityData(entityId).orElse(null);
-        if (livingEntityData == null || livingEntityData.getEntityType() != EntityTypes.WOLF) return;
+        LivingEntityData entityData = this.cacheManager.getLivingEntityData(entityId).orElse(null);
+        if (entityData == null) return;
 
-        packet.getEntityMetadata().forEach(wolfEntityData -> {
-            if (wolfEntityData.getIndex() == MetadataIndex.TAMABLE_TAMED) {
-                livingEntityData.setTamed(((Byte) wolfEntityData.getValue() & 0x04) != 0);
-            } else if (wolfEntityData.getIndex() == MetadataIndex.TAMABLE_OWNER) {
-                Object value = wolfEntityData.getValue();
-
-                UUID ownerUUID = value instanceof String
-                        ? Optional.ofNullable((String) value)
-                        .filter(user.getUUID().toString()::equals)
-                        .map(UUID::fromString)
-                        .orElse(null)
-                        : ((Optional<UUID>) value)
-                        .filter(user.getUUID()::equals)
-                        .orElse(null);
-
-                livingEntityData.setOwnerUUID(ownerUUID);
-            }
+        packet.getEntityMetadata().forEach(metaData -> {
+            entityData.processMetaData(metaData, user);
         });
     }
 
@@ -202,6 +175,19 @@ public class EntityState<P> extends PacketListenerAbstract {
                 }, 100, TimeUnit.MILLISECONDS);
             }
         }
+    }
+
+    private LivingEntityData createLivingEntity(EntityType entityType) {
+        LivingEntityData entityData;
+        if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.WOLF)) {
+            entityData = new WolfData();
+        } else if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.ABSTRACT_HORSE)) {
+            entityData = new RidableEntityData();
+        } else {
+            entityData = new LivingEntityData();
+        }
+        entityData.setEntityType(entityType);
+        return entityData;
     }
 
     private void handlePassengerEvent(User user, int vehicleId, float healthValue, boolean entering) {
