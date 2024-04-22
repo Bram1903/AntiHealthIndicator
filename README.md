@@ -52,7 +52,7 @@ Players that are OP (Operators) have these permissions by default.
 
 ## Installation
 
-1. **Prerequisites**: Ensure the [PacketEvents library](https://github.com/retrooper/packetevents) is installed.
+1. **Prerequisites**: Ensure the [PacketEvents library](https://modrinth.com/plugin/packetevents/versions#all-versions) is installed.
 2. **Download**: Get the latest release from
    the [GitHub release page](https://github.com/Bram1903/AntiHealthIndicator/releases/latest).
 3. **Installation**: Move the downloaded plugin to your server's plugins directory.
