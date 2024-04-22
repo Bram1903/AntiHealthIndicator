@@ -4,67 +4,62 @@
 [![CodeQL](https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/codeql.yml/badge.svg)](https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/codeql.yml)
 ![GitHub Release](https://img.shields.io/github/release/Bram1903/AntiHealthIndicator.svg)
 
+## Overview
+
+AntiHealthIndicator is a robust Minecraft plugin
+designed to foster fair gameplay by preventing cheaters and modders from gaining unfair advantages.
+This lightweight solution modifies specific data packets
+to ensure players cannot access critical information such as health or player status,
+thereby maintaining a level playing field for all participants.
+
 ## Showcase
 
 ![Demo](showcase/AntiHealthIndicator.gif)
 
-## Supported Versions
+## Key Features
 
-This plugin supports every Minecraft version from 1.8.8 to 1.20.4.
-Besides that, the plugin also supports Spigot, Paper, and Folia.
+- **Asynchronous Design**: Utilizes asynchronous packet modifications to ensure server performance remains unaffected.
+- **Compatibility**: Supports a wide range of Minecraft versions from 1.8.8 to 1.20.4, along with popular server
+  platforms including Spigot, Paper, and Folia.
+- **Customizable Settings**: Highly configurable plugin settings enable server administrators to tailor the experience
+  according to their preferences.
+- **Update Notifications**: Automatically checks for updates upon startup and notifies administrators of available
+  upgrades.
+- **Permission System**: Implements a permission system to grant specific privileges, including bypassing spoofing
+  features.
 
-Technically, it should also work on any Spigot or Paper fork, but I can't guarantee that statement.
+## Spoofers
 
-## Features
+The plugin includes a set of spoofing features, including:
 
-- **Completely Asynchronous** - The plugin is designed to be as lightweight as possible.
-  All packet modifications are done asynchronously, so the main thread is never blocked.
-- **Folia Support** - The plugin integrates with [Folia](https://papermc.io/software/folia), which is a Paper fork that
-  adds regionised multithreading to the server.
-- **Configurable** - The plugin is highly configurable, allowing you to adjust the settings to your liking.
-- **Update Checker** - The plugin automatically checks for updates on startup.
-  If a new version is available, a message will be sent to the console.
-- **Stand Alone** - The plugin is completely stand alone, meaning it doesn't require any other plugins to function.
-- **Permission Bypass** - The plugin allows you to bypass the spoofing features with the `AntiHealthIndicator.Bypass`
-  permission (can be enabled in the config).
-
-### Spoofers
-
-> The spoofer features is a collection of features that modify the data packets sent to the client or other clients,
-> which prevents them from being used to gain an unfair advantage.
-
-- **Health**
-- **Air Ticks**
-- **Player Absorption**
-- **Player Saturation**
-- **Player XP**
-- **Item Durability**
-- **Item Enchantments**
-- **Item Stack Amount**
-- **World Seed**
-- **Enchantment Seed**
+- Health
+- Air Ticks
+- Player Absorption
+- Player Saturation
+- Player XP
+- Item Durability
+- Item Enchantments
+- Item Stack Amount
+- World Seed
+- Enchantment Seed
 
 ## Permission Nodes
 
 Players that are OP (Operators) have these permissions by default.
 
 - `AntiHealthIndicator.Notify` Notifies the player when a new update is available.
-- `AntiHealthIndicator.Bypass` Prevents the player from receiving spoofed data.
+- `AntiHealthIndicator.Bypass` Prevents the player from receiving spoofed data (if enabled in the config).
 
-## Installation Guide
+## Installation
 
-1. [Download the latest release](https://github.com/Bram1903/AntiHealthIndicator/releases/latest) from the release
-   page.
+1. **Prerequisites**: Ensure the [PacketEvents library](https://github.com/retrooper/packetevents) is installed.
+2. **Download**: Get the latest release from
+   the [GitHub release page](https://github.com/Bram1903/AntiHealthIndicator/releases/latest).
+3. **Installation**: Move the downloaded plugin to your server's plugins directory.
+4. **Configuration**: Customize settings in the `config.yml` file to match server preferences.
+5. **Restart**: Restart the server for changes to take effect.
 
-2. Move the downloaded plugin to the plugins directory of your server.
-
-3. Restart your server for the changes to be implemented.
-
-4. Adjust the presets in the `config.yml` file to match your preferences. (Restart required)
-
-5. You're good to go!
-
-## Compiling Jar From Source
+## Compiling From Source
 
 ### Prerequisites
 
@@ -85,26 +80,29 @@ Players that are OP (Operators) have these permissions by default.
    ```
 
 3. **Compile the Source Code**:
-   Use Gradle to compile the source code and generate the jar file:
+   Use the Gradle wrapper to compile the source code and generate the plugin JAR file:
+   <details>
+   <summary><strong>Linux / macOS</strong></summary>
+
    ```bash
    ./gradlew build
    ```
-   or for Windows CMD:
+   </details>
+   <details>
+   <summary><strong>Windows</strong></summary>
+
    ```cmd
    .\gradlew build
    ```
-
-4. **Locate the Jar File**:
-   Upon successful compilation,
-   the generated jar file can be found in the `build/libs/` directory within the project root.
-
-By following these steps, you will compile the AntiHealthIndicator plugin from its source code.
+   </details>
 
 ## Credits
 
-- **[Retrooper](https://github.com/retrooper)** for helping me with multiple questions, and for writing the amazing
-  library
-  [PacketEvents](https://github.com/retrooper/packetevents)
-  which this plugin uses, to get easy read and write access to the Minecraft protocol!
-- A few people in the PacketEvents [Discord server](https://discord.me/packetevents) for helping me with a bunch of
-  questions I had!
+- **[@Retrooper](https://github.com/retrooper)**: Author of
+  the [PacketEvents library](https://github.com/retrooper/packetevents) for facilitating access to Minecraft protocol.
+- **[@Tofaa](https://github.com/Tofaa2)**: Provided invaluable assistance and guidance during the development of this
+  project.
+
+## License
+
+This project is licensed under the [GPL3 License](LICENSE).
