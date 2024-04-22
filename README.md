@@ -4,6 +4,9 @@
 [![CodeQL](https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/codeql.yml/badge.svg)](https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/codeql.yml)
 ![GitHub Release](https://img.shields.io/github/release/Bram1903/AntiHealthIndicator.svg)
 
+[![SpigotMC](https://img.shields.io/badge/-SpigotMC-blue?style=for-the-badge&logo=SpigotMC)](https://www.spigotmc.org/resources/antihealthindicator.114851/)
+[![Modrinth](https://img.shields.io/badge/-Modrinth-green?style=for-the-badge&logo=Modrinth)](https://modrinth.com/plugin/antihealthindicator)
+
 ## Overview
 
 AntiHealthIndicator is a robust Minecraft plugin
