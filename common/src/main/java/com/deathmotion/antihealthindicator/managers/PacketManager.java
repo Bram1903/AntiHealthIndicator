@@ -46,13 +46,6 @@ public class PacketManager<P> {
         if (platform.getConfigurationOption(ConfigOption.ENTITY_DATA_ENABLED)) {
             PacketEvents.getAPI().getEventManager().registerListener(new EntityState<>(this.platform));
             PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener<>(this.platform));
-
-            boolean spoofHealth = platform.getConfigurationOption(ConfigOption.HEALTH_ENABLED);
-            boolean ignoreVehicles = platform.getConfigurationOption(ConfigOption.IGNORE_VEHICLES_ENABLED);
-
-            if (spoofHealth && ignoreVehicles) {
-                // TODO: Add a check listener that keeps track of the entities that are riding vehicles
-            }
         }
     }
 
@@ -60,7 +53,6 @@ public class PacketManager<P> {
         if (platform.getConfigurationOption(ConfigOption.ITEMS_ENABLED)) {
             PacketEvents.getAPI().getEventManager().registerListener(new EntityEquipmentListener<>(this.platform));
         }
-
         if (platform.getConfigurationOption(ConfigOption.SPOOF_FOOD_SATURATION_ENABLED)) {
             PacketEvents.getAPI().getEventManager().registerListener(new PlayerUpdateHealthListener<>(this.platform));
         }

@@ -96,15 +96,17 @@ public class EntityState<P> extends PacketListenerAbstract {
     private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet) {
         int entityId = packet.getEntityId();
         EntityType entityType = packet.getEntityType();
+
         LivingEntityData entityData = createLivingEntity(entityType);
         this.cacheManager.addLivingEntity(entityId, entityData);
     }
 
     private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet) {
-        int entityId = packet.getEntityId();
         EntityType entityType = packet.getEntityType();
 
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.LIVINGENTITY)) {
+            int entityId = packet.getEntityId();
+
             LivingEntityData entityData = createLivingEntity(entityType);
             this.cacheManager.addLivingEntity(entityId, entityData);
         }

@@ -66,7 +66,7 @@ public class CacheManager {
     }
 
     public float getVehicleHealth(int entityId) {
-        return getVehicleData(entityId).map(RidableEntityData::getHealth).orElse(0f);
+        return getVehicleData(entityId).map(RidableEntityData::getHealth).orElse(0.5f);
     }
 
     public boolean isUserPassenger(int entityId, int userId) {
