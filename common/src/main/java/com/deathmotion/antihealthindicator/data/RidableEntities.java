@@ -21,6 +21,7 @@
 package com.deathmotion.antihealthindicator.data;
 
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

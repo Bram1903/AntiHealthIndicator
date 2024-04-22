@@ -184,6 +184,7 @@ public class EntityState<P> extends PacketListenerAbstract {
 
     private LivingEntityData createLivingEntity(EntityType entityType) {
         LivingEntityData entityData;
+
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.WOLF)) {
             entityData = new WolfData();
         } else if (RidableEntities.RIDABLE_ENTITY_TYPES.contains(entityType)) {
@@ -191,6 +192,7 @@ public class EntityState<P> extends PacketListenerAbstract {
         } else {
             entityData = new LivingEntityData();
         }
+
         entityData.setEntityType(entityType);
         return entityData;
     }
