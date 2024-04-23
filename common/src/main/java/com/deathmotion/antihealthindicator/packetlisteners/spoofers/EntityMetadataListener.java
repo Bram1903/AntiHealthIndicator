@@ -99,11 +99,18 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
             return;
         }
 
+        boolean ignoreWolf;
         if (entityType == EntityTypes.WOLF && ignoreWolvesEnabled) {
-            if (shouldIgnoreWolf(user, livingEntityData)) return;
+            ignoreWolf = shouldIgnoreWolf(user, livingEntityData);
+        } else {
+            ignoreWolf = false;
         }
 
         packet.getEntityMetadata().forEach(entityData -> {
+            livingEntityData.processMetaData(entityData, user);
+
+            if (ignoreWolf) return;
+
             if (entityType == EntityTypes.IRON_GOLEM && ignoreIronGolemsEnabled) {
                 if (!gradualIronGolemHealthEnabled || !healthTexturesSupported) {
                     spoofLivingEntityMetadata(entityData);
