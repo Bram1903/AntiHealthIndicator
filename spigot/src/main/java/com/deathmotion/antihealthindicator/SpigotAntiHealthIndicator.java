@@ -30,6 +30,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -71,9 +72,12 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
     }
 
     @Override
-    public boolean isEntityRemoved(int entityId, Object playerObject) {
-        Player player = (Player) playerObject;
-        return SpigotConversionUtil.getEntityById(player.getWorld(), entityId) == null;
+    public boolean isEntityRemoved(int entityId, @Nullable Object playerObject) {
+        if (playerObject instanceof Player) {
+            return SpigotConversionUtil.getEntityById(((Player) playerObject).getWorld(), entityId) == null;
+        }
+
+        return SpigotConversionUtil.getEntityById(null, entityId) == null;
     }
 
     @Override

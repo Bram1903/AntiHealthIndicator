@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
 
 public class EntityState<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
-    private final CacheManager cacheManager;
+    private final CacheManager<P> cacheManager;
 
     private final boolean isBypassEnabled;
 

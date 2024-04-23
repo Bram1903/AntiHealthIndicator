@@ -28,6 +28,7 @@ import com.deathmotion.antihealthindicator.wrappers.PlatformLoggerWrapperImpl;
 import com.deathmotion.antihealthindicator.wrappers.interfaces.Scheduler;
 import com.github.retrooper.packetevents.PacketEvents;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -36,14 +37,14 @@ public abstract class AHIPlatform<P> {
 
     private final PlatformLoggerWrapperImpl loggerWrapper = new PlatformLoggerWrapperImpl();
     protected Scheduler scheduler;
-    private CacheManager cacheManager;
+    private CacheManager<P> cacheManager;
 
     public void commonOnLoad() {
         // Load common stuff
     }
 
     public void commonOnEnable() {
-        cacheManager = new CacheManager();
+        cacheManager = new CacheManager<>(this);
 
         new UpdateManager<>(this);
         new PacketManager<>(this);
@@ -57,7 +58,7 @@ public abstract class AHIPlatform<P> {
 
     public abstract boolean hasPermission(UUID sender, String permission);
 
-    public abstract boolean isEntityRemoved(int entityId, Object player);
+    public abstract boolean isEntityRemoved(int entityId, @Nullable Object player);
 
     public abstract boolean getConfigurationOption(ConfigOption option);
 

@@ -39,7 +39,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 
 public class EntityMetadataListener<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
-    private final CacheManager cacheManager;
+    private final CacheManager<P> cacheManager;
 
     private final boolean healthTexturesSupported;
     private final boolean allowBypassEnabled;

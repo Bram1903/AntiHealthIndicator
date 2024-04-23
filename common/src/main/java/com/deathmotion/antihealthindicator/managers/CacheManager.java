@@ -20,6 +20,7 @@
 
 package com.deathmotion.antihealthindicator.managers;
 
+import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.cache.LivingEntityData;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntityData;
 import lombok.Getter;
@@ -27,13 +28,19 @@ import lombok.Getter;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Getter
-public class CacheManager {
+public class CacheManager<P> {
+    private final AHIPlatform<P> platform;
+
     private final ConcurrentHashMap<Integer, LivingEntityData> livingEntityDataCache;
 
-    public CacheManager() {
+    public CacheManager(AHIPlatform<P> platform) {
+        this.platform = platform;
+
         livingEntityDataCache = new ConcurrentHashMap<>();
+        this.CleanCache();
     }
 
     public Optional<LivingEntityData> getLivingEntityData(int entityId) {
@@ -80,4 +87,33 @@ public class CacheManager {
                 .findFirst()
                 .orElse(0);
     }
+
+    private void CleanCache() {
+        this.platform.getScheduler().runAsyncTaskAtFixedRate((o) -> {
+            livingEntityDataCache.keySet().forEach(key -> {
+                if (this.platform.isEntityRemoved(key, null)) {
+                    livingEntityDataCache.remove(key);
+                }
+            });
+        }, 1, 1, TimeUnit.MINUTES);
+    }
+
+//    private void CleanCache() {
+//        this.platform.getScheduler().runAsyncTaskAtFixedRate((o) -> {
+//            final Set<Integer> keysToRemove = new HashSet<>();
+//
+//            final int initialSize = livingEntityDataCache.size();
+//
+//            livingEntityDataCache.keySet().forEach(key -> {
+//                if (this.platform.isEntityRemoved(key, null)) {
+//                    keysToRemove.add(key);
+//                }
+//            });
+//
+//            keysToRemove.forEach(this::removeLivingEntity);
+//            int removedEntitiesCount = initialSize - livingEntityDataCache.size();
+//
+//            this.platform.getLoggerWrapper().info("The cache was reduced by: " + removedEntitiesCount);
+//        }, 1, 1, TimeUnit.MINUTES);
+//    }
 }
