@@ -23,6 +23,7 @@ package com.deathmotion.antihealthindicator.managers;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.cache.LivingEntityData;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntityData;
+import com.deathmotion.antihealthindicator.packetlisteners.EntityState;
 import lombok.Getter;
 
 import java.util.Map;
@@ -88,6 +89,11 @@ public class CacheManager<P> {
                 .orElse(0);
     }
 
+    /**
+     * Technically the {@link EntityState} handler should remove entities from the cache
+     * when an entity is being removed,
+     * but this is a safety measure to ensure that the cache won't be creating memory leaks.
+     */
     private void CleanCache() {
         this.platform.getScheduler().runAsyncTaskAtFixedRate((o) -> {
             livingEntityDataCache.keySet().forEach(key -> {
@@ -97,23 +103,4 @@ public class CacheManager<P> {
             });
         }, 1, 1, TimeUnit.MINUTES);
     }
-
-//    private void CleanCache() {
-//        this.platform.getScheduler().runAsyncTaskAtFixedRate((o) -> {
-//            final Set<Integer> keysToRemove = new HashSet<>();
-//
-//            final int initialSize = livingEntityDataCache.size();
-//
-//            livingEntityDataCache.keySet().forEach(key -> {
-//                if (this.platform.isEntityRemoved(key, null)) {
-//                    keysToRemove.add(key);
-//                }
-//            });
-//
-//            keysToRemove.forEach(this::removeLivingEntity);
-//            int removedEntitiesCount = initialSize - livingEntityDataCache.size();
-//
-//            this.platform.getLoggerWrapper().info("The cache was reduced by: " + removedEntitiesCount);
-//        }, 1, 1, TimeUnit.MINUTES);
-//    }
 }
