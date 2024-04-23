@@ -22,6 +22,9 @@ import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.cache.LivingEntityData;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntityData;
 import com.deathmotion.antihealthindicator.packetlisteners.EntityState;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import lombok.Getter;
 
 import java.util.Map;
@@ -34,11 +37,18 @@ public class CacheManager<P> {
     private final AHIPlatform<P> platform;
 
     private final ConcurrentHashMap<Integer, LivingEntityData> livingEntityDataCache;
+    private final Cache<Integer, LivingEntityData> test;
 
     public CacheManager(AHIPlatform<P> platform) {
         this.platform = platform;
 
         livingEntityDataCache = new ConcurrentHashMap<>();
+        test = Caffeine.newBuilder()
+                .expireAfterAccess(5, TimeUnit.MINUTES)
+                .removalListener((Integer entityId, LivingEntityData livingEntityData, RemovalCause cause) ->
+                        System.out.println("Entity ID: " + entityId + " has been removed."))
+                .build();
+
         this.CleanCache();
     }
 

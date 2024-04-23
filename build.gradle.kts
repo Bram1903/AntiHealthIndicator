@@ -37,8 +37,10 @@ tasks {
         minimize()
         archiveFileName.set("${project.name}-${project.version}.jar")
 
-        subprojects.forEach { subproject ->
+        project.subprojects.forEach { subproject ->
             from(project(subproject.path).sourceSets.main.get().output)
         }
+
+        relocate("com.github.benmanes.caffeine", "com.deathmotion.antihealthindicator.shaded.caffeine")
     }
 }
