@@ -44,7 +44,6 @@ The plugin includes a set of spoofing features, including:
 - Item Enchantments
 - Item Stack Amount
 - World Seed
-- Enchantment Seed
 
 ## Permission Nodes
 

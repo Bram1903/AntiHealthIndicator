@@ -29,7 +29,6 @@ public enum ConfigOption {
     ALLOW_BYPASS_ENABLED("allow-bypass.enabled", false),
 
     SPOOF_WORLD_SEED_ENABLED("spoof.world-seed.enabled", false),
-    SPOOF_ENCHANT_SEED_ENABLED("spoof.enchant-seed.enabled", false),
     SPOOF_FOOD_SATURATION_ENABLED("spoof.food-saturation.enabled", true),
 
     ENTITY_DATA_ENABLED("spoof.entity-data.enabled", true),

@@ -57,8 +57,5 @@ public class PacketManager<P> {
         if (platform.getConfigurationOption(ConfigOption.SPOOF_WORLD_SEED_ENABLED)) {
             PacketEvents.getAPI().getEventManager().registerListener(new WorldSeedListener<>(this.platform));
         }
-        if (platform.getConfigurationOption(ConfigOption.ENCHANTMENTS_ENABLED)) {
-            PacketEvents.getAPI().getEventManager().registerListener(new WindowItemsListener<>(this.platform));
-        }
     }
 }
