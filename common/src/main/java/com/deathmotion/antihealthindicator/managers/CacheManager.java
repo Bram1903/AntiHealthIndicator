@@ -21,7 +21,9 @@ package com.deathmotion.antihealthindicator.managers;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.cache.LivingEntityData;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntityData;
-import com.github.benmanes.caffeine.cache.*;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalListener;
 import lombok.Getter;
 
 import java.util.Map;
@@ -31,19 +33,25 @@ import java.util.concurrent.TimeUnit;
 @Getter
 public class CacheManager<P> {
     private final AHIPlatform<P> platform;
-
     private final Cache<Integer, LivingEntityData> livingEntityDataCache;
+    private final RemovalListener<Integer, LivingEntityData> removalListener;
 
     public CacheManager(AHIPlatform<P> platform) {
         this.platform = platform;
 
-        this.livingEntityDataCache = Caffeine.newBuilder()
-                .expireAfterAccess(10, TimeUnit.SECONDS)
-                .removalListener((RemovalListener<Integer, LivingEntityData>) (key, value, cause) -> {
-                    if (key != null && cause.wasEvicted()) {
-                        this.checkDeletedEntity(key, value);
+        this.removalListener = (key, value, cause) -> {
+            if (key != null && cause.wasEvicted()) {
+                this.platform.getScheduler().runAsyncTask((o) -> {
+                    if (!this.platform.isEntityRemoved(key, null)) {
+                        this.addLivingEntity(key, value);
                     }
-                })
+                });
+            }
+        };
+
+        this.livingEntityDataCache = Caffeine.newBuilder()
+                .expireAfterAccess(1, TimeUnit.MINUTES)
+                .removalListener(this.removalListener)
                 .build();
     }
 
@@ -57,7 +65,7 @@ public class CacheManager<P> {
     }
 
     public boolean isLivingEntityCached(int entityId) {
-        return livingEntityDataCache.asMap().containsKey(entityId);
+        return livingEntityDataCache.getIfPresent(entityId) != null;
     }
 
     public void addLivingEntity(int entityId, LivingEntityData livingEntityData) {
@@ -85,20 +93,11 @@ public class CacheManager<P> {
     }
 
     public int getEntityIdByPassengerId(int passengerId) {
-        return livingEntityDataCache.asMap().entrySet().stream()
-                .filter(entry -> entry.getValue() instanceof RidableEntityData && ((RidableEntityData) entry.getValue()).getPassengerId() == passengerId)
-                .mapToInt(Map.Entry::getKey)
-                .findFirst()
-                .orElse(0);
-    }
-
-    private void checkDeletedEntity(int entityId, LivingEntityData livingEntityData) {
-        if (platform.isEntityRemoved(entityId, null)) {
-            this.platform.getLoggerWrapper().info("Entity with id " + entityId + " was removed from the world, removing from cache");
+        for (Map.Entry<Integer, LivingEntityData> entry : livingEntityDataCache.asMap().entrySet()) {
+            if (entry.getValue() instanceof RidableEntityData && ((RidableEntityData) entry.getValue()).getPassengerId() == passengerId) {
+                return entry.getKey();
+            }
         }
-        else {
-            this.platform.getLoggerWrapper().info("Entity with id " + entityId + " was not removed from the world, re-adding to cache");
-            this.addLivingEntity(entityId, livingEntityData);
-        }
+        return 0;
     }
 }
