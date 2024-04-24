@@ -102,10 +102,13 @@ Players that are OP (Operators) have these permissions by default.
 
 ## Credits
 
+Without the following people, this project wouldn't be half as good as it is right now!
+
 - **[@Retrooper](https://github.com/retrooper)**: Author of
-  the [PacketEvents library](https://github.com/retrooper/packetevents) for facilitating access to Minecraft protocol.
-- **[@Tofaa](https://github.com/Tofaa2)**: Provided invaluable assistance and guidance during the development of this
-  project.
+  the [PacketEvents library](https://github.com/retrooper/packetevents) and just a great guy overall!
+- **[@Tofaa](https://github.com/Tofaa2)**:
+  Really nice person who helped me with the major part of the project infrastructure and logic!
+  Check out his [EntityLib](https://github.com/Tofaa2/EntityLib)!
 
 ## License
 
