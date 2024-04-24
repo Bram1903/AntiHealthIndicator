@@ -21,39 +21,34 @@ package com.deathmotion.antihealthindicator.managers;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.cache.LivingEntityData;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntityData;
-import com.deathmotion.antihealthindicator.packetlisteners.EntityState;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.*;
 import lombok.Getter;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Getter
 public class CacheManager<P> {
     private final AHIPlatform<P> platform;
 
-    private final ConcurrentHashMap<Integer, LivingEntityData> livingEntityDataCache;
-    private final Cache<Integer, LivingEntityData> test;
+    private final Cache<Integer, LivingEntityData> livingEntityDataCache;
 
     public CacheManager(AHIPlatform<P> platform) {
         this.platform = platform;
 
-        livingEntityDataCache = new ConcurrentHashMap<>();
-        test = Caffeine.newBuilder()
-                .expireAfterAccess(5, TimeUnit.MINUTES)
-                .removalListener((Integer entityId, LivingEntityData livingEntityData, RemovalCause cause) ->
-                        System.out.println("Entity ID: " + entityId + " has been removed."))
+        this.livingEntityDataCache = Caffeine.newBuilder()
+                .expireAfterAccess(10, TimeUnit.SECONDS)
+                .removalListener((RemovalListener<Integer, LivingEntityData>) (key, value, cause) -> {
+                    if (key != null && cause.wasEvicted()) {
+                        this.checkDeletedEntity(key, value);
+                    }
+                })
                 .build();
-
-        this.CleanCache();
     }
 
     public Optional<LivingEntityData> getLivingEntityData(int entityId) {
-        return Optional.ofNullable(livingEntityDataCache.get(entityId));
+        return Optional.ofNullable(livingEntityDataCache.getIfPresent(entityId));
     }
 
     public Optional<RidableEntityData> getVehicleData(int entityId) {
@@ -62,15 +57,15 @@ public class CacheManager<P> {
     }
 
     public boolean isLivingEntityCached(int entityId) {
-        return livingEntityDataCache.containsKey(entityId);
+        return livingEntityDataCache.asMap().containsKey(entityId);
     }
 
     public void addLivingEntity(int entityId, LivingEntityData livingEntityData) {
-        livingEntityDataCache.putIfAbsent(entityId, livingEntityData);
+        livingEntityDataCache.put(entityId, livingEntityData);
     }
 
     public void removeLivingEntity(int entityId) {
-        livingEntityDataCache.remove(entityId);
+        livingEntityDataCache.invalidate(entityId);
     }
 
     public void updateVehiclePassenger(int entityId, int passengerId) {
@@ -90,25 +85,20 @@ public class CacheManager<P> {
     }
 
     public int getEntityIdByPassengerId(int passengerId) {
-        return livingEntityDataCache.entrySet().stream()
+        return livingEntityDataCache.asMap().entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof RidableEntityData && ((RidableEntityData) entry.getValue()).getPassengerId() == passengerId)
                 .mapToInt(Map.Entry::getKey)
                 .findFirst()
                 .orElse(0);
     }
 
-    /**
-     * Technically the {@link EntityState} handler should remove entities from the cache
-     * when an entity is being removed,
-     * but this is a safety measure to ensure that the cache won't be creating memory leaks.
-     */
-    private void CleanCache() {
-        this.platform.getScheduler().runAsyncTaskAtFixedRate((o) -> {
-            livingEntityDataCache.keySet().forEach(key -> {
-                if (this.platform.isEntityRemoved(key, null)) {
-                    livingEntityDataCache.remove(key);
-                }
-            });
-        }, 1, 1, TimeUnit.MINUTES);
+    private void checkDeletedEntity(int entityId, LivingEntityData livingEntityData) {
+        if (platform.isEntityRemoved(entityId, null)) {
+            this.platform.getLoggerWrapper().info("Entity with id " + entityId + " was removed from the world, removing from cache");
+        }
+        else {
+            this.platform.getLoggerWrapper().info("Entity with id " + entityId + " was not removed from the world, re-adding to cache");
+            this.addLivingEntity(entityId, livingEntityData);
+        }
     }
 }

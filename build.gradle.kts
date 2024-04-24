@@ -24,6 +24,10 @@ allprojects {
     }
 }
 
+dependencies {
+    api("com.github.ben-manes.caffeine:caffeine:2.5.6")
+}
+
 tasks {
     build {
         dependsOn(shadowJar)
@@ -34,13 +38,12 @@ tasks {
     }
 
     shadowJar {
-        minimize()
         archiveFileName.set("${project.name}-${project.version}.jar")
-
         project.subprojects.forEach { subproject ->
             from(project(subproject.path).sourceSets.main.get().output)
         }
 
         relocate("com.github.benmanes.caffeine", "com.deathmotion.antihealthindicator.shaded.caffeine")
+        minimize()
     }
 }

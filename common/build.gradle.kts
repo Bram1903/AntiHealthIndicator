@@ -4,7 +4,7 @@ dependencies {
     compileOnlyApi("com.github.retrooper.packetevents:api:2.2.1")
     compileOnlyApi("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
-    implementation("com.github.ben-manes.caffeine:caffeine:2.5.6")
+    api("com.github.ben-manes.caffeine:caffeine:2.5.6")
 
     compileOnlyApi("net.kyori:adventure-api:$adventureVersion")
     compileOnlyApi("net.kyori:adventure-text-serializer-gson:$adventureVersion")
