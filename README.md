@@ -51,6 +51,8 @@ Players that are OP (Operators) have these permissions by default.
 
 - `AntiHealthIndicator.Notify` Notifies the player when a new update is available.
 - `AntiHealthIndicator.Bypass` Prevents the player from receiving spoofed data (if enabled in the config).
+- `AntiHealthIndicator.Debug` Allows the player to receive debug messages periodically in-game when debugging is enabled
+  in the config.
 
 ## Installation
 
