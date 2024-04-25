@@ -22,6 +22,8 @@ import lombok.Getter;
 
 @Getter
 public enum ConfigOption {
+    DEBUG_ENABLED("debug.enabled", false),
+
     UPDATE_CHECKER_ENABLED("update-checker.enabled", true),
     UPDATE_CHECKER_PRINT_TO_CONSOLE("update-checker.print-to-console", true),
     NOTIFY_IN_GAME("update-checker.notify-in-game", true),

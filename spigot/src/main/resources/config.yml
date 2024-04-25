@@ -6,6 +6,10 @@
 #   /_/    \_\_| |_|\__|_|_|  |_|\___|\__,_|_|\__|_| |_|_____|_| |_|\__,_|_|\___\__,_|\__\___/|_|
 #
 
+debug:
+  # If enabled, the plugin will print debug messages to players with the permission "AntiHealthIndicator.Debug".
+  enabled: false
+
 # This option determines whether the plugin will check for an update on startup.
 update-checker:
   enabled: true

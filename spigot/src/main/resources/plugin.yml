@@ -14,5 +14,8 @@ permissions:
   AntiHealthIndicator.Bypass:
     description: "This permission prevents the player from receiving spoofed data."
     default: op
+  AntiHealthIndicator.Debug:
+    description: "This permission allows players to see debug messages."
+    default: op
 depend:
   - packetevents

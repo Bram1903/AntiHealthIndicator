@@ -21,9 +21,11 @@ package com.deathmotion.antihealthindicator;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.deathmotion.antihealthindicator.wrappers.interfaces.Scheduler;
+import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -86,6 +88,14 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
     @Override
     public String getPluginVersion() {
         return this.plugin.getDescription().getVersion();
+    }
+
+    @Override
+    public void broadcastComponent(Component component, @Nullable String permission) {
+        Bukkit.getOnlinePlayers().stream()
+                .filter(player -> permission == null || player.hasPermission(permission))
+                .map(player -> PacketEvents.getAPI().getPlayerManager().getUser(player))
+                .forEach(user -> user.sendMessage(component));
     }
 
     public void enableBStats() {

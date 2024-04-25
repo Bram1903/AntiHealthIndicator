@@ -21,11 +21,16 @@ package com.deathmotion.antihealthindicator.managers;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.cache.LivingEntityData;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntityData;
+import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.RemovalListener;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -39,10 +44,16 @@ public class CacheManager<P> implements RemovalListener<Integer, LivingEntityDat
 
     public CacheManager(AHIPlatform<P> platform) {
         this.platform = platform;
-        this.cache = Caffeine.newBuilder()
+        Caffeine<Integer, LivingEntityData> cacheBuilder = Caffeine.newBuilder()
                 .expireAfterAccess(1, TimeUnit.MINUTES)
-                .removalListener(this)
-                .build();
+                .removalListener(this);
+
+        if (platform.getConfigurationOption(ConfigOption.DEBUG_ENABLED)) {
+            cacheBuilder.recordStats();
+            LogCacheStats();
+        }
+
+        this.cache = cacheBuilder.build();
     }
 
     public Optional<LivingEntityData> getLivingEntityData(int entityId) {
@@ -98,11 +109,30 @@ public class CacheManager<P> implements RemovalListener<Integer, LivingEntityDat
         }
 
         platform.getScheduler().runAsyncTask((o) -> {
-            if (platform.isEntityRemoved(key, null)) {
-                platform.getLoggerWrapper().info("Entity " + key + " was removed from cache");
-                return;
-            }
+            if (platform.isEntityRemoved(key, null)) return;
             addLivingEntity(key, value);
         });
+    }
+
+    private void LogCacheStats() {
+        platform.getScheduler().runAsyncTaskAtFixedRate((o) -> {
+            CacheStats newStats = cache.stats();
+            Component statsComponent = Component.text()
+                    .append(Component.text("[DEBUG] Cache Stats", NamedTextColor.GREEN)
+                            .decoration(TextDecoration.BOLD, true))
+                    .appendNewline()
+                    .append(Component.text("\n\u25cf Cache Size: ", NamedTextColor.GREEN)
+                            .decoration(TextDecoration.BOLD, true))
+                    .append(Component.text(cache.estimatedSize(), NamedTextColor.AQUA)
+                            .append(Component.text("\n\u25cf Hit Count: ", NamedTextColor.GREEN)
+                                    .decoration(TextDecoration.BOLD, true))
+                            .append(Component.text(newStats.hitCount(), NamedTextColor.AQUA)))
+                    .append(Component.text("\n\u25cf Miss Count: ", NamedTextColor.GREEN)
+                            .decoration(TextDecoration.BOLD, true))
+                    .append(Component.text(newStats.missCount(), NamedTextColor.AQUA))
+                    .build();
+
+            platform.broadcastComponent(statsComponent, "AntiHealthIndicator.Debug");
+        }, 10, 10, TimeUnit.SECONDS);
     }
 }

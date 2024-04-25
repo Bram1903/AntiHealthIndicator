@@ -26,6 +26,7 @@ import com.deathmotion.antihealthindicator.wrappers.PlatformLoggerWrapperImpl;
 import com.deathmotion.antihealthindicator.wrappers.interfaces.Scheduler;
 import com.github.retrooper.packetevents.PacketEvents;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -61,4 +62,6 @@ public abstract class AHIPlatform<P> {
     public abstract boolean getConfigurationOption(ConfigOption option);
 
     public abstract String getPluginVersion();
+
+    public abstract void broadcastComponent(Component component, @Nullable String permission);
 }
