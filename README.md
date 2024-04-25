@@ -15,6 +15,13 @@ This lightweight solution modifies specific data packets
 to ensure players cannot access critical information such as health or player status,
 thereby maintaining a level playing field for all participants.
 
+### Requires PacketEvents
+The plugin doesn't shade PacketEvents anymore because of performance considerations, 
+so you will need to install the latest version of PacketEvents on your server.
+
+GitHub: https://github.com/retrooper/packetevents <br>
+Latest Release: https://ci.codemc.io/job/retrooper/job/packetevents/
+
 ## Showcase
 
 ![Demo](showcase/AntiHealthIndicator.gif)
