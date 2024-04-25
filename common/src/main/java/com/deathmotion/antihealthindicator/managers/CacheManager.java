@@ -117,16 +117,20 @@ public class CacheManager<P> implements RemovalListener<Integer, LivingEntityDat
     private void LogCacheStats() {
         platform.getScheduler().runAsyncTaskAtFixedRate((o) -> {
             CacheStats newStats = cache.stats();
+
             Component statsComponent = Component.text()
                     .append(Component.text("[DEBUG] Cache Stats", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
                     .appendNewline()
                     .append(Component.text("\n\u25cf Cache Size: ", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
-                    .append(Component.text(cache.estimatedSize(), NamedTextColor.AQUA)
-                            .append(Component.text("\n\u25cf Hit Count: ", NamedTextColor.GREEN)
-                                    .decoration(TextDecoration.BOLD, true))
-                            .append(Component.text(newStats.hitCount(), NamedTextColor.AQUA)))
+                    .append(Component.text(cache.estimatedSize(), NamedTextColor.AQUA))
+                    .append(Component.text("\n\u25cf Evicted Items: ", NamedTextColor.GREEN)
+                            .decoration(TextDecoration.BOLD, true))
+                    .append(Component.text(newStats.evictionCount(), NamedTextColor.AQUA))
+                    .append(Component.text("\n\u25cf Hit Count: ", NamedTextColor.GREEN)
+                            .decoration(TextDecoration.BOLD, true))
+                    .append(Component.text(newStats.hitCount(), NamedTextColor.AQUA))
                     .append(Component.text("\n\u25cf Miss Count: ", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
                     .append(Component.text(newStats.missCount(), NamedTextColor.AQUA))
