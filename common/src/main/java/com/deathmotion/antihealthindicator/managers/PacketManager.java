@@ -21,7 +21,10 @@ package com.deathmotion.antihealthindicator.managers;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.packetlisteners.EntityState;
-import com.deathmotion.antihealthindicator.packetlisteners.spoofers.*;
+import com.deathmotion.antihealthindicator.packetlisteners.spoofers.EntityEquipmentListener;
+import com.deathmotion.antihealthindicator.packetlisteners.spoofers.EntityMetadataListener;
+import com.deathmotion.antihealthindicator.packetlisteners.spoofers.PlayerUpdateHealthListener;
+import com.deathmotion.antihealthindicator.packetlisteners.spoofers.WorldSeedListener;
 import com.github.retrooper.packetevents.PacketEvents;
 
 public class PacketManager<P> {
