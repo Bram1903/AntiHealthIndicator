@@ -45,7 +45,7 @@ public class PlayerJoin<P> extends PacketListenerAbstract {
                 .append(Component.text("now available", NamedTextColor.GREEN)
                         .decorate(TextDecoration.UNDERLINED)
                         .hoverEvent(HoverEvent.showText(Component.text("Click to download", NamedTextColor.GREEN)))
-                        .clickEvent(ClickEvent.openUrl("https://www.spigotmc.org/resources/antihealthindicator.20803/")))
+                        .clickEvent(ClickEvent.openUrl("https://www.spigotmc.org/resources/antihealthindicator.114851/")))
                 .append(Component.text("!", NamedTextColor.GREEN))
                 .build();
     }
