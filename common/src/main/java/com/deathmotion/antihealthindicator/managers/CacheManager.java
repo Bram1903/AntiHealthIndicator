@@ -23,40 +23,30 @@ import com.deathmotion.antihealthindicator.data.cache.LivingEntityData;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntityData;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.RemovalListener;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-public class CacheManager<P> {
+public class CacheManager<P> implements RemovalListener<Integer, LivingEntityData> {
     private final AHIPlatform<P> platform;
-    private final Cache<Integer, LivingEntityData> livingEntityDataCache;
-    private final RemovalListener<Integer, LivingEntityData> removalListener;
+    private final Cache<Integer, LivingEntityData> cache;
 
     public CacheManager(AHIPlatform<P> platform) {
         this.platform = platform;
-
-        this.removalListener = (key, value, cause) -> {
-            if (key != null && cause.wasEvicted()) {
-                this.platform.getScheduler().runAsyncTask((o) -> {
-                    if (!this.platform.isEntityRemoved(key, null)) {
-                        this.addLivingEntity(key, value);
-                    }
-                });
-            }
-        };
-
-        this.livingEntityDataCache = Caffeine.newBuilder()
+        this.cache = Caffeine.newBuilder()
                 .expireAfterAccess(1, TimeUnit.MINUTES)
-                .removalListener(this.removalListener)
+                .removalListener(this)
                 .build();
     }
 
     public Optional<LivingEntityData> getLivingEntityData(int entityId) {
-        return Optional.ofNullable(livingEntityDataCache.getIfPresent(entityId));
+        return Optional.ofNullable(cache.getIfPresent(entityId));
     }
 
     public Optional<RidableEntityData> getVehicleData(int entityId) {
@@ -65,15 +55,15 @@ public class CacheManager<P> {
     }
 
     public boolean isLivingEntityCached(int entityId) {
-        return livingEntityDataCache.getIfPresent(entityId) != null;
+        return cache.getIfPresent(entityId) != null;
     }
 
     public void addLivingEntity(int entityId, LivingEntityData livingEntityData) {
-        livingEntityDataCache.put(entityId, livingEntityData);
+        cache.put(entityId, livingEntityData);
     }
 
     public void removeLivingEntity(int entityId) {
-        livingEntityDataCache.invalidate(entityId);
+        cache.invalidate(entityId);
     }
 
     public void updateVehiclePassenger(int entityId, int passengerId) {
@@ -93,11 +83,26 @@ public class CacheManager<P> {
     }
 
     public int getEntityIdByPassengerId(int passengerId) {
-        for (Map.Entry<Integer, LivingEntityData> entry : livingEntityDataCache.asMap().entrySet()) {
+        for (Map.Entry<Integer, LivingEntityData> entry : cache.asMap().entrySet()) {
             if (entry.getValue() instanceof RidableEntityData && ((RidableEntityData) entry.getValue()).getPassengerId() == passengerId) {
                 return entry.getKey();
             }
         }
         return 0;
+    }
+
+    @Override
+    public void onRemoval(Integer key, LivingEntityData value, @NotNull RemovalCause cause) {
+        if (key == null || !cause.wasEvicted()) {
+            return;
+        }
+
+        platform.getScheduler().runAsyncTask((o) -> {
+            if (platform.isEntityRemoved(key, null)) {
+                platform.getLoggerWrapper().info("Entity " + key + " was removed from cache");
+                return;
+            }
+            addLivingEntity(key, value);
+        });
     }
 }
