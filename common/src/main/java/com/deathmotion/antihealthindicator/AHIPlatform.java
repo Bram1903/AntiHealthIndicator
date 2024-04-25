@@ -57,11 +57,11 @@ public abstract class AHIPlatform<P> {
 
     public abstract boolean hasPermission(UUID sender, String permission);
 
+    public abstract void broadcastComponent(Component component, @Nullable String permission);
+
     public abstract boolean isEntityRemoved(int entityId, @Nullable Object player);
 
     public abstract boolean getConfigurationOption(ConfigOption option);
 
     public abstract String getPluginVersion();
-
-    public abstract void broadcastComponent(Component component, @Nullable String permission);
 }

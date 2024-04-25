@@ -40,13 +40,17 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
     private final JavaPlugin plugin;
     private ConfigManager configManager;
 
-
     public SpigotAntiHealthIndicator(JavaPlugin plugin) {
         this.plugin = plugin;
     }
 
     void setConfigManager(ConfigManager configManager) {
         this.configManager = configManager;
+    }
+
+    @Override
+    public JavaPlugin getPlatform() {
+        return this.plugin;
     }
 
     @Override
@@ -59,16 +63,19 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
     }
 
     @Override
-    public JavaPlugin getPlatform() {
-        return this.plugin;
-    }
-
-    @Override
     public boolean hasPermission(UUID sender, String permission) {
         CommandSender commandSender = Bukkit.getPlayer(sender);
         if (commandSender == null) return false;
 
         return commandSender.hasPermission(permission);
+    }
+
+    @Override
+    public void broadcastComponent(Component component, @Nullable String permission) {
+        Bukkit.getOnlinePlayers().stream()
+                .filter(player -> permission == null || player.hasPermission(permission))
+                .map(player -> PacketEvents.getAPI().getPlayerManager().getUser(player))
+                .forEach(user -> user.sendMessage(component));
     }
 
     @Override
@@ -88,14 +95,6 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
     @Override
     public String getPluginVersion() {
         return this.plugin.getDescription().getVersion();
-    }
-
-    @Override
-    public void broadcastComponent(Component component, @Nullable String permission) {
-        Bukkit.getOnlinePlayers().stream()
-                .filter(player -> permission == null || player.hasPermission(permission))
-                .map(player -> PacketEvents.getAPI().getPlayerManager().getUser(player))
-                .forEach(user -> user.sendMessage(component));
     }
 
     public void enableBStats() {
