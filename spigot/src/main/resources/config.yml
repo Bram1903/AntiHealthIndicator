@@ -41,6 +41,14 @@ spoof:
     # If disabled, none of the following settings will have any effect.
     enabled: true
 
+    # If enabled, metadata (like health, absorption, etc.) will only be hidden for other players.
+    # Entities other than players are ignored (like mobs, animals, etc.).
+    # This will result in a much smaller cache size, but it will only work for players.
+    # Caching shouldn't really be a performance concern, but if you want to save some memory, you can enable this.
+    # When enabled, the ignored vehicles, wolves and iron golems settings will have no effect.
+    players-only:
+      enabled: false
+
     # If enabled, hides the oxygen number of other entities.
     air-ticks:
       enabled: true

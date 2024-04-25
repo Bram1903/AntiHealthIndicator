@@ -39,6 +39,8 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
     private final CacheManager<P> cacheManager;
 
+    private final boolean playersOnly;
+
     private final boolean healthTexturesSupported;
     private final boolean allowBypassEnabled;
     private final boolean ignoreVehiclesEnabled;
@@ -55,6 +57,8 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
     public EntityMetadataListener(AHIPlatform<P> platform) {
         this.platform = platform;
         this.cacheManager = platform.getCacheManager();
+
+        this.playersOnly = platform.getConfigurationOption(ConfigOption.PLAYER_ONLY);
 
         healthTexturesSupported = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_15);
         allowBypassEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
@@ -83,7 +87,7 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
             if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
         }
 
-        if (ignoreVehiclesEnabled) {
+        if (!playersOnly && ignoreVehiclesEnabled) {
             if (cacheManager.isUserPassenger(packet.getEntityId(), user.getEntityId())) return;
         }
 
@@ -92,6 +96,8 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         LivingEntityData livingEntityData = cacheManager.getLivingEntityData(entityId).orElse(null);
         if (livingEntityData == null) return;
         EntityType entityType = livingEntityData.getEntityType();
+
+        if (playersOnly && entityType != EntityTypes.PLAYER) return;
 
         if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) {
             return;

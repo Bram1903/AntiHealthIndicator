@@ -34,6 +34,7 @@ public enum ConfigOption {
     SPOOF_FOOD_SATURATION_ENABLED("spoof.food-saturation.enabled", true),
 
     ENTITY_DATA_ENABLED("spoof.entity-data.enabled", true),
+    PLAYER_ONLY("spoof.entity-data.players-only.enabled", false),
     AIR_TICKS_ENABLED("spoof.entity-data.air-ticks.enabled", true),
     HEALTH_ENABLED("spoof.entity-data.health.enabled", true),
 

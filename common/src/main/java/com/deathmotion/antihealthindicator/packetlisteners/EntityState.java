@@ -45,12 +45,14 @@ public class EntityState<P> implements PacketListener {
     private final AHIPlatform<P> platform;
     private final CacheManager<P> cacheManager;
 
+    private final boolean playersOnly;
     private final boolean isBypassEnabled;
 
     public EntityState(AHIPlatform<P> platform) {
         this.platform = platform;
         this.cacheManager = platform.getCacheManager();
 
+        this.playersOnly = platform.getConfigurationOption(ConfigOption.PLAYER_ONLY);
         this.isBypassEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
     }
 
@@ -58,18 +60,24 @@ public class EntityState<P> implements PacketListener {
     public void onPacketSend(PacketSendEvent event) {
         final PacketTypeCommon type = event.getPacketType();
 
-        if (PacketType.Play.Server.SPAWN_LIVING_ENTITY == type) {
-            handleSpawnLivingEntity(new WrapperPlayServerSpawnLivingEntity(event));
-        } else if (PacketType.Play.Server.SPAWN_ENTITY == type) {
-            handleSpawnEntity(new WrapperPlayServerSpawnEntity(event));
-        } else if (PacketType.Play.Server.JOIN_GAME == type) {
-            handleJoinGame(new WrapperPlayServerJoinGame(event));
-        } else if (PacketType.Play.Server.ENTITY_METADATA == type) {
-            handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), event.getUser());
-        } else if (PacketType.Play.Server.SET_PASSENGERS == type) {
-            handleSetPassengers(new WrapperPlayServerSetPassengers(event), event.getUser());
-        } else if (PacketType.Play.Server.ATTACH_ENTITY == type) {
-            handleAttachEntity(new WrapperPlayServerAttachEntity(event), event.getUser());
+        if (playersOnly) {
+            if (PacketType.Play.Server.JOIN_GAME == type) {
+                handleJoinGame(new WrapperPlayServerJoinGame(event));
+            }
+        } else {
+            if (PacketType.Play.Server.SPAWN_LIVING_ENTITY == type) {
+                handleSpawnLivingEntity(new WrapperPlayServerSpawnLivingEntity(event));
+            } else if (PacketType.Play.Server.SPAWN_ENTITY == type) {
+                handleSpawnEntity(new WrapperPlayServerSpawnEntity(event));
+            } else if (PacketType.Play.Server.JOIN_GAME == type) {
+                handleJoinGame(new WrapperPlayServerJoinGame(event));
+            } else if (PacketType.Play.Server.ENTITY_METADATA == type) {
+                handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), event.getUser());
+            } else if (PacketType.Play.Server.SET_PASSENGERS == type) {
+                handleSetPassengers(new WrapperPlayServerSetPassengers(event), event.getUser());
+            } else if (PacketType.Play.Server.ATTACH_ENTITY == type) {
+                handleAttachEntity(new WrapperPlayServerAttachEntity(event), event.getUser());
+            }
         }
     }
 
