@@ -24,7 +24,7 @@ Latest Release: https://ci.codemc.io/job/retrooper/job/packetevents/
 
 ## Showcase
 
-![Demo](showcase/AntiHealthIndicator.gif)
+![Demo](docs/showcase/AntiHealthIndicator.gif)
 
 ## Key Features
 
