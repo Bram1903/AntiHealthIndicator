@@ -65,16 +65,8 @@ public class CacheManager<P> implements RemovalListener<Integer, LivingEntityDat
                 .map(entityData -> (RidableEntityData) entityData);
     }
 
-    public boolean isLivingEntityCached(int entityId) {
-        return cache.getIfPresent(entityId) != null;
-    }
-
     public void addLivingEntity(int entityId, LivingEntityData livingEntityData) {
         cache.put(entityId, livingEntityData);
-    }
-
-    public void removeLivingEntity(int entityId) {
-        cache.invalidate(entityId);
     }
 
     public void updateVehiclePassenger(int entityId, int passengerId) {
@@ -131,9 +123,6 @@ public class CacheManager<P> implements RemovalListener<Integer, LivingEntityDat
                     .append(Component.text("\n\u25cf Hit Count: ", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
                     .append(Component.text(newStats.hitCount(), NamedTextColor.AQUA))
-                    .append(Component.text("\n\u25cf Miss Count: ", NamedTextColor.GREEN)
-                            .decoration(TextDecoration.BOLD, true))
-                    .append(Component.text(newStats.missCount(), NamedTextColor.AQUA))
                     .build();
 
             platform.broadcastComponent(statsComponent, "AntiHealthIndicator.Debug");
