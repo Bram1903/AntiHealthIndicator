@@ -121,8 +121,8 @@ public class UpdateManager<P> {
 
     private void printUpdateInfo(boolean printToConsole, String formattedVersion) {
         if (printToConsole) {
-            platform.getLoggerWrapper().info("Found a new version " + formattedVersion);
-            platform.getLoggerWrapper().info(GITHUB_RELEASES_URL);
+            platform.getLogManager().info("Found a new version " + formattedVersion);
+            platform.getLogManager().info(GITHUB_RELEASES_URL);
         }
 
         if (shouldNotifyInGame()) {
@@ -136,10 +136,10 @@ public class UpdateManager<P> {
      * @param e An instance of IOException representing the occurred error.
      */
     private void LogUpdateError(IOException e) {
-        platform.getLoggerWrapper().error("<--------------------------------------------------------------->");
-        platform.getLoggerWrapper().error("Failed to check for a new release!");
-        platform.getLoggerWrapper().error("Error message:\n" + e.getMessage());
-        platform.getLoggerWrapper().info(GITHUB_RELEASES_URL);
-        platform.getLoggerWrapper().error("<--------------------------------------------------------------->");
+        platform.getLogManager().error("<--------------------------------------------------------------->");
+        platform.getLogManager().error("Failed to check for a new release!");
+        platform.getLogManager().error("Error message:\n" + e.getMessage());
+        platform.getLogManager().info(GITHUB_RELEASES_URL);
+        platform.getLogManager().error("<--------------------------------------------------------------->");
     }
 }

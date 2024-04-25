@@ -22,7 +22,7 @@ import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.managers.PacketManager;
 import com.deathmotion.antihealthindicator.managers.UpdateManager;
-import com.deathmotion.antihealthindicator.wrappers.PlatformLoggerWrapperImpl;
+import com.deathmotion.antihealthindicator.wrappers.LogManager;
 import com.deathmotion.antihealthindicator.wrappers.interfaces.Scheduler;
 import com.github.retrooper.packetevents.PacketEvents;
 import lombok.Getter;
@@ -34,7 +34,7 @@ import java.util.UUID;
 @Getter
 public abstract class AHIPlatform<P> {
 
-    private final PlatformLoggerWrapperImpl loggerWrapper = new PlatformLoggerWrapperImpl();
+    private final LogManager logManager = new LogManager();
     protected Scheduler scheduler;
     private CacheManager<P> cacheManager;
 
