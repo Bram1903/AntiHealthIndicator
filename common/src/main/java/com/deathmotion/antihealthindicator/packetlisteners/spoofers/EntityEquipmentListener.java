@@ -73,7 +73,7 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
             WrapperPlayServerEntityEquipment packet = new WrapperPlayServerEntityEquipment(event);
 
             if (bypassPermissionEnabled) {
-                if (this.platform.hasPermission(event.getUser().getUUID(), "AntiHealthIndicator.Bypass")) return;
+                if (platform.hasPermission(event.getUser().getUUID(), "AntiHealthIndicator.Bypass")) return;
             }
 
             List<Equipment> equipmentList = packet.getEquipment();

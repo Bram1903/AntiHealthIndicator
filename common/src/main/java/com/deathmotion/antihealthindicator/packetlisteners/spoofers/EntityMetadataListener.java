@@ -84,12 +84,12 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         }
 
         if (ignoreVehiclesEnabled) {
-            if (this.cacheManager.isUserPassenger(packet.getEntityId(), user.getEntityId())) return;
+            if (cacheManager.isUserPassenger(packet.getEntityId(), user.getEntityId())) return;
         }
 
         int entityId = packet.getEntityId();
 
-        LivingEntityData livingEntityData = this.cacheManager.getLivingEntityData(entityId).orElse(null);
+        LivingEntityData livingEntityData = cacheManager.getLivingEntityData(entityId).orElse(null);
         if (livingEntityData == null) return;
         EntityType entityType = livingEntityData.getEntityType();
 

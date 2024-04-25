@@ -67,7 +67,7 @@ public class UpdateManager<P> {
     public void checkForUpdate(boolean printToConsole) {
         platform.getScheduler().runAsyncTask((o) -> {
             try {
-                List<Integer> currentVersion = parseVersion(this.platform.getPluginVersion());
+                List<Integer> currentVersion = parseVersion(platform.getPluginVersion());
                 List<Integer> latestVersion = getLatestGitHubVersion();
 
                 compareVersions(currentVersion, latestVersion, printToConsole);
@@ -126,7 +126,7 @@ public class UpdateManager<P> {
         }
 
         if (shouldNotifyInGame()) {
-            PacketEvents.getAPI().getEventManager().registerListener(new PlayerJoin<>(this.platform, formattedVersion));
+            PacketEvents.getAPI().getEventManager().registerListener(new PlayerJoin<>(platform, formattedVersion));
         }
     }
 

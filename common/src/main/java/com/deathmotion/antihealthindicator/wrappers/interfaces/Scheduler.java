@@ -18,8 +18,6 @@
 
 package com.deathmotion.antihealthindicator.wrappers.interfaces;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -27,6 +25,4 @@ public interface Scheduler {
     void runAsyncTask(Consumer<Object> task);
 
     void rynAsyncTaskDelayed(Consumer<Object> task, long delay, TimeUnit timeUnit);
-
-    void runAsyncTaskAtFixedRate(@NotNull Consumer<Object> task, long delay, long period, @NotNull TimeUnit timeUnit);
 }

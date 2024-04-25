@@ -97,7 +97,7 @@ public class EntityState<P> extends PacketListenerAbstract {
         EntityType entityType = packet.getEntityType();
 
         LivingEntityData entityData = createLivingEntity(entityType);
-        this.cacheManager.addLivingEntity(entityId, entityData);
+        cacheManager.addLivingEntity(entityId, entityData);
     }
 
     private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet) {
@@ -107,7 +107,7 @@ public class EntityState<P> extends PacketListenerAbstract {
             int entityId = packet.getEntityId();
 
             LivingEntityData entityData = createLivingEntity(entityType);
-            this.cacheManager.addLivingEntity(entityId, entityData);
+            cacheManager.addLivingEntity(entityId, entityData);
         }
     }
 
@@ -115,13 +115,13 @@ public class EntityState<P> extends PacketListenerAbstract {
         LivingEntityData livingEntityData = new LivingEntityData();
         livingEntityData.setEntityType(EntityTypes.PLAYER);
 
-        this.cacheManager.addLivingEntity(packet.getEntityId(), livingEntityData);
+        cacheManager.addLivingEntity(packet.getEntityId(), livingEntityData);
     }
 
     private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, User user) {
         int entityId = packet.getEntityId();
 
-        LivingEntityData entityData = this.cacheManager.getLivingEntityData(entityId).orElse(null);
+        LivingEntityData entityData = cacheManager.getLivingEntityData(entityId).orElse(null);
         if (entityData == null) return;
 
         packet.getEntityMetadata().forEach(metaData -> {
@@ -134,11 +134,11 @@ public class EntityState<P> extends PacketListenerAbstract {
         int[] passengers = packet.getPassengers();
 
         if (passengers.length > 0) {
-            this.cacheManager.updateVehiclePassenger(entityId, passengers[0]);
-            handlePassengerEvent(user, entityId, this.cacheManager.getVehicleHealth(entityId), true);
+            cacheManager.updateVehiclePassenger(entityId, passengers[0]);
+            handlePassengerEvent(user, entityId, cacheManager.getVehicleHealth(entityId), true);
         } else {
-            int passengerId = this.cacheManager.getPassengerId(entityId);
-            this.cacheManager.updateVehiclePassenger(entityId, -1);
+            int passengerId = cacheManager.getPassengerId(entityId);
+            cacheManager.updateVehiclePassenger(entityId, -1);
 
             if (user.getEntityId() == passengerId) {
                 handlePassengerEvent(user, entityId, 0.5F, false);
@@ -151,13 +151,13 @@ public class EntityState<P> extends PacketListenerAbstract {
         int passengerId = packet.getAttachedId();
 
         if (entityId > 0) {
-            this.cacheManager.updateVehiclePassenger(entityId, passengerId);
-            handlePassengerEvent(user, entityId, this.cacheManager.getVehicleHealth(entityId), true);
+            cacheManager.updateVehiclePassenger(entityId, passengerId);
+            handlePassengerEvent(user, entityId, cacheManager.getVehicleHealth(entityId), true);
         } else {
             // With the Entity Attach packet, the entity ID is set to -1 when the entity is detached;
             // Thus we need to retrieve the vehicle we stepped of by using a reverse lookup by passenger ID
-            int reversedEntityId = this.cacheManager.getEntityIdByPassengerId(passengerId);
-            this.cacheManager.updateVehiclePassenger(reversedEntityId, -1);
+            int reversedEntityId = cacheManager.getEntityIdByPassengerId(passengerId);
+            cacheManager.updateVehiclePassenger(reversedEntityId, -1);
 
             if (user.getEntityId() == passengerId) {
                 handlePassengerEvent(user, reversedEntityId, 0.5F, false);
@@ -167,11 +167,11 @@ public class EntityState<P> extends PacketListenerAbstract {
 
     private void handleEntityDestroy(WrapperPlayServerDestroyEntities packet, Object player) {
         for (int entityId : packet.getEntityIds()) {
-            if (this.cacheManager.isLivingEntityCached(entityId)) {
+            if (cacheManager.isLivingEntityCached(entityId)) {
                 // Schedule this 2 ticks later because Bukkit updates intervals 1 tick later
-                this.platform.getScheduler().rynAsyncTaskDelayed(task -> {
-                    if (this.platform.isEntityRemoved(entityId, player)) {
-                        this.cacheManager.removeLivingEntity(entityId);
+                platform.getScheduler().rynAsyncTaskDelayed(task -> {
+                    if (platform.isEntityRemoved(entityId, player)) {
+                        cacheManager.removeLivingEntity(entityId);
                     }
                 }, 100, TimeUnit.MILLISECONDS);
             }
@@ -198,7 +198,7 @@ public class EntityState<P> extends PacketListenerAbstract {
 
         if (!entering) {
             if (isBypassEnabled) {
-                if (this.platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
+                if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
             }
         }
 

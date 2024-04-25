@@ -45,20 +45,20 @@ public class PacketManager<P> {
 
     private void setupEntityListeners() {
         if (platform.getConfigurationOption(ConfigOption.ENTITY_DATA_ENABLED)) {
-            PacketEvents.getAPI().getEventManager().registerListener(new EntityState<>(this.platform));
-            PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener<>(this.platform));
+            PacketEvents.getAPI().getEventManager().registerListener(new EntityState<>(platform));
+            PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener<>(platform));
         }
     }
 
     private void setupAdditionalListeners() {
         if (platform.getConfigurationOption(ConfigOption.ITEMS_ENABLED)) {
-            PacketEvents.getAPI().getEventManager().registerListener(new EntityEquipmentListener<>(this.platform));
+            PacketEvents.getAPI().getEventManager().registerListener(new EntityEquipmentListener<>(platform));
         }
         if (platform.getConfigurationOption(ConfigOption.SPOOF_FOOD_SATURATION_ENABLED)) {
-            PacketEvents.getAPI().getEventManager().registerListener(new PlayerUpdateHealthListener<>(this.platform));
+            PacketEvents.getAPI().getEventManager().registerListener(new PlayerUpdateHealthListener<>(platform));
         }
         if (platform.getConfigurationOption(ConfigOption.SPOOF_WORLD_SEED_ENABLED)) {
-            PacketEvents.getAPI().getEventManager().registerListener(new WorldSeedListener<>(this.platform));
+            PacketEvents.getAPI().getEventManager().registerListener(new WorldSeedListener<>(platform));
         }
     }
 }
