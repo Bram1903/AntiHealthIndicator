@@ -27,7 +27,6 @@ import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
 import com.github.retrooper.packetevents.event.PacketListener;
-import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
@@ -40,7 +39,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 public class EntityState<P> implements PacketListener {
@@ -62,35 +60,16 @@ public class EntityState<P> implements PacketListener {
 
         if (PacketType.Play.Server.SPAWN_LIVING_ENTITY == type) {
             handleSpawnLivingEntity(new WrapperPlayServerSpawnLivingEntity(event));
-            return;
-        }
-
-        if (PacketType.Play.Server.SPAWN_ENTITY == type) {
+        } else if (PacketType.Play.Server.SPAWN_ENTITY == type) {
             handleSpawnEntity(new WrapperPlayServerSpawnEntity(event));
-            return;
-        }
-
-        if (PacketType.Play.Server.JOIN_GAME == type) {
+        } else if (PacketType.Play.Server.JOIN_GAME == type) {
             handleJoinGame(new WrapperPlayServerJoinGame(event));
-            return;
-        }
-
-        if (PacketType.Play.Server.ENTITY_METADATA == type) {
+        } else if (PacketType.Play.Server.ENTITY_METADATA == type) {
             handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), event.getUser());
-        }
-
-        if (PacketType.Play.Server.SET_PASSENGERS == type) {
+        } else if (PacketType.Play.Server.SET_PASSENGERS == type) {
             handleSetPassengers(new WrapperPlayServerSetPassengers(event), event.getUser());
-            return;
-        }
-
-        if (PacketType.Play.Server.ATTACH_ENTITY == type) {
+        } else if (PacketType.Play.Server.ATTACH_ENTITY == type) {
             handleAttachEntity(new WrapperPlayServerAttachEntity(event), event.getUser());
-            return;
-        }
-
-        if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
-            handleEntityDestroy(new WrapperPlayServerDestroyEntities(event), event.getPlayer());
         }
     }
 
@@ -163,19 +142,6 @@ public class EntityState<P> implements PacketListener {
 
             if (user.getEntityId() == passengerId) {
                 handlePassengerEvent(user, reversedEntityId, 0.5F, false);
-            }
-        }
-    }
-
-    private void handleEntityDestroy(WrapperPlayServerDestroyEntities packet, Object player) {
-        for (int entityId : packet.getEntityIds()) {
-            if (cacheManager.isLivingEntityCached(entityId)) {
-                // Schedule this 2 ticks later because Bukkit updates intervals 1 tick later
-                platform.getScheduler().rynAsyncTaskDelayed(task -> {
-                    if (platform.isEntityRemoved(entityId, player)) {
-                        cacheManager.removeLivingEntity(entityId);
-                    }
-                }, 100, TimeUnit.MILLISECONDS);
             }
         }
     }
