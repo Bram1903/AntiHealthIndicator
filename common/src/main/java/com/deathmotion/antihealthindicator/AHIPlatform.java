@@ -34,8 +34,8 @@ import java.util.UUID;
 @Getter
 public abstract class AHIPlatform<P> {
 
-    private final LogManager logManager = new LogManager();
     protected Scheduler scheduler;
+    private final LogManager logManager = new LogManager();
     private CacheManager<P> cacheManager;
 
     public void commonOnLoad() {
