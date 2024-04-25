@@ -26,6 +26,7 @@ import com.deathmotion.antihealthindicator.packetlisteners.spoofers.EntityMetada
 import com.deathmotion.antihealthindicator.packetlisteners.spoofers.PlayerUpdateHealthListener;
 import com.deathmotion.antihealthindicator.packetlisteners.spoofers.WorldSeedListener;
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
 
 public class PacketManager<P> {
     private final AHIPlatform<P> platform;
@@ -45,7 +46,7 @@ public class PacketManager<P> {
 
     private void setupEntityListeners() {
         if (platform.getConfigurationOption(ConfigOption.ENTITY_DATA_ENABLED)) {
-            PacketEvents.getAPI().getEventManager().registerListener(new EntityState<>(platform));
+            PacketEvents.getAPI().getEventManager().registerListener(new EntityState<>(platform), PacketListenerPriority.LOW);
             PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener<>(platform));
         }
     }

@@ -26,6 +26,7 @@ import com.deathmotion.antihealthindicator.data.cache.WolfData;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
+import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
@@ -41,7 +42,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class EntityState<P> extends PacketListenerAbstract {
+
+public class EntityState<P> implements PacketListener {
     private final AHIPlatform<P> platform;
     private final CacheManager<P> cacheManager;
 
