@@ -16,23 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.deathmotion.antihealthindicator.wrappers;
+package com.deathmotion.antihealthindicator.interfaces;
 
-import java.util.logging.Logger;
+import org.jetbrains.annotations.NotNull;
 
-public final class LogManager {
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
-    private final Logger logger = Logger.getLogger("AntiHealthIndicator");
+public interface Scheduler {
+    void runAsyncTask(Consumer<Object> task);
 
-    public void info(String message) {
-        logger.info(message);
-    }
+    void rynAsyncTaskDelayed(Consumer<Object> task, long delay, TimeUnit timeUnit);
 
-    public void warning(String message) {
-        logger.warning(message);
-    }
-
-    public void error(String message) {
-        logger.severe(message);
-    }
+    void runAsyncTaskAtFixedRate(@NotNull Consumer<Object> task, long delay, long period, @NotNull TimeUnit timeUnit);
 }
