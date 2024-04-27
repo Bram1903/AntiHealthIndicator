@@ -19,8 +19,8 @@
 package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
-import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
+import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;

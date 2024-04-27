@@ -19,11 +19,11 @@
 package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
+import com.deathmotion.antihealthindicator.managers.LogManager;
 import com.deathmotion.antihealthindicator.managers.PacketManager;
 import com.deathmotion.antihealthindicator.managers.UpdateManager;
-import com.deathmotion.antihealthindicator.managers.LogManager;
-import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.github.retrooper.packetevents.PacketEvents;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
