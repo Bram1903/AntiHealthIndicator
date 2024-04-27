@@ -26,16 +26,35 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn;
 
+/**
+ * Listens for WorldSeed events to modify the seed value.
+ *
+ * @param <P> The platform type.
+ */
 public class WorldSeedListener<P> extends PacketListenerAbstract {
 
     protected final boolean bypassPermissionEnabled;
     private final AHIPlatform<P> platform;
 
+    /**
+     * Constructs a new WorldSeedListener with the specified {@link AHIPlatform}.
+     *
+     * @param platform The platform to use.
+     */
     public WorldSeedListener(AHIPlatform<P> platform) {
         this.platform = platform;
         this.bypassPermissionEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
+
+        platform.getLogManager().debug("World Seed listener has been set up.");
     }
 
+    /**
+     * This function is called when an {@link PacketSendEvent} is triggered.
+     * Overwrites the {@link WrapperPlayServerJoinGame} and {@link WrapperPlayServerRespawn} packets
+     * to control seed value.
+     *
+     * @param event The event that has been triggered.
+     */
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType().equals(PacketType.Play.Server.JOIN_GAME)) {

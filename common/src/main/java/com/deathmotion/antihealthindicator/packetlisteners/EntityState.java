@@ -40,7 +40,11 @@ import com.github.retrooper.packetevents.wrapper.play.server.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Listens for EntityState events and manages the caching of various entity state details.
+ *
+ * @param <P> The platform type.
+ */
 public class EntityState<P> implements PacketListener {
     private final AHIPlatform<P> platform;
     private final CacheManager<P> cacheManager;
@@ -48,14 +52,27 @@ public class EntityState<P> implements PacketListener {
     private final boolean playersOnly;
     private final boolean isBypassEnabled;
 
+    /**
+     * Constructs a new EntityState with the specified {@link AHIPlatform}.
+     *
+     * @param platform The platform to use.
+     */
     public EntityState(AHIPlatform<P> platform) {
         this.platform = platform;
         this.cacheManager = platform.getCacheManager();
 
         this.playersOnly = platform.getConfigurationOption(ConfigOption.PLAYER_ONLY);
         this.isBypassEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
+
+        platform.getLogManager().debug("Entity State listener has been set up.");
     }
 
+    /**
+     * This function is called when an {@link PacketSendEvent} is triggered.
+     * Manages the state of various entities based on the event triggered.
+     *
+     * @param event The event that has been triggered.
+     */
     @Override
     public void onPacketSend(PacketSendEvent event) {
         final PacketTypeCommon type = event.getPacketType();

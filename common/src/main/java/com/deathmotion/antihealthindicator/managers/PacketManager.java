@@ -28,15 +28,29 @@ import com.deathmotion.antihealthindicator.packetlisteners.spoofers.WorldSeedLis
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 
+/**
+ * Manager for handling packet listeners
+ *
+ * @param <P> The platform type
+ */
 public class PacketManager<P> {
     private final AHIPlatform<P> platform;
 
+    /**
+     * Constructs a new PacketManager with the specified {@link AHIPlatform}.
+     *
+     * @param platform The platform to use.
+     */
     public PacketManager(AHIPlatform<P> platform) {
         this.platform = platform;
 
         setupPacketListeners();
+        platform.getLogManager().debug("Packet listeners have been set up.");
     }
 
+    /**
+     * Sets up packet listeners
+     */
     public void setupPacketListeners() {
         setupEntityListeners();
         setupAdditionalListeners();
@@ -44,6 +58,9 @@ public class PacketManager<P> {
         PacketEvents.getAPI().init();
     }
 
+    /**
+     * Sets up entity listeners
+     */
     private void setupEntityListeners() {
         if (platform.getConfigurationOption(ConfigOption.ENTITY_DATA_ENABLED)) {
             PacketEvents.getAPI().getEventManager().registerListener(new EntityState<>(platform), PacketListenerPriority.LOW);
@@ -51,6 +68,9 @@ public class PacketManager<P> {
         }
     }
 
+    /**
+     * Sets up additional listeners
+     */
     private void setupAdditionalListeners() {
         if (platform.getConfigurationOption(ConfigOption.ITEMS_ENABLED)) {
             PacketEvents.getAPI().getEventManager().registerListener(new EntityEquipmentListener<>(platform));

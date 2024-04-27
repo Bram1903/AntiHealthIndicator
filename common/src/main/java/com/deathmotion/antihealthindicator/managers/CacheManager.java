@@ -37,11 +37,21 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Manages the cache services of the platform.
+ *
+ * @param <P> The platform type.
+ */
 @Getter
 public class CacheManager<P> implements RemovalListener<Integer, LivingEntityData> {
     private final AHIPlatform<P> platform;
     private final Cache<Integer, LivingEntityData> cache;
 
+    /**
+     * Constructs a new CacheManager with the specified {@link AHIPlatform}.
+     *
+     * @param platform The platform to use.
+     */
     public CacheManager(AHIPlatform<P> platform) {
         this.platform = platform;
         Caffeine<Integer, LivingEntityData> cacheBuilder = Caffeine.newBuilder()
@@ -54,37 +64,87 @@ public class CacheManager<P> implements RemovalListener<Integer, LivingEntityDat
         }
 
         this.cache = cacheBuilder.build();
+        this.platform.getLogManager().debug("CacheManager initialized.");
     }
 
+    /**
+     * Gets the LivingEntity data if present in cache.
+     *
+     * @param entityId The unique identifier of the entity
+     * @return Optional of LivingEntityData
+     */
     public Optional<LivingEntityData> getLivingEntityData(int entityId) {
         return Optional.ofNullable(cache.getIfPresent(entityId));
     }
 
+    /**
+     * Gets the RidableEntity data if present in cache.
+     *
+     * @param entityId The unique identifier of the vehicle
+     * @return Optional of RidableEntityData
+     */
     public Optional<RidableEntityData> getVehicleData(int entityId) {
         return getLivingEntityData(entityId).filter(entityData -> entityData instanceof RidableEntityData)
                 .map(entityData -> (RidableEntityData) entityData);
     }
 
+    /**
+     * Adds a LivingEntity to the cache.
+     *
+     * @param entityId         The unique identifier of the entity
+     * @param livingEntityData The data of the LivingEntity
+     */
     public void addLivingEntity(int entityId, LivingEntityData livingEntityData) {
         cache.put(entityId, livingEntityData);
     }
 
+    /**
+     * Updates the passenger of the vehicle (RidableEntity).
+     *
+     * @param entityId    The unique identifier of the vehicle
+     * @param passengerId The unique identifier of the passenger
+     */
     public void updateVehiclePassenger(int entityId, int passengerId) {
         getVehicleData(entityId).ifPresent(ridableEntityData -> ridableEntityData.setPassengerId(passengerId));
     }
 
+    /**
+     * Returns the health of the vehicle (RidableEntity).
+     *
+     * @param entityId The unique identifier of the vehicle
+     * @return A float value representing the health of the vehicle
+     */
     public float getVehicleHealth(int entityId) {
         return getVehicleData(entityId).map(RidableEntityData::getHealth).orElse(0.5f);
     }
 
+    /**
+     * Checks if the user is a passenger of a vehicle.
+     *
+     * @param entityId The unique identifier of the vehicle
+     * @param userId   The unique identifier of the user
+     * @return A boolean indicating if the user is a passenger of the vehicle
+     */
     public boolean isUserPassenger(int entityId, int userId) {
         return getVehicleData(entityId).map(ridableEntityData -> ridableEntityData.getPassengerId() == userId).orElse(false);
     }
 
+    /**
+     * Returns the passenger id of a vehicle.
+     *
+     * @param entityId The unique identifier of the vehicle
+     * @return An integer representing the passenger id of the vehicle
+     */
     public int getPassengerId(int entityId) {
         return getVehicleData(entityId).map(RidableEntityData::getPassengerId).orElse(0);
     }
 
+    /**
+     * Returns the entity id associated with the specified passenger id.
+     *
+     * @param passengerId The unique identifier of the passenger
+     * @return An integer representing the entity id of the vehicle
+     */
     public int getEntityIdByPassengerId(int passengerId) {
         for (Map.Entry<Integer, LivingEntityData> entry : cache.asMap().entrySet()) {
             if (entry.getValue() instanceof RidableEntityData && ((RidableEntityData) entry.getValue()).getPassengerId() == passengerId) {
@@ -94,6 +154,13 @@ public class CacheManager<P> implements RemovalListener<Integer, LivingEntityDat
         return 0;
     }
 
+    /**
+     * This function is called after an entry has been removed from the cache.
+     *
+     * @param key   The unique identifier of the entity
+     * @param value The data of the LivingEntity
+     * @param cause The cause of removal
+     */
     @Override
     public void onRemoval(Integer key, LivingEntityData value, @NotNull RemovalCause cause) {
         if (key == null || !cause.wasEvicted()) {
@@ -106,6 +173,9 @@ public class CacheManager<P> implements RemovalListener<Integer, LivingEntityDat
         });
     }
 
+    /**
+     * Logs cache stats at a regular interval.
+     */
     private void LogCacheStats() {
         platform.getScheduler().runAsyncTaskAtFixedRate((o) -> {
             CacheStats newStats = cache.stats();

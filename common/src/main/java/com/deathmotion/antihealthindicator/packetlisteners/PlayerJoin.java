@@ -31,10 +31,21 @@ import net.kyori.adventure.text.format.TextDecoration;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Listens for PlayerJoin events and informs the user about the latest version of the application.
+ *
+ * @param <P> The platform type.
+ */
 public class PlayerJoin<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
     private final Component updateComponent;
 
+    /**
+     * Constructs a new PlayerJoin with the specified {@link AHIPlatform} and latestVersion of the application.
+     *
+     * @param platform      The platform to use.
+     * @param latestVersion The latest version of the application.
+     */
     public PlayerJoin(AHIPlatform<P> platform, String latestVersion) {
         this.platform = platform;
 
@@ -48,8 +59,16 @@ public class PlayerJoin<P> extends PacketListenerAbstract {
                         .clickEvent(ClickEvent.openUrl("https://www.spigotmc.org/resources/antihealthindicator.114851/")))
                 .append(Component.text("!", NamedTextColor.GREEN))
                 .build();
+
+        platform.getLogManager().debug("Update detected. Player join listener has been set up.");
     }
 
+    /**
+     * This function is called when an {@link PacketSendEvent} is triggered.
+     * Sends a message to the player about the latest version of the application.
+     *
+     * @param event The event that has been triggered.
+     */
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (PacketType.Play.Server.JOIN_GAME == event.getPacketType()) {

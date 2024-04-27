@@ -22,8 +22,8 @@ import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.managers.PacketManager;
 import com.deathmotion.antihealthindicator.managers.UpdateManager;
-import com.deathmotion.antihealthindicator.wrappers.LogManager;
-import com.deathmotion.antihealthindicator.wrappers.interfaces.Scheduler;
+import com.deathmotion.antihealthindicator.managers.LogManager;
+import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.github.retrooper.packetevents.PacketEvents;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -33,35 +33,80 @@ import java.util.UUID;
 
 @Getter
 public abstract class AHIPlatform<P> {
-
     protected Scheduler scheduler;
-    private final LogManager logManager = new LogManager();
+    private LogManager<P> logManager;
     private CacheManager<P> cacheManager;
 
+    /**
+     * Called when the platform is loaded.
+     */
     public void commonOnLoad() {
         // Load common stuff
     }
 
+    /**
+     * Called when the platform is enabled.
+     */
     public void commonOnEnable() {
+        logManager = new LogManager<>(this);
         cacheManager = new CacheManager<>(this);
 
         new UpdateManager<>(this);
         new PacketManager<>(this);
     }
 
+    /**
+     * Called when the platform gets disabled.
+     */
     public void commonOnDisable() {
         PacketEvents.getAPI().terminate();
     }
 
+    /**
+     * Gets the platform.
+     *
+     * @return The platform.
+     */
     public abstract P getPlatform();
 
+    /**
+     * Checks if a sender has a certain permission.
+     *
+     * @param sender     The UUID of the entity to check.
+     * @param permission The permission string to check.
+     * @return true if the entity has the permission, false otherwise.
+     */
     public abstract boolean hasPermission(UUID sender, String permission);
 
+    /**
+     * Sends a broadcast message with a specific component and permission.
+     *
+     * @param component  The component to broadcast.
+     * @param permission The permission required to receive the broadcast. Can be null.
+     */
     public abstract void broadcastComponent(Component component, @Nullable String permission);
 
+    /**
+     * Checks whether an entity has been removed.
+     *
+     * @param entityId The ID of the entity to check.
+     * @param player   The player to check for the entity removal. Can be null.
+     * @return true if the entity has been removed, false otherwise.
+     */
     public abstract boolean isEntityRemoved(int entityId, @Nullable Object player);
 
+    /**
+     * Retrieves the value of a configuration option.
+     *
+     * @param option The configuration option to retrieve.
+     * @return The value of the configuration option.
+     */
     public abstract boolean getConfigurationOption(ConfigOption option);
 
+    /**
+     * Retrieves the version of the plugin.
+     *
+     * @return The version of the plugin.
+     */
     public abstract String getPluginVersion();
 }

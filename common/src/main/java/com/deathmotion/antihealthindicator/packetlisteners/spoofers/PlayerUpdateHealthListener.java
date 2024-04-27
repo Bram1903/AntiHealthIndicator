@@ -25,17 +25,33 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateHealth;
 
+/**
+ * Listens for PlayerUpdateHealth events to modify the health display.
+ *
+ * @param <P> The platform type.
+ */
 public class PlayerUpdateHealthListener<P> extends PacketListenerAbstract {
-
-
     private final AHIPlatform<P> platform;
     private final boolean bypassPermissionEnabled;
 
+    /**
+     * Constructs a new PlayerUpdateHealthListener with the specified {@link AHIPlatform}.
+     *
+     * @param platform The platform to use.
+     */
     public PlayerUpdateHealthListener(AHIPlatform<P> platform) {
         this.platform = platform;
         this.bypassPermissionEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
+
+        platform.getLogManager().debug("Player Update Health listener has been set up.");
     }
 
+    /**
+     * This function is called when an {@link PacketSendEvent} is triggered.
+     * Overwrites the {@link WrapperPlayServerUpdateHealth} for players to control how they are displayed.
+     *
+     * @param event The event that has been triggered.
+     */
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() == PacketType.Play.Server.UPDATE_HEALTH) {

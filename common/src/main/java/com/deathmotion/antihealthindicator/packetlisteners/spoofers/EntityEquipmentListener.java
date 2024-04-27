@@ -35,6 +35,11 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Listens for EntityEquipment events to apply modifications.
+ *
+ * @param <P> The platform type.
+ */
 public class EntityEquipmentListener<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
 
@@ -52,6 +57,11 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
             .level(3)
             .build());
 
+    /**
+     * Constructs a new EntityEquipmentListener with the specified platform.
+     *
+     * @param platform The platform to use.
+     */
     public EntityEquipmentListener(AHIPlatform<P> platform) {
         this.platform = platform;
 
@@ -60,6 +70,8 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
         this.spoofStackAmount = platform.getConfigurationOption(ConfigOption.STACK_AMOUNT_ENABLED);
         this.spoofDurability = platform.getConfigurationOption(ConfigOption.DURABILITY_ENABLED);
         this.spoofEnchantments = platform.getConfigurationOption(ConfigOption.ENCHANTMENTS_ENABLED);
+
+        platform.getLogManager().debug("Entity Equipment listener initialized.");
     }
 
     /**

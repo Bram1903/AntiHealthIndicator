@@ -35,6 +35,11 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 
+/**
+ * Listens for EntityMetadata events to modify the display of entity attributes.
+ *
+ * @param <P> The platform type.
+ */
 public class EntityMetadataListener<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
     private final CacheManager<P> cacheManager;
@@ -54,6 +59,11 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
     private final boolean absorptionEnabled;
     private final boolean xpEnabled;
 
+    /**
+     * Constructs a new EntityMetadataListener with the specified {@link AHIPlatform}.
+     *
+     * @param platform The platform to use.
+     */
     public EntityMetadataListener(AHIPlatform<P> platform) {
         this.platform = platform;
         this.cacheManager = platform.getCacheManager();
@@ -72,8 +82,16 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         airTicksEnabled = platform.getConfigurationOption(ConfigOption.AIR_TICKS_ENABLED);
         absorptionEnabled = platform.getConfigurationOption(ConfigOption.ABSORPTION_ENABLED);
         xpEnabled = platform.getConfigurationOption(ConfigOption.XP_ENABLED);
+
+        platform.getLogManager().debug("Entity Metadata listener initialized.");
     }
 
+    /**
+     * This function is called when an {@link PacketSendEvent} is triggered.
+     * Overwrites the {@link EntityData} for certain entities to control how they are displayed.
+     *
+     * @param event The event that has been triggered.
+     */
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (!event.getPacketType().equals(PacketType.Play.Server.ENTITY_METADATA)) return;
@@ -135,6 +153,13 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         event.markForReEncode(true);
     }
 
+    /**
+     * Determines whether a given wolf should be ignored.
+     *
+     * @param user             The user to which the wolf is displayed.
+     * @param livingEntityData The data of the wolf entity.
+     * @return Whether the wolf should be ignored.
+     */
     private boolean shouldIgnoreWolf(User user, LivingEntityData livingEntityData) {
         if (!ignoreTamedWolves && !ignoreOwnedWolves) {
             return true;
@@ -145,6 +170,11 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         return (ignoreTamedWolves && wolfData.isTamed()) || (ignoreOwnedWolves && wolfData.isOwnerPresent() && wolfData.getOwnerUUID().equals(user.getUUID()));
     }
 
+    /**
+     * Modifies the display of an Iron Golem's metadata.
+     *
+     * @param obj The data of the Iron Golem entity to be modified.
+     */
     private void spoofIronGolemMetadata(EntityData obj) {
         // Checks if the metadata index is related to air ticks and if the configuration option for it is enabled
         if (obj.getIndex() == MetadataIndex.AIR_TICKS && airTicksEnabled) {
@@ -169,6 +199,11 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         }
     }
 
+    /**
+     * Modifies the display of a Living Entity's metadata (excluding players).
+     *
+     * @param obj The data of the Living Entity to be modified.
+     */
     private void spoofLivingEntityMetadata(EntityData obj) {
         if (obj.getIndex() == MetadataIndex.AIR_TICKS && airTicksEnabled) {
             setDynamicValue(obj, 1);
@@ -180,6 +215,11 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         }
     }
 
+    /**
+     * Modifies the display of a Player's metadata.
+     *
+     * @param obj The data of the Player to be modified.
+     */
     private void spoofPlayerMetadata(EntityData obj) {
         if (obj.getIndex() == MetadataIndex.ABSORPTION && absorptionEnabled) {
             setDynamicValue(obj, 0);

@@ -20,7 +20,7 @@ package com.deathmotion.antihealthindicator.schedulers;
 
 import com.deathmotion.antihealthindicator.AHIPlugin;
 import com.deathmotion.antihealthindicator.schedulers.folia.FoliaCompatUtil;
-import com.deathmotion.antihealthindicator.wrappers.interfaces.Scheduler;
+import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
