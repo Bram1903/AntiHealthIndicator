@@ -20,7 +20,7 @@ The plugin doesn't shade PacketEvents anymore because of performance considerati
 so you will need to install the latest version of PacketEvents on your server.
 
 GitHub: https://github.com/retrooper/packetevents <br>
-Latest Release: https://ci.codemc.io/job/retrooper/job/packetevents/
+Latest Release: https://ci.codemc.io/job/retrooper/job/packetevents/lastSuccessfulBuild/artifact/spigot/build/libs/packetevents-spigot-2.2.1.jar
 
 ## Showcase
 
