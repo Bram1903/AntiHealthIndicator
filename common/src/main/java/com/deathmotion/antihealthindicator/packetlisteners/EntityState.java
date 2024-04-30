@@ -137,6 +137,8 @@ public class EntityState<P> implements PacketListener {
 
     private void handleSetPassengers(WrapperPlayServerSetPassengers packet, User user) {
         int entityId = packet.getEntityId();
+        if (entityId == user.getEntityId()) return;
+
         int[] passengers = packet.getPassengers();
 
         if (passengers.length > 0) {
@@ -154,6 +156,8 @@ public class EntityState<P> implements PacketListener {
 
     private void handleAttachEntity(WrapperPlayServerAttachEntity packet, User user) {
         int entityId = packet.getHoldingId();
+        if (entityId == user.getEntityId()) return;
+
         int passengerId = packet.getAttachedId();
 
         if (entityId > 0) {
