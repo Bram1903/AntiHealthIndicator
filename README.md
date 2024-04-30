@@ -76,6 +76,7 @@ Players that are OP (Operators) have these permissions by default.
 ### Prerequisites
 
 - Java Development Kit (JDK) version 8 or higher
+- [Git](https://git-scm.com/downloads)
 
 ### Steps:
 
