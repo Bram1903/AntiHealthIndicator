@@ -97,9 +97,10 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         if (!event.getPacketType().equals(PacketType.Play.Server.ENTITY_METADATA)) return;
 
         WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata(event);
+        int entityId = packet.getEntityId();
         User user = event.getUser();
 
-        if (event.getUser().getEntityId() == packet.getEntityId()) return;
+        if (entityId == user.getEntityId()) return;
 
         if (allowBypassEnabled) {
             if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
@@ -108,8 +109,6 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         if (!playersOnly && ignoreVehiclesEnabled) {
             if (cacheManager.isUserPassenger(packet.getEntityId(), user.getEntityId())) return;
         }
-
-        int entityId = packet.getEntityId();
 
         LivingEntityData livingEntityData = cacheManager.getLivingEntityData(entityId).orElse(null);
         if (livingEntityData == null) return;
