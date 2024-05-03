@@ -20,7 +20,7 @@ package com.deathmotion.antihealthindicator.schedulers;
 
 import com.deathmotion.antihealthindicator.AHIPlugin;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
-import com.deathmotion.antihealthindicator.schedulers.folia.FoliaCompatUtil;
+import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
@@ -36,16 +36,16 @@ public final class SpigotScheduler implements Scheduler {
 
     @Override
     public void runAsyncTask(Consumer<Object> task) {
-        FoliaCompatUtil.getAsyncScheduler().runNow(plugin, task);
+        FoliaScheduler.getAsyncScheduler().runNow(plugin, task);
     }
 
     @Override
     public void rynAsyncTaskDelayed(Consumer<Object> task, long delay, TimeUnit timeUnit) {
-        FoliaCompatUtil.getAsyncScheduler().runDelayed(plugin, task, delay, timeUnit);
+        FoliaScheduler.getAsyncScheduler().runDelayed(plugin, task, delay, timeUnit);
     }
 
     @Override
     public void runAsyncTaskAtFixedRate(@NotNull Consumer<Object> task, long delay, long period, @NotNull TimeUnit timeUnit) {
-        FoliaCompatUtil.getAsyncScheduler().runAtFixedRate(plugin, task, delay, period, timeUnit);
+        FoliaScheduler.getAsyncScheduler().runAtFixedRate(plugin, task, delay, period, timeUnit);
     }
 }
