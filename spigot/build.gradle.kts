@@ -24,8 +24,8 @@ tasks {
             url("https://ci.codemc.io/job/retrooper/job/packetevents/lastBuild/artifact/spigot/build/libs/packetevents-spigot-2.2.1.jar")
             url("https://ci.lucko.me/job/spark/410/artifact/spark-bukkit/build/libs/spark-1.10.65-bukkit.jar")
             url("https://download.luckperms.net/1530/bukkit/loader/LuckPerms-Bukkit-5.4.117.jar")
-            url("https://github.com/ViaVersion/ViaVersion/releases/download/4.10.0/ViaVersion-4.10.0.jar")
-            url("https://github.com/ViaVersion/ViaBackwards/releases/download/4.10.0/ViaBackwards-4.10.0.jar")
+            url("https://github.com/ViaVersion/ViaVersion/releases/download/4.10.1/ViaVersion-4.10.1.jar")
+            url("https://github.com/ViaVersion/ViaBackwards/releases/download/4.10.1/ViaBackwards-4.10.1.jar")
         }
 
         jvmArgs = listOf(
