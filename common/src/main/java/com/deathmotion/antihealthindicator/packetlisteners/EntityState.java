@@ -191,15 +191,17 @@ public class EntityState<P> implements PacketListener {
     }
 
     private void handlePassengerEvent(User user, int vehicleId, float healthValue, boolean entering) {
-        List<EntityData> metadata = new ArrayList<>();
+        platform.getScheduler().runAsyncTask((o) -> {
+            List<EntityData> metadata = new ArrayList<>();
 
-        if (!entering) {
-            if (isBypassEnabled) {
-                if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
+            if (!entering) {
+                if (isBypassEnabled) {
+                    if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
+                }
             }
-        }
 
-        metadata.add(new EntityData(MetadataIndex.HEALTH, EntityDataTypes.FLOAT, healthValue));
-        user.sendPacketSilently(new WrapperPlayServerEntityMetadata(vehicleId, metadata));
+            metadata.add(new EntityData(MetadataIndex.HEALTH, EntityDataTypes.FLOAT, healthValue));
+            user.sendPacketSilently(new WrapperPlayServerEntityMetadata(vehicleId, metadata));
+        });
     }
 }
