@@ -1,3 +1,7 @@
+repositories {
+    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+}
+
 dependencies {
     implementation(project(":common"))
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
@@ -5,6 +9,8 @@ dependencies {
 }
 
 tasks {
+    runPaper.folia.registerTask()
+
     runServer {
         // The version of the server to run
         val version = "1.20.6"
