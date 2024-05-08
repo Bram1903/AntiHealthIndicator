@@ -5,7 +5,7 @@ repositories {
 dependencies {
     implementation(project(":common"))
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
-    compileOnly("com.github.retrooper.packetevents:spigot:2.2.1")
+    compileOnly("com.github.retrooper.packetevents:spigot:2.3.0")
 }
 
 tasks {
@@ -17,7 +17,7 @@ tasks {
     val javaVersion = 21
 
     val requiredPlugins = runPaper.downloadPluginsSpec {
-        url("https://ci.codemc.io/job/retrooper/job/packetevents/lastBuild/artifact/spigot/build/libs/packetevents-spigot-2.2.1.jar")
+        url("https://ci.codemc.io/job/retrooper/job/packetevents/lastBuild/artifact/spigot/build/libs/packetevents-spigot-2.3.0.jar")
     }
 
     val jvmArgsExternal = listOf(
