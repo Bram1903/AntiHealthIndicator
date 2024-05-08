@@ -1,7 +1,7 @@
 dependencies {
     implementation(project(":common"))
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
-    compileOnly("com.github.retrooper.packetevents:spigot:2.2.1")
+    compileOnly("com.github.retrooper.packetevents:spigot:2.3.0")
 }
 
 tasks {
@@ -21,7 +21,7 @@ tasks {
         })
 
         downloadPlugins {
-            url("https://ci.codemc.io/job/retrooper/job/packetevents/lastBuild/artifact/spigot/build/libs/packetevents-spigot-2.2.1.jar")
+            url("https://ci.codemc.io/job/retrooper/job/packetevents/lastBuild/artifact/spigot/build/libs/packetevents-spigot-2.3.0.jar")
             url("https://ci.lucko.me/job/spark/410/artifact/spark-bukkit/build/libs/spark-1.10.65-bukkit.jar")
             url("https://download.luckperms.net/1530/bukkit/loader/LuckPerms-Bukkit-5.4.117.jar")
             url("https://github.com/ViaVersion/ViaVersion/releases/download/4.10.0/ViaVersion-4.10.0.jar")

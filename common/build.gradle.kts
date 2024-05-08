@@ -1,7 +1,7 @@
 val adventureVersion = "4.16.0"
 
 dependencies {
-    compileOnlyApi("com.github.retrooper.packetevents:api:2.2.1")
+    compileOnlyApi("com.github.retrooper.packetevents:api:2.3.0")
     compileOnlyApi("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
     api("com.github.ben-manes.caffeine:caffeine:2.5.6")
