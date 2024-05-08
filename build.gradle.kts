@@ -7,7 +7,6 @@ plugins {
 
 allprojects {
     apply(plugin = "java")
-    apply(plugin = "java-library")
     apply(plugin = "com.github.johnrengelman.shadow")
     apply(plugin = "xyz.jpenilla.run-paper")
 
@@ -19,7 +18,6 @@ allprojects {
 
     repositories {
         mavenCentral()
-        maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.codemc.io/repository/maven-releases/")
     }
 }
@@ -35,10 +33,12 @@ tasks {
 
     withType<JavaCompile> {
         options.encoding = "UTF-8"
+        options.release = 8
     }
 
     shadowJar {
         archiveFileName.set("${project.name}-${project.version}.jar")
+
         project.subprojects.forEach { subproject ->
             from(project(subproject.path).sourceSets.main.get().output)
         }
