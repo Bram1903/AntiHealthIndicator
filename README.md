@@ -51,6 +51,10 @@ The plugin includes a set of spoofing features, including:
 - Item Stack Amount
 - World Seed
 
+## Commands
+
+- `/antihealthindicator` or `/ahi` - Displays the plugin version.
+
 ## Permission Nodes
 
 Players that are OP (Operators) have these permissions by default.
@@ -59,6 +63,7 @@ Players that are OP (Operators) have these permissions by default.
 - `AntiHealthIndicator.Bypass` Prevents the player from receiving spoofed data (if enabled in the config).
 - `AntiHealthIndicator.Debug` Allows the player to receive debug messages periodically in-game when debugging is enabled
   in the config.
+- `AntiHealthIndicator.Version` Allows the player to run /ahi to check the plugin version. (Granted by default)
 
 ## Installation
 
