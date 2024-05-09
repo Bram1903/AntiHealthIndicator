@@ -52,9 +52,6 @@ public class AHICommand implements CommandExecutor {
         return true;
     }
 
-    /**
-     * Initialises the PlayerCrasher plugin message component.
-     */
     private void initPcComponent() {
         pcComponent = Component.text()
                 .append(Component.text("\u25cf", NamedTextColor.GREEN)
