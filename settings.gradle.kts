@@ -3,7 +3,7 @@ plugins {
 }
 
 include("common")
-include("spigot")
+include("platforms:spigot")
 
 rootProject.name = "AntiHealthIndicator"
 

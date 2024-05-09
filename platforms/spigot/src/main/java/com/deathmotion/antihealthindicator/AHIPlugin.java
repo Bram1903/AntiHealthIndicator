@@ -35,6 +35,7 @@ public class AHIPlugin extends JavaPlugin {
         ahi.setConfigManager(new ConfigManager(this));
 
         ahi.commonOnEnable();
+        ahi.registerCommands();
         ahi.enableBStats();
     }
 

@@ -18,6 +18,7 @@
 
 package com.deathmotion.antihealthindicator;
 
+import com.deathmotion.antihealthindicator.commands.AHICommand;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
@@ -44,7 +45,7 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
         this.plugin = plugin;
     }
 
-    void setConfigManager(ConfigManager configManager) {
+    protected void setConfigManager(ConfigManager configManager) {
         this.configManager = configManager;
     }
 
@@ -58,7 +59,7 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
         return scheduler;
     }
 
-    void setScheduler(Scheduler scheduler) {
+    protected void setScheduler(Scheduler scheduler) {
         this.scheduler = scheduler;
     }
 
@@ -97,11 +98,15 @@ public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
         return this.plugin.getDescription().getVersion();
     }
 
-    public void enableBStats() {
+    protected void enableBStats() {
         try {
             new Metrics(this.plugin, 20803);
         } catch (Exception e) {
             this.plugin.getLogger().warning("Something went wrong while enabling bStats.\n" + e.getMessage());
         }
+    }
+
+    protected void registerCommands() {
+        this.plugin.getCommand("antihealthindicator").setExecutor(new AHICommand(this.getPlatform()));
     }
 }

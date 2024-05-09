@@ -17,7 +17,7 @@ tasks {
     val javaVersion = 21
 
     val requiredPlugins = runPaper.downloadPluginsSpec {
-        url("https://ci.codemc.io/job/retrooper/job/packetevents/lastBuild/artifact/spigot/build/libs/packetevents-spigot-2.3.0.jar")
+        url("https://ci.codemc.io/job/retrooper/job/packetevents/lastSuccessfulBuild/artifact/spigot/build/libs/packetevents-spigot-2.3.1-SNAPSHOT.jar")
     }
 
     val jvmArgsExternal = listOf(

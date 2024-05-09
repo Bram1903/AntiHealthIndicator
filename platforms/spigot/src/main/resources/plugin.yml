@@ -7,6 +7,13 @@ version: '2.1.0'
 api-version: '1.13'
 folia-supported: true
 load: POSTWORLD
+commands:
+  AntiHealthIndicator:
+    description: Base command for AntiHealthIndicator.
+    permission: AntiHealthIndicator.Version
+    permission-message: Unknown command. Type "/help" for help
+    aliases:
+      - ahi
 permissions:
   AntiHealthIndicator.Notify:
     description: "This permission allows players to be notified when an update is found."
@@ -17,5 +24,8 @@ permissions:
   AntiHealthIndicator.Debug:
     description: "This permission allows players to see debug messages."
     default: op
+  AntiHealthIndicator.Version:
+    description: "This permission allows players to run the /antihealthindicator command."
+    default: true
 depend:
   - packetevents
