@@ -28,7 +28,7 @@ so you will need to install the latest version of PacketEvents on your server.
 ## Key Features
 
 - **Asynchronous Design**: Utilizes asynchronous packet modifications to ensure server performance remains unaffected.
-- **Compatibility**: Supports a wide range of Minecraft versions from 1.8.8 to 1.20.4, along with popular server
+- **Compatibility**: Supports a wide range of Minecraft versions from 1.8.8 to 1.20.6, along with popular server
   platforms including Spigot, Paper, and Folia.
 - **Customizable Settings**: Highly configurable plugin settings enable server administrators to tailor the experience
   according to their preferences.
