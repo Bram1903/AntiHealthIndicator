@@ -56,7 +56,8 @@ public class AHICommand implements CommandExecutor {
                     .getProtocolManager()
                     .getUsers()
                     .stream()
-                    .filter(userStream -> userStream.getUUID().equals(((Player) sender).getUniqueId()))
+                    .filter(user -> user != null && user.getUUID() != null)
+                    .filter(user -> user.getUUID().equals(((Player) sender).getUniqueId()))
                     .findFirst().ifPresent(user -> user.sendMessage(pcComponent));
 
             return true;
