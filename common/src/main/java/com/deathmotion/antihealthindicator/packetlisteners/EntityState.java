@@ -37,7 +37,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -192,15 +192,11 @@ public class EntityState<P> implements PacketListener {
 
     private void handlePassengerEvent(User user, int vehicleId, float healthValue, boolean entering) {
         platform.getScheduler().runAsyncTask((o) -> {
-            List<EntityData> metadata = new ArrayList<>();
-
-            if (!entering) {
-                if (isBypassEnabled) {
-                    if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
-                }
+            if (!entering && isBypassEnabled) {
+                if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
             }
 
-            metadata.add(new EntityData(MetadataIndex.HEALTH, EntityDataTypes.FLOAT, healthValue));
+            List<EntityData> metadata = Collections.singletonList(new EntityData(MetadataIndex.HEALTH, EntityDataTypes.FLOAT, healthValue));
             user.sendPacketSilently(new WrapperPlayServerEntityMetadata(vehicleId, metadata));
         });
     }
