@@ -1,5 +1,4 @@
 plugins {
-    java
     id("java-library")
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("xyz.jpenilla.run-paper") version "2.2.3"
