@@ -13,9 +13,11 @@ allprojects {
     group = "com.deathmotion.antihealthindicator"
     version = "2.1.0"
 
-    java.sourceCompatibility = JavaVersion.VERSION_1_8
-    java.targetCompatibility = JavaVersion.VERSION_1_8
-    java.disableAutoTargetJvm()
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+        disableAutoTargetJvm()
+    }
 
     repositories {
         mavenCentral()
@@ -45,8 +47,14 @@ tasks {
         }
 
         relocate("com.github.benmanes.caffeine", "com.deathmotion.antihealthindicator.shaded.caffeine")
-        relocate("net.kyori.adventure.text.serializer.gson", "io.github.retrooper.packetevents.adventure.serializer.gson")
-        relocate("net.kyori.adventure.text.serializer.legacy", "io.github.retrooper.packetevents.adventure.serializer.legacy")
+        relocate(
+            "net.kyori.adventure.text.serializer.gson",
+            "io.github.retrooper.packetevents.adventure.serializer.gson"
+        )
+        relocate(
+            "net.kyori.adventure.text.serializer.legacy",
+            "io.github.retrooper.packetevents.adventure.serializer.legacy"
+        )
         minimize()
     }
 }

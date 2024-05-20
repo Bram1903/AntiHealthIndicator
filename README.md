@@ -16,7 +16,8 @@ to ensure players cannot access critical information such as health or player st
 thereby maintaining a level playing field for all participants.
 
 ### Requires PacketEvents
-The plugin doesn't shade PacketEvents anymore because of performance considerations, 
+
+The plugin doesn't shade PacketEvents anymore because of performance considerations,
 so you will need to install the latest version of PacketEvents on your server.
 
 [PacketEvents on Modrinth](https://modrinth.com/plugin/packetevents)
