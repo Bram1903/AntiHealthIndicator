@@ -2,11 +2,6 @@ plugins {
     id("com.gradle.enterprise") version ("3.16.2")
 }
 
-include("common")
-include("platforms:spigot")
-
-rootProject.name = "AntiHealthIndicator"
-
 gradleEnterprise {
     if (System.getenv("CI") != null) {
         buildScan {
@@ -16,3 +11,7 @@ gradleEnterprise {
         }
     }
 }
+
+rootProject.name = "AntiHealthIndicator"
+include("common")
+include("platforms:spigot")
