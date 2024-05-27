@@ -22,8 +22,8 @@ import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.deathmotion.antihealthindicator.schedulers.SpigotScheduler;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class AHIPlugin extends JavaPlugin {
-    private final SpigotAntiHealthIndicator ahi = new SpigotAntiHealthIndicator(this);
+public class AHIBukkit extends JavaPlugin {
+    private final BukkitAntiHealthIndicator ahi = new BukkitAntiHealthIndicator(this);
 
     public void onLoad() {
         ahi.commonOnLoad();

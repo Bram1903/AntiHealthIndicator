@@ -18,7 +18,7 @@
 
 package com.deathmotion.antihealthindicator.schedulers;
 
-import com.deathmotion.antihealthindicator.AHIPlugin;
+import com.deathmotion.antihealthindicator.AHIBukkit;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
 import org.jetbrains.annotations.NotNull;
@@ -28,9 +28,9 @@ import java.util.function.Consumer;
 
 public final class SpigotScheduler implements Scheduler {
 
-    private final AHIPlugin plugin;
+    private final AHIBukkit plugin;
 
-    public SpigotScheduler(AHIPlugin plugin) {
+    public SpigotScheduler(AHIBukkit plugin) {
         this.plugin = plugin;
     }
 

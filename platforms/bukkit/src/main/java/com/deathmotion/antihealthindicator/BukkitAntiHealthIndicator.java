@@ -36,12 +36,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 @Getter
-public class SpigotAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
+public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
 
     private final JavaPlugin plugin;
     private ConfigManager configManager;
 
-    public SpigotAntiHealthIndicator(JavaPlugin plugin) {
+    public BukkitAntiHealthIndicator(JavaPlugin plugin) {
         this.plugin = plugin;
     }
 
