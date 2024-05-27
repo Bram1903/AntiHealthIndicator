@@ -3,6 +3,7 @@ package com.deathmotion.antihealthindicator.velocity;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import org.slf4j.Logger;
 
@@ -12,7 +13,10 @@ import org.slf4j.Logger;
         version = "2.1.0",
         description = "Prevent health indicators from being displayed on the client",
         authors = {"Bram"},
-        url = "https://github.com/Bram1903/AntiHealthIndicator"
+        url = "https://github.com/Bram1903/AntiHealthIndicator",
+        dependencies = {
+                @Dependency(id = "packetevents"),
+        }
 )
 public class Velocity {
 
