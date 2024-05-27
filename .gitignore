@@ -6,6 +6,7 @@ build/
 
 ### runPaper Task
 platforms/spigot/server/
+platforms/velocity/server/
 
 ### IntelliJ IDEA ###
 .idea/

@@ -13,5 +13,7 @@ gradleEnterprise {
 }
 
 rootProject.name = "AntiHealthIndicator"
+
 include("common")
 include("platforms:spigot")
+include("platforms:velocity")
