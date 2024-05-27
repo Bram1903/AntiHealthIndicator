@@ -23,7 +23,6 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
-import com.velocitypowered.api.proxy.ProxyServer;
 import org.slf4j.Logger;
 
 @Plugin(
@@ -37,14 +36,20 @@ import org.slf4j.Logger;
                 @Dependency(id = "packetevents"),
         }
 )
-public class AHIVelocity extends ProxyServer {
-    private final VelocityAntiHealthIndicator ahi = new VelocityAntiHealthIndicator(this);
+public class AHIVelocity {
+    @Inject
+    private VelocityAntiHealthIndicator ahi;
 
     @Inject
     private Logger logger;
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
+        ahi.setScheduler(new VelocityScheduler(this));
+        ahi.setConfigManager(new ConfigManager(this));
+
+        ahi.commonOnEnable();
+        ahi.enableBStats();
         logger.info("Hello, Velocity!");
     }
 }

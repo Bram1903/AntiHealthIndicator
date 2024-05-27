@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     implementation(project(":common"))
+    compileOnly("com.github.retrooper.packetevents:velocity:2.3.0")
     compileOnly("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
     annotationProcessor("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
 }

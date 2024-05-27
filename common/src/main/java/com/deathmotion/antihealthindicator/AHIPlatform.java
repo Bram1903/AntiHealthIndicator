@@ -38,13 +38,6 @@ public abstract class AHIPlatform<P> {
     private CacheManager<P> cacheManager;
 
     /**
-     * Called when the platform is loaded.
-     */
-    public void commonOnLoad() {
-        // Load common stuff
-    }
-
-    /**
      * Called when the platform is enabled.
      */
     public void commonOnEnable() {

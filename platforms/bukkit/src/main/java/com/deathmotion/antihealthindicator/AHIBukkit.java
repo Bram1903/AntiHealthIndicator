@@ -25,10 +25,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class AHIBukkit extends JavaPlugin {
     private final BukkitAntiHealthIndicator ahi = new BukkitAntiHealthIndicator(this);
 
-    public void onLoad() {
-        ahi.commonOnLoad();
-    }
-
     @Override
     public void onEnable() {
         ahi.setScheduler(new SpigotScheduler(this));

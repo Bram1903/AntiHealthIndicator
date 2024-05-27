@@ -19,24 +19,36 @@
 package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import com.deathmotion.antihealthindicator.interfaces.Scheduler;
+import com.google.inject.Inject;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.util.UUID;
 
 public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
 
-    private final ProxyServer proxy;
+    @Inject
+    private ProxyServer proxy;
 
-    public VelocityAntiHealthIndicator(ProxyServer proxy) {
-        this.proxy = proxy;
-    }
+    @Inject
+    private Logger logger;
 
     @Override
     public ProxyServer getPlatform() {
         return this.proxy;
+    }
+
+    @Override
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
+
+    protected void setScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
     }
 
     @Override
@@ -67,5 +79,13 @@ public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
     @Override
     public String getPluginVersion() {
         return this.proxy.getVersion().toString();
+    }
+
+    protected void enableBStats() {
+        try {
+            //new Metrics(this, this.proxy, this.logger, "", 20803);
+        } catch (Exception e) {
+            this.logger.warn("Something went wrong while enabling bStats.\n{}", e.getMessage());
+        }
     }
 }
