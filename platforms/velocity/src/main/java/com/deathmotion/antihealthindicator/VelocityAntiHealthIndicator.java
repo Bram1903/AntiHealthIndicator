@@ -21,12 +21,15 @@ package com.deathmotion.antihealthindicator;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.google.inject.Inject;
+import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import io.github.retrooper.packetevents.bstats.Metrics;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
+import java.nio.file.Path;
 import java.util.UUID;
 
 public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
@@ -36,6 +39,8 @@ public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
 
     @Inject
     private Logger logger;
+
+    @Inject @DataDirectory Path dataDirectory;
 
     @Override
     public ProxyServer getPlatform() {
@@ -83,7 +88,7 @@ public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
 
     protected void enableBStats() {
         try {
-            //new Metrics(this, this.proxy, this.logger, "", 20803);
+            Metrics.createInstance(this, this.getPlatform(), logger, dataDirectory, 20803);
         } catch (Exception e) {
             this.logger.warn("Something went wrong while enabling bStats.\n{}", e.getMessage());
         }
