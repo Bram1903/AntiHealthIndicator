@@ -18,13 +18,18 @@
 
 package com.deathmotion.antihealthindicator;
 
+import com.deathmotion.antihealthindicator.schedulers.VelocityScheduler;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.slf4j.Logger;
+
+import java.nio.file.Path;
 
 @Plugin(
         id = "antihealthindicator",
@@ -38,24 +43,26 @@ import org.slf4j.Logger;
         }
 )
 public class AHIVelocity {
-    private final ProxyServer server;
-    private final Logger logger;
     private final VelocityAntiHealthIndicator ahi;
+    private final ProxyServer server;
 
     @Inject
-    public AHIVelocity(ProxyServer server, Logger logger) {
+    public AHIVelocity(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         this.server = server;
-        this.logger = logger;
-        this.ahi = new VelocityAntiHealthIndicator();
+        this.ahi = new VelocityAntiHealthIndicator(server, logger, dataDirectory);
     }
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        ahi.setScheduler(new VelocityScheduler(this));
+        ahi.setScheduler(new VelocityScheduler(this.server));
         ahi.setConfigManager(new ConfigManager(this));
 
         ahi.commonOnEnable();
         ahi.enableBStats();
-        logger.info("Hello, Velocity!");
+    }
+
+    @Subscribe()
+    public void onProxyShutdown(ProxyShutdownEvent event) {
+        ahi.commonOnDisable();
     }
 }

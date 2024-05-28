@@ -34,13 +34,16 @@ import java.util.UUID;
 
 public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
 
-    @Inject
-    private ProxyServer proxy;
+    private final ProxyServer proxy;
+    private final Logger logger;
+    private final Path dataDirectory;
 
     @Inject
-    private Logger logger;
-
-    @Inject @DataDirectory Path dataDirectory;
+    public VelocityAntiHealthIndicator(ProxyServer proxy, Logger logger, @DataDirectory Path dataDirectory) {
+        this.proxy = proxy;
+        this.logger = logger;
+        this.dataDirectory = dataDirectory;
+    }
 
     @Override
     public ProxyServer getPlatform() {
@@ -83,7 +86,7 @@ public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
 
     @Override
     public String getPluginVersion() {
-        return this.proxy.getVersion().toString();
+        return this.getPlatform().getVersion().getVersion();
     }
 
     protected void enableBStats() {
