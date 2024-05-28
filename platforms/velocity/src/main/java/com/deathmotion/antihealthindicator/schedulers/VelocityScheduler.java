@@ -20,6 +20,7 @@ package com.deathmotion.antihealthindicator.schedulers;
 
 import com.deathmotion.antihealthindicator.AHIVelocity;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
+import com.google.inject.Inject;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,6 +32,7 @@ public final class VelocityScheduler implements Scheduler {
     private final AHIVelocity ahiVelocity;
     private final ProxyServer proxy;
 
+    @Inject
     public VelocityScheduler(AHIVelocity ahiVelocity, ProxyServer server) {
         this.ahiVelocity = ahiVelocity;
         this.proxy = server;

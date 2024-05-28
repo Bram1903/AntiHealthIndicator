@@ -22,30 +22,21 @@ import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.google.inject.Inject;
-import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import io.github.retrooper.packetevents.bstats.Metrics;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 
-import java.nio.file.Path;
 import java.util.UUID;
 
 public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
 
     private final ProxyServer proxy;
-    private final Path dataDirectory;
-    private final Logger logger;
-
     private ConfigManager configManager;
 
     @Inject
-    public VelocityAntiHealthIndicator(ProxyServer proxy, @DataDirectory Path dataDirectory, Logger logger) {
+    public VelocityAntiHealthIndicator(ProxyServer proxy) {
         this.proxy = proxy;
-        this.dataDirectory = dataDirectory;
-        this.logger = logger;
     }
 
     @Override
@@ -93,6 +84,7 @@ public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
 
     @Override
     public String getPluginVersion() {
-        return this.getPlatform().getVersion().getVersion();
+        // TODO: Implement a proper global versioning system
+        return "2.1.0";
     }
 }
