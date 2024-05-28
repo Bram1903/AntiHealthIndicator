@@ -56,9 +56,9 @@ public class ConfigManager {
 
             Path configPath = dataDirectory.resolve("config.toml");
 
-            if(!Files.exists(configPath)) {
+            if (!Files.exists(configPath)) {
                 InputStream resourceFile = getClass().getResourceAsStream("/config.toml");
-                if(resourceFile != null) {
+                if (resourceFile != null) {
                     Files.copy(resourceFile, configPath, StandardCopyOption.REPLACE_EXISTING);
                 } else {
                     logger.warn("The file config.toml not found in resources.");
