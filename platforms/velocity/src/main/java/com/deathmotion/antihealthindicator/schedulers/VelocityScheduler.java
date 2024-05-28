@@ -18,6 +18,7 @@
 
 package com.deathmotion.antihealthindicator.schedulers;
 
+import com.deathmotion.antihealthindicator.AHIVelocity;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.jetbrains.annotations.NotNull;
@@ -27,23 +28,25 @@ import java.util.function.Consumer;
 
 public final class VelocityScheduler implements Scheduler {
 
+    private final AHIVelocity ahiVelocity;
     private final ProxyServer proxy;
 
-    public VelocityScheduler(ProxyServer proxy) {
-        this.proxy = proxy;
+    public VelocityScheduler(AHIVelocity ahiVelocity, ProxyServer server) {
+        this.ahiVelocity = ahiVelocity;
+        this.proxy = server;
     }
 
     @Override
     public void runAsyncTask(Consumer<Object> task) {
         this.proxy.getScheduler()
-                .buildTask(this.proxy, () -> task.accept(null))
+                .buildTask(this.ahiVelocity, () -> task.accept(null))
                 .schedule();
     }
 
     @Override
     public void rynAsyncTaskDelayed(Consumer<Object> task, long delay, TimeUnit timeUnit) {
         this.proxy.getScheduler()
-                .buildTask(this.proxy, () -> task.accept(null))
+                .buildTask(this.ahiVelocity, () -> task.accept(null))
                 .delay(delay, timeUnit)
                 .schedule();
     }
@@ -51,7 +54,7 @@ public final class VelocityScheduler implements Scheduler {
     @Override
     public void runAsyncTaskAtFixedRate(@NotNull Consumer<Object> task, long delay, long period, @NotNull TimeUnit timeUnit) {
         this.proxy.getScheduler()
-                .buildTask(this.proxy, () -> task.accept(null))
+                .buildTask(this.ahiVelocity, () -> task.accept(null))
                 .delay(delay, timeUnit)
                 .repeat(period, timeUnit)
                 .schedule();

@@ -28,6 +28,7 @@ import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import io.github.retrooper.packetevents.bstats.Metrics;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
@@ -59,15 +60,23 @@ public class AHIVelocity {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        ahi.setScheduler(new VelocityScheduler(this.server));
+        ahi.setScheduler(new VelocityScheduler(this, this.server));
         ahi.setConfigManager(new ConfigManager(this.logger, this.dataDirectory));
 
         ahi.commonOnEnable();
-        ahi.enableBStats();
+        enableBStats();
     }
 
     @Subscribe()
     public void onProxyShutdown(ProxyShutdownEvent event) {
         ahi.commonOnDisable();
+    }
+
+    private void enableBStats() {
+        try {
+            Metrics.createInstance(this, this.ahi.getPlatform(), logger, dataDirectory, 20803);
+        } catch (Exception e) {
+            this.logger.warn("Something went wrong while enabling bStats.\n{}", e.getMessage());
+        }
     }
 }

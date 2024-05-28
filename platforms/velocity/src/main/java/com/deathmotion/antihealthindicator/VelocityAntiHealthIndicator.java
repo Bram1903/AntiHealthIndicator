@@ -95,12 +95,4 @@ public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
     public String getPluginVersion() {
         return this.getPlatform().getVersion().getVersion();
     }
-
-    protected void enableBStats() {
-        try {
-            Metrics.createInstance(this, this.getPlatform(), logger, dataDirectory, 20803);
-        } catch (Exception e) {
-            this.logger.warn("Something went wrong while enabling bStats.\n{}", e.getMessage());
-        }
-    }
 }
