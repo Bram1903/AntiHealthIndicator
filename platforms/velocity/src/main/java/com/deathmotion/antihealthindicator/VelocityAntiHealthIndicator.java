@@ -20,6 +20,7 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
+import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.google.inject.Inject;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
@@ -35,14 +36,16 @@ import java.util.UUID;
 public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
 
     private final ProxyServer proxy;
-    private final Logger logger;
     private final Path dataDirectory;
+    private final Logger logger;
+
+    private ConfigManager configManager;
 
     @Inject
-    public VelocityAntiHealthIndicator(ProxyServer proxy, Logger logger, @DataDirectory Path dataDirectory) {
+    public VelocityAntiHealthIndicator(ProxyServer proxy, @DataDirectory Path dataDirectory, Logger logger) {
         this.proxy = proxy;
-        this.logger = logger;
         this.dataDirectory = dataDirectory;
+        this.logger = logger;
     }
 
     @Override
@@ -57,6 +60,10 @@ public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
 
     protected void setScheduler(Scheduler scheduler) {
         this.scheduler = scheduler;
+    }
+
+    protected void setConfigManager(ConfigManager configManager) {
+        this.configManager = configManager;
     }
 
     @Override
@@ -81,7 +88,7 @@ public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
 
     @Override
     public boolean getConfigurationOption(ConfigOption option) {
-        return false;
+        return this.configManager.getConfigurationOption(option);
     }
 
     @Override

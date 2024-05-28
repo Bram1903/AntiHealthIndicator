@@ -18,6 +18,7 @@
 
 package com.deathmotion.antihealthindicator;
 
+import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.deathmotion.antihealthindicator.schedulers.VelocityScheduler;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
@@ -43,19 +44,23 @@ import java.nio.file.Path;
         }
 )
 public class AHIVelocity {
-    private final VelocityAntiHealthIndicator ahi;
     private final ProxyServer server;
+    private final Path dataDirectory;
+    private final Logger logger;
+    private final VelocityAntiHealthIndicator ahi;
 
     @Inject
-    public AHIVelocity(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
+    public AHIVelocity(ProxyServer server, @DataDirectory Path dataDirectory, Logger logger) {
         this.server = server;
-        this.ahi = new VelocityAntiHealthIndicator(server, logger, dataDirectory);
+        this.dataDirectory = dataDirectory;
+        this.logger = logger;
+        this.ahi = new VelocityAntiHealthIndicator(server, dataDirectory, logger);
     }
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         ahi.setScheduler(new VelocityScheduler(this.server));
-        ahi.setConfigManager(new ConfigManager(this));
+        ahi.setConfigManager(new ConfigManager(this.logger, this.dataDirectory));
 
         ahi.commonOnEnable();
         ahi.enableBStats();
