@@ -1,5 +1,7 @@
 plugins {
-    id("xyz.jpenilla.run-velocity") version "2.3.0"
+    antihealthindicator.`library-conventions`
+    antihealthindicator.`shadow-conventions`
+    alias(libs.plugins.run.velocity)
 }
 
 repositories {
@@ -11,9 +13,9 @@ repositories {
 
 dependencies {
     implementation(project(":common"))
-    compileOnly("com.github.retrooper.packetevents:velocity:2.3.0")
-    compileOnly("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
-    annotationProcessor("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
+    compileOnly(libs.packetevents.velocity)
+    compileOnly(libs.velocity)
+    annotationProcessor(libs.velocity)
 }
 
 tasks.register("generateTemplates") {}

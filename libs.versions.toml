@@ -1,0 +1,29 @@
+[versions]
+adventure = "4.16.0"
+packetevents = "2.3.0"
+spigot = "1.20.6-R0.1-SNAPSHOT"
+velocity = "3.3.0-SNAPSHOT"
+run-paper = "2.3.0"
+caffeine = "2.5.6"
+lombok = "1.18.30"
+
+[libraries]
+adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
+adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version.ref = "adventure" }
+adventure-text-serializer-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
+adventure-text-serializer-gson-legacy = { group = "net.kyori", name = "adventure-text-serializer-gson-legacy-impl", version.ref = "adventure" }
+adventure-nbt = { group = "net.kyori", name = "adventure-nbt", version.ref = "adventure" }
+packetevents-api = { group = "com.github.retrooper.packetevents", name = "api", version.ref = "packetevents" }
+packetevents-spigot = { group = "com.github.retrooper.packetevents", name = "spigot", version.ref = "packetevents" }
+packetevents-velocity = { group = "com.github.retrooper.packetevents", name = "velocity", version.ref = "packetevents" }
+caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
+lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
+spigot = { group = "org.spigotmc", name = "spigot-api", version.ref = "spigot" }
+velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
+
+[bundles]
+adventure = [ "adventure-api", "adventure-text-serializer-gson", "adventure-text-serializer-legacy", "adventure-nbt" ]
+
+[plugins]
+run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
+run-velocity = { id = "xyz.jpenilla.run-velocity", version.ref = "run-paper" }

@@ -1,15 +1,17 @@
 plugins {
-    id("xyz.jpenilla.run-paper") version "2.3.0"
+    antihealthindicator.`library-conventions`
+    antihealthindicator.`shadow-conventions`
+    alias(libs.plugins.run.paper)
 }
 
 repositories {
-    maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
 }
 
 dependencies {
     implementation(project(":common"))
-    compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
-    compileOnly("com.github.retrooper.packetevents:spigot:2.3.0")
+    compileOnly(libs.spigot)
+    compileOnly(libs.packetevents.spigot)
 }
 
 tasks {

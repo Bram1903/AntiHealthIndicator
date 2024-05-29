@@ -1,0 +1,5 @@
+[versions]
+shadow = "8.1.1"
+
+[libraries]
+shadow = { group = "com.github.johnrengelman", name = "shadow", version.ref = "shadow" }

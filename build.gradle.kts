@@ -1,56 +1,31 @@
-plugins {
-    id("java-library")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-}
-
-allprojects {
-    apply(plugin = "java")
-
-    group = "com.deathmotion.antihealthindicator"
-    version = "2.1.0"
-
-    java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-        disableAutoTargetJvm()
-    }
-
-    repositories {
-        mavenCentral()
-        maven("https://repo.codemc.io/repository/maven-releases/")
-    }
-}
-
-dependencies {
-    api("com.github.ben-manes.caffeine:caffeine:2.5.6")
-}
+group = "com.deathmotion.antihealthindicator"
+description = rootProject.name
+version = "2.1.0"
 
 tasks {
-    build {
-        dependsOn(shadowJar)
-    }
+    register("build") {
+        dependsOn(*subprojects.map { it.tasks["build"] }.toTypedArray())
+        group = "build"
 
-    withType<JavaCompile> {
-        options.encoding = "UTF-8"
-        options.release = 8
-    }
+        doLast {
+            val buildOut = project.layout.buildDirectory.dir("libs").get().asFile
+            if (!buildOut.exists())
+                buildOut.mkdirs()
 
-    shadowJar {
-        archiveFileName.set("${project.name}-${project.version}.jar")
+            for (subproject in subprojects) {
+                val subIn = subproject.layout.buildDirectory.dir("libs").get()
 
-        project.subprojects.forEach { subproject ->
-            from(project(subproject.path).sourceSets.main.get().output)
+                copy {
+                    from(subIn)
+                    into(buildOut)
+                }
+            }
         }
+    }
 
-        relocate("com.github.benmanes.caffeine", "com.deathmotion.antihealthindicator.shaded.caffeine")
-        relocate(
-            "net.kyori.adventure.text.serializer.gson",
-            "io.github.retrooper.packetevents.adventure.serializer.gson"
-        )
-        relocate(
-            "net.kyori.adventure.text.serializer.legacy",
-            "io.github.retrooper.packetevents.adventure.serializer.legacy"
-        )
-        minimize()
+    register<Delete>("clean") {
+        dependsOn(*subprojects.map { it.tasks["clean"] }.toTypedArray())
+        group = "build"
+        delete(rootProject.layout.buildDirectory)
     }
 }
