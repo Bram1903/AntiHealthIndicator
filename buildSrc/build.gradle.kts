@@ -15,5 +15,4 @@ repositories {
 
 dependencies {
     implementation(libs.shadow)
-    compileOnly(libs.jetbrains.annotations)
 }
