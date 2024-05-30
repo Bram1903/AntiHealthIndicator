@@ -1,5 +1,6 @@
 plugins {
     antihealthindicator.`shadow-conventions`
+    antihealthindicator.`library-conventions`
 }
 
 group = "com.deathmotion.antihealthindicator"
@@ -13,8 +14,9 @@ dependencies {
 }
 
 tasks {
+    val excludedModule = "platforms"
+
     build {
-        val excludedModule = "platforms"
         dependsOn(*subprojects.filter { it.name != excludedModule }.map { it.tasks["build"] }.toTypedArray())
         dependsOn(shadowJar)
 
@@ -33,4 +35,12 @@ tasks {
             }
         }
     }
+
+    clean<Delete> {
+        dependsOn(*subprojects.filter { it.name != excludedModule }.map { it.tasks["clean"] }.toTypedArray())
+        group = "build"
+        delete(rootProject.layout.buildDirectory)
+    }
+
+    defaultTasks("build")
 }
