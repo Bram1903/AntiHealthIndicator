@@ -5,8 +5,7 @@ build/
 !**/src/test/**/build/
 
 ### runPaper Task
-platforms/bukkit/server/
-platforms/velocity/server/
+/server/
 
 ### IntelliJ IDEA ###
 .idea/
