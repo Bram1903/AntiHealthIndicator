@@ -18,7 +18,7 @@
 
 package com.deathmotion.antihealthindicator;
 
-import com.deathmotion.antihealthindicator.managers.ConfigManager;
+import com.deathmotion.antihealthindicator.managers.VelocityConfigManager;
 import com.deathmotion.antihealthindicator.schedulers.VelocityScheduler;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
@@ -61,7 +61,7 @@ public class AHIVelocity {
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         ahi.setScheduler(new VelocityScheduler(this, this.server));
-        ahi.setConfigManager(new ConfigManager(this.logger, this.dataDirectory));
+        ahi.setConfigManager(new VelocityConfigManager(this.logger, this.dataDirectory));
 
         ahi.commonOnEnable();
         enableBStats();

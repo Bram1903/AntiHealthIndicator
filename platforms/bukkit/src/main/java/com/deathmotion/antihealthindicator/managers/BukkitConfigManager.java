@@ -24,11 +24,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class ConfigManager {
+public class BukkitConfigManager {
     private final JavaPlugin plugin;
     private final Map<ConfigOption, Object> configurationOptions = new EnumMap<>(ConfigOption.class);
 
-    public ConfigManager(JavaPlugin plugin) {
+    public BukkitConfigManager(JavaPlugin plugin) {
         this.plugin = plugin;
 
         saveDefaultConfiguration();

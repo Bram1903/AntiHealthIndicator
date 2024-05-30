@@ -33,14 +33,14 @@ import java.nio.file.StandardCopyOption;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class ConfigManager {
+public class VelocityConfigManager {
     private final Logger logger;
     private final Path dataDirectory;
 
     private final Map<ConfigOption, Object> configurationOptions = new EnumMap<>(ConfigOption.class);
 
     @Inject
-    public ConfigManager(Logger logger, @DataDirectory Path dataDirectory) {
+    public VelocityConfigManager(Logger logger, @DataDirectory Path dataDirectory) {
         this.logger = logger;
         this.dataDirectory = dataDirectory;
 
