@@ -31,3 +31,4 @@ rootProject.name = "AntiHealthIndicator"
 include(":common")
 include(":platforms:bukkit")
 include(":platforms:velocity")
+include(":platforms:bungeecord")

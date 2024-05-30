@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":platforms:bukkit"))
     implementation(project(":platforms:velocity"))
+    implementation(project(":platforms:bungeecord"))
 }
 
 tasks {

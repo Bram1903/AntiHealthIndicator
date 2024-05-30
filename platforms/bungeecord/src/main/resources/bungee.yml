@@ -1,0 +1,3 @@
+name: AntiHealthIndicator
+version: '${version}'
+main: com.deathmotion.antihealthindicator.Bungeecord
