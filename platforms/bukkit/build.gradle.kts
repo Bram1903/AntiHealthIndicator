@@ -40,7 +40,7 @@ tasks {
         downloadPlugins.from(requiredPlugins)
         downloadPlugins {
             url("https://ci.lucko.me/job/spark/410/artifact/spark-bukkit/build/libs/spark-1.10.65-bukkit.jar")
-            url("https://ci.lucko.me/job/LuckPerms/lastBuild/artifact/bukkit/loader/build/libs/LuckPerms-Bukkit-5.4.128.jar")
+            url("https://download.luckperms.net/1543/bukkit/loader/LuckPerms-Bukkit-5.4.130.jar")
         }
 
         jvmArgs = jvmArgsExternal
