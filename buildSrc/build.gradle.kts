@@ -9,10 +9,5 @@ kotlin {
 }
 
 repositories {
-    gradlePluginPortal()
     mavenCentral()
-}
-
-dependencies {
-    implementation(libs.shadow)
 }

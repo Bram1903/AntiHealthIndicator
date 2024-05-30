@@ -28,6 +28,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "AntiHealthIndicator"
-include("common")
-include("platforms:bukkit")
-include("platforms:velocity")
+include(":common")
+include(":platforms:bukkit")
+include(":platforms:velocity")

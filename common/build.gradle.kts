@@ -1,5 +1,6 @@
 plugins {
-    antihealthindicator.`library-conventions`
+    antihealthindicator.`java-conventions`
+    `java-library`
 }
 
 dependencies {
@@ -8,4 +9,9 @@ dependencies {
     compileOnlyApi(libs.bundles.adventure)
     compileOnlyApi(libs.lombok)
     annotationProcessor(libs.lombok)
+}
+
+// So that SNAPSHOT is always the latest SNAPSHOT
+configurations.all {
+    resolutionStrategy.cacheDynamicVersionsFor(0, TimeUnit.SECONDS)
 }

@@ -6,6 +6,7 @@ velocity = "3.3.0-SNAPSHOT"
 run-paper = "2.3.0"
 caffeine = "2.5.6"
 lombok = "1.18.30"
+shadow = "8.1.1"
 
 [libraries]
 adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
@@ -27,3 +28,4 @@ adventure = [ "adventure-api", "adventure-text-serializer-gson", "adventure-text
 [plugins]
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
 run-velocity = { id = "xyz.jpenilla.run-velocity", version.ref = "run-paper" }
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }

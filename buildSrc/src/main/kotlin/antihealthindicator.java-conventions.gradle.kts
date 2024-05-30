@@ -1,5 +1,5 @@
 plugins {
-    `java-library`
+    java
 }
 
 group = rootProject.group
@@ -13,7 +13,6 @@ repositories {
 }
 
 java {
-    withSourcesJar()
     disableAutoTargetJvm()
 }
 
@@ -25,14 +24,5 @@ tasks {
         options.release = 8
     }
 
-    jar {
-        archiveClassifier = "default"
-    }
-
     defaultTasks("build")
-}
-
-// So that SNAPSHOT is always the latest SNAPSHOT
-configurations.all {
-    resolutionStrategy.cacheDynamicVersionsFor(0, "seconds")
 }
