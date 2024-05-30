@@ -1,3 +1,21 @@
 name: AntiHealthIndicator
-version: '${version}'
-main: com.deathmotion.antihealthindicator.Bungeecord
+author: Bram
+description: Spoofs certain information sent by the server to other players to prevent them from deducing information about the player's health, armor, held item, etc.
+website: https://github.com/Bram1903/AntiHealthIndicator
+main: com.deathmotion.antihealthindicator.AHIBungee
+version: '2.1.0'
+permissions:
+  AntiHealthIndicator.Notify:
+    description: "This permission allows players to be notified when an update is found."
+    default: op
+  AntiHealthIndicator.Bypass:
+    description: "This permission prevents the player from receiving spoofed data."
+    default: op
+  AntiHealthIndicator.Debug:
+    description: "This permission allows players to see debug messages."
+    default: op
+  AntiHealthIndicator.Version:
+    description: "This permission allows players to run the /antihealthindicator command."
+    default: true
+depend:
+  - packetevents

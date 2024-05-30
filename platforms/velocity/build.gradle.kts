@@ -11,8 +11,8 @@ repositories {
 
 dependencies {
     implementation(project(":common"))
-    compileOnly(libs.packetevents.velocity)
     compileOnly(libs.velocity)
+    compileOnly(libs.packetevents.velocity)
     annotationProcessor(libs.velocity)
 }
 
