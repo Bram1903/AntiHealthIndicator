@@ -14,7 +14,8 @@ dependencies {
 
 tasks {
     build {
-        dependsOn(*subprojects.map { it.tasks["build"] }.toTypedArray())
+        val excludedModule = "platforms"
+        dependsOn(*subprojects.filter { it.name != excludedModule }.map { it.tasks["build"] }.toTypedArray())
         dependsOn(shadowJar)
 
         doLast {
@@ -22,7 +23,7 @@ tasks {
             if (!buildOut.exists())
                 buildOut.mkdirs()
 
-            for (subproject in subprojects) {
+            for (subproject in subprojects.filter { it.name != excludedModule }) {
                 val subIn = subproject.layout.buildDirectory.dir("libs").get()
 
                 copy {
