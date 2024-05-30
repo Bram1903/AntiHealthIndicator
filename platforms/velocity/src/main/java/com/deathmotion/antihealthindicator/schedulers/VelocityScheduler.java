@@ -46,7 +46,7 @@ public final class VelocityScheduler implements Scheduler {
     }
 
     @Override
-    public void rynAsyncTaskDelayed(Consumer<Object> task, long delay, TimeUnit timeUnit) {
+    public void runAsyncTaskDelayed(Consumer<Object> task, long delay, TimeUnit timeUnit) {
         this.proxy.getScheduler()
                 .buildTask(this.ahiVelocity, () -> task.accept(null))
                 .delay(delay, timeUnit)

@@ -74,7 +74,7 @@ public class PlayerJoin<P> extends PacketListenerAbstract {
         if (PacketType.Play.Server.JOIN_GAME == event.getPacketType()) {
             User user = event.getUser();
 
-            platform.getScheduler().rynAsyncTaskDelayed((o) -> {
+            platform.getScheduler().runAsyncTaskDelayed((o) -> {
                 if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Notify")) {
                     user.sendMessage(updateComponent);
                 }

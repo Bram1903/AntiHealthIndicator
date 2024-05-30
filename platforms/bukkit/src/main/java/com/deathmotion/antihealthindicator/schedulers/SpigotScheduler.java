@@ -40,7 +40,7 @@ public final class SpigotScheduler implements Scheduler {
     }
 
     @Override
-    public void rynAsyncTaskDelayed(Consumer<Object> task, long delay, TimeUnit timeUnit) {
+    public void runAsyncTaskDelayed(Consumer<Object> task, long delay, TimeUnit timeUnit) {
         FoliaScheduler.getAsyncScheduler().runDelayed(plugin, task, delay, timeUnit);
     }
 
