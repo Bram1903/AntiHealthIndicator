@@ -5,7 +5,7 @@ plugins {
 
 tasks {
     shadowJar {
-        archiveFileName = "antihealthindicator-${project.version}.jar"
+        archiveFileName = "AntiHealthIndicator-${project.version}.jar"
         archiveClassifier = null
     }
 
