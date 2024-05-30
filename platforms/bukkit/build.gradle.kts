@@ -1,6 +1,5 @@
 plugins {
     antihealthindicator.`library-conventions`
-    antihealthindicator.`shadow-conventions`
     alias(libs.plugins.run.paper)
 }
 

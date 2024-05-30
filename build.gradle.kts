@@ -1,11 +1,21 @@
+plugins {
+    antihealthindicator.`shadow-conventions`
+}
+
 group = "com.deathmotion.antihealthindicator"
 description = rootProject.name
 version = "2.1.0"
 
+dependencies {
+    implementation(project(":common"))
+    implementation(project("platforms:bukkit"))
+    implementation(project("platforms:velocity"))
+}
+
 tasks {
-    register("build") {
+    build {
         dependsOn(*subprojects.map { it.tasks["build"] }.toTypedArray())
-        group = "build"
+        dependsOn(shadowJar)
 
         doLast {
             val buildOut = project.layout.buildDirectory.dir("libs").get().asFile
@@ -21,11 +31,5 @@ tasks {
                 }
             }
         }
-    }
-
-    register<Delete>("clean") {
-        dependsOn(*subprojects.map { it.tasks["clean"] }.toTypedArray())
-        group = "build"
-        delete(rootProject.layout.buildDirectory)
     }
 }

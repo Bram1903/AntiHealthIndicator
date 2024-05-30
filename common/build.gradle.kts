@@ -1,6 +1,5 @@
 plugins {
     antihealthindicator.`library-conventions`
-    antihealthindicator.`shadow-conventions`
 }
 
 dependencies {
