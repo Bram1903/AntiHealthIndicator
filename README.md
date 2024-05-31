@@ -127,7 +127,7 @@ Special thanks to:
 - **[@Retrooper](https://github.com/retrooper)**: Author of [PacketEvents](https://github.com/retrooper/packetevents).
 - **[@Tofaa](https://github.com/Tofaa2)**: Assisted with project infrastructure and logic. Check out
   his [EntityLib](https://github.com/Tofaa2/EntityLib).
-- **[@Booky10](https://github.com/booky10vv)**: Helped with complex tasks.
+- **[@Booky10](https://github.com/booky10)**: Helped with complex tasks.
 - **[@Abhigya](https://github.com/AbhigyaKrishna)**: Designed the Gradle Build Chain.
 
 ## License
