@@ -10,6 +10,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven("https://repo.codemc.io/repository/maven-releases/")
+    maven("https://repo.codemc.io/repository/maven-snapshots/")
 }
 
 java {

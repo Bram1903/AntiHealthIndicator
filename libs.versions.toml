@@ -1,6 +1,6 @@
 [versions]
 adventure = "4.16.0"
-packetevents = "2.3.0"
+packetevents = "2.3.1-SNAPSHOT"
 spigot = "1.20.6-R0.1-SNAPSHOT"
 velocity = "3.3.0-SNAPSHOT"
 bungeecord = "1.20-R0.1-SNAPSHOT"
