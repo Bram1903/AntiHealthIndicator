@@ -1,46 +1,55 @@
-# AntiHealthIndicator
-
-[![Build](https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/gradle.yml/badge.svg)](https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/gradle.yml)
-[![CodeQL](https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/codeql.yml/badge.svg)](https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/codeql.yml)
-![GitHub Release](https://img.shields.io/github/release/Bram1903/AntiHealthIndicator.svg)
-
-[![SpigotMC](https://img.shields.io/badge/-SpigotMC-blue?style=for-the-badge&logo=SpigotMC)](https://www.spigotmc.org/resources/antihealthindicator.114851/)
-[![Modrinth](https://img.shields.io/badge/-Modrinth-green?style=for-the-badge&logo=Modrinth)](https://modrinth.com/plugin/antihealthindicator)
+<div align="center">
+  <h1>AntiHealthIndicator</h1>
+  <img alt="Build" src="https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/gradle.yml/badge.svg">
+  <img alt="CodeQL" src="https://github.com/Bram1903/AntiHealthIndicator/actions/workflows/codeql.yml/badge.svg">
+  <img alt="GitHub Release" src="https://img.shields.io/github/release/Bram1903/AntiHealthIndicator.svg">
+  <br>
+  <a href="https://www.spigotmc.org/resources/antihealthindicator.114851/"><img alt="SpigotMC" src="https://img.shields.io/badge/-SpigotMC-blue?style=for-the-badge&logo=SpigotMC"></a>
+  <a href="https://modrinth.com/plugin/antihealthindicator"><img alt="Modrinth" src="https://img.shields.io/badge/-Modrinth-green?style=for-the-badge&logo=Modrinth"></a>
+</div>
 
 ## Overview
 
-AntiHealthIndicator is a robust Minecraft plugin
-designed to foster fair gameplay by preventing cheaters and modders from gaining unfair advantages.
-This lightweight solution modifies specific data packets
-to ensure players cannot access critical information such as health or player status,
-thereby maintaining a level playing field for all participants.
+The **AntiHealthIndicator** plugin prevents hackers and modders from seeing other players' health. Designed to be
+lightweight with minimal server performance impact, it modifies packets directly, making it impossible to bypass. Logic
+executes asynchronously to minimize server load. Additional features include hiding durability, enchantments, item stack
+amounts, player saturation, absorption, and XP.
 
 ### Requires PacketEvents
 
-The plugin doesn't shade PacketEvents anymore because of performance considerations,
-so you will need to install the latest version of PacketEvents on your server.
+Ensure the [PacketEvents](https://modrinth.com/plugin/packetevents) library is installed on your server.
 
-[PacketEvents on Modrinth](https://modrinth.com/plugin/packetevents)
+## Table of Contents
+
+- [Overview](#overview)
+    - [Requires PacketEvents](#requires-packetevents)
+- [Showcase](#showcase)
+- [Supported Platforms & Versions](#supported-platforms--versions)
+- [Spoofers](#spoofers)
+- [Commands](#commands)
+- [Permission Nodes](#permission-nodes)
+- [Installation](#installation)
+- [Compiling From Source](#compiling-from-source)
+    - [Prerequisites](#prerequisites)
+    - [Steps](#steps)
+- [Credits](#credits)
+- [License](#license)
 
 ## Showcase
 
 ![Demo](docs/showcase/AntiHealthIndicator.gif)
 
-## Key Features
+## Supported Platforms & Versions
 
-- **Asynchronous Design**: Utilizes asynchronous packet modifications to ensure server performance remains unaffected.
-- **Compatibility**: Supports a wide range of Minecraft versions from 1.8.8 to 1.20.6, along with popular server
-  platforms including Spigot, Paper, and Folia.
-- **Customizable Settings**: Highly configurable plugin settings enable server administrators to tailor the experience
-  according to their preferences.
-- **Update Notifications**: Automatically checks for updates upon startup and notifies administrators of available
-  upgrades.
-- **Permission System**: Implements a permission system to grant specific privileges, including bypassing spoofing
-  features.
+| Platform                           | Supported Versions |
+|------------------------------------|--------------------|
+| Bukkit (Spigot, Paper, Folia etc.) | 1.8.8 - 1.20.6     |
+| Velocity                           | Latest Major       |
+| BungeeCord (or any forks)          | Latest Major       |
 
 ## Spoofers
 
-The plugin includes a set of spoofing features, including:
+The plugin includes various spoofing features:
 
 - Health
 - Air Ticks
@@ -58,47 +67,44 @@ The plugin includes a set of spoofing features, including:
 
 ## Permission Nodes
 
-Players that are OP (Operators) have these permissions by default.
+Operators (OPs) have these permissions by default:
 
-- `AntiHealthIndicator.Notify` Notifies the player when a new update is available.
-- `AntiHealthIndicator.Bypass` Prevents the player from receiving spoofed data (if enabled in the config).
-- `AntiHealthIndicator.Debug` Allows the player to receive debug messages periodically in-game when debugging is enabled
-  in the config.
-- `AntiHealthIndicator.Version` Allows the player to run /ahi to check the plugin version. (Granted by default)
+- `AntiHealthIndicator.Notify` - Notifies player of updates.
+- `AntiHealthIndicator.Bypass` - Prevents receiving spoofed data (if enabled in config).
+- `AntiHealthIndicator.Debug` - Receives debug messages if debugging is enabled.
+- `AntiHealthIndicator.Version` - Allows running `/ahi` to check the plugin version.
 
 ## Installation
 
-1. **Prerequisites**: Ensure the [PacketEvents library](https://modrinth.com/plugin/packetevents)
-   is installed.
+1. **Prerequisites**: Install [PacketEvents](https://modrinth.com/plugin/packetevents).
 2. **Download**: Get the latest release from
    the [GitHub release page](https://github.com/Bram1903/AntiHealthIndicator/releases/latest).
 3. **Installation**: Move the downloaded plugin to your server's plugins directory.
-4. **Configuration**: Customize settings in the `config.yml` file to match server preferences.
+4. **Configuration**: Customize settings in `config.yml`.
 5. **Restart**: Restart the server for changes to take effect.
 
 ## Compiling From Source
 
 ### Prerequisites
 
-- Java Development Kit (JDK) version 17 or higher
+- Java Development Kit (JDK) version 21 or higher
 - [Git](https://git-scm.com/downloads)
 
-### Steps:
+### Steps
 
 1. **Clone the Repository**:
-   Clone the repository containing the AntiHealthIndicator source code to your local machine using Git:
    ```bash
    git clone https://github.com/Bram1903/AntiHealthIndicator.git
    ```
 
 2. **Navigate to Project Directory**:
-   Change your current directory to the root directory of the cloned project:
    ```bash
    cd AntiHealthIndicator
    ```
 
 3. **Compile the Source Code**:
-   Use the Gradle wrapper to compile the source code and generate the plugin JAR file:
+   Use the Gradle wrapper to compile and generate the plugin JAR file:
+
    <details>
    <summary><strong>Linux / macOS</strong></summary>
 
@@ -116,13 +122,13 @@ Players that are OP (Operators) have these permissions by default.
 
 ## Credits
 
-Without the following people, this project wouldn't be half as good as it is right now!
+Special thanks to:
 
-- **[@Retrooper](https://github.com/retrooper)**: Author of
-  the [PacketEvents library](https://github.com/retrooper/packetevents) and just a great guy overall!
-- **[@Tofaa](https://github.com/Tofaa2)**:
-  Really nice person who helped me with the major part of the project infrastructure and logic!
-  Check out his [EntityLib](https://github.com/Tofaa2/EntityLib)!
+- **[@Retrooper](https://github.com/retrooper)**: Author of [PacketEvents](https://github.com/retrooper/packetevents).
+- **[@Tofaa](https://github.com/Tofaa2)**: Assisted with project infrastructure and logic. Check out
+  his [EntityLib](https://github.com/Tofaa2/EntityLib).
+- **[@Booky10](https://github.com/booky10vv)**: Helped with complex tasks.
+- **[@Abhigya](https://github.com/AbhigyaKrishna)**: Designed the Gradle Build Chain.
 
 ## License
 
