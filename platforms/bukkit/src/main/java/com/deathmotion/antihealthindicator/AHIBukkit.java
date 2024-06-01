@@ -19,7 +19,8 @@
 package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.managers.BukkitConfigManager;
-import com.deathmotion.antihealthindicator.schedulers.SpigotScheduler;
+import com.deathmotion.antihealthindicator.schedulers.BukkitScheduler;
+import com.deathmotion.antihealthindicator.schedulers.FoliaScheduler;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class AHIBukkit extends JavaPlugin {
@@ -27,7 +28,7 @@ public class AHIBukkit extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        ahi.setScheduler(new SpigotScheduler(this));
+        ahi.setScheduler(isFolia() ? new FoliaScheduler(this) : new BukkitScheduler(this));
         ahi.setBukkitConfigManager(new BukkitConfigManager(this));
 
         ahi.commonOnEnable();
@@ -38,5 +39,14 @@ public class AHIBukkit extends JavaPlugin {
     @Override
     public void onDisable() {
         ahi.commonOnDisable();
+    }
+
+    private static boolean isFolia() {
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 }

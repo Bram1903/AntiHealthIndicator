@@ -1,13 +1,14 @@
 [versions]
 adventure = "4.16.0"
 packetevents = "2.3.1-SNAPSHOT"
-spigot = "1.20.6-R0.1-SNAPSHOT"
+paper = "1.20.6-R0.1-SNAPSHOT"
 velocity = "3.3.0-SNAPSHOT"
 bungeecord = "1.20-R0.1-SNAPSHOT"
 run-paper = "2.3.0"
 caffeine = "2.5.6"
 lombok = "1.18.30"
 shadow = "8.1.1"
+paperweight-userdev = "1.7.1"
 
 [libraries]
 adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
@@ -21,7 +22,6 @@ packetevents-velocity = { group = "com.github.retrooper.packetevents", name = "v
 packetevents-bungeecord = { group = "com.github.retrooper.packetevents", name = "bungeecord", version.ref = "packetevents" }
 caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
 lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
-spigot = { group = "org.spigotmc", name = "spigot-api", version.ref = "spigot" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 bungeecord = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungeecord" }
 
@@ -32,3 +32,4 @@ adventure = [ "adventure-api", "adventure-text-serializer-gson", "adventure-text
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
 run-velocity = { id = "xyz.jpenilla.run-velocity", version.ref = "run-paper" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight-userdev" }

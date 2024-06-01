@@ -1,13 +1,10 @@
 plugins {
     antihealthindicator.`java-conventions`
-}
-
-repositories {
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    alias(libs.plugins.paperweight.userdev)
 }
 
 dependencies {
     implementation(project(":common"))
-    compileOnly(libs.spigot)
+    paperweight.paperDevBundle(libs.versions.paper)
     compileOnly(libs.packetevents.spigot)
 }

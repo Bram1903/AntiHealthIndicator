@@ -20,32 +20,36 @@ package com.deathmotion.antihealthindicator.schedulers;
 
 import com.deathmotion.antihealthindicator.AHIBukkit;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
-import io.github.retrooper.packetevents.util.folia.FoliaScheduler;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-public final class SpigotScheduler implements Scheduler {
+public final class BukkitScheduler implements Scheduler {
 
     private final AHIBukkit plugin;
 
-    public SpigotScheduler(AHIBukkit plugin) {
+    public BukkitScheduler(AHIBukkit plugin) {
         this.plugin = plugin;
     }
 
     @Override
     public void runAsyncTask(Consumer<Object> task) {
-        FoliaScheduler.getAsyncScheduler().runNow(plugin, task);
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> task.accept(null));
     }
 
     @Override
     public void runAsyncTaskDelayed(Consumer<Object> task, long delay, TimeUnit timeUnit) {
-        FoliaScheduler.getAsyncScheduler().runDelayed(plugin, task, delay, timeUnit);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> task.accept(null), convertTimeToTicks(delay, timeUnit));
     }
 
     @Override
     public void runAsyncTaskAtFixedRate(@NotNull Consumer<Object> task, long delay, long period, @NotNull TimeUnit timeUnit) {
-        FoliaScheduler.getAsyncScheduler().runAtFixedRate(plugin, task, delay, period, timeUnit);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> task.accept(null), convertTimeToTicks(delay, timeUnit), convertTimeToTicks(period, timeUnit));
+    }
+
+    private long convertTimeToTicks(long time, TimeUnit timeUnit) {
+        return timeUnit.toMillis(time) / 50;
     }
 }
