@@ -26,6 +26,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class AHIBukkit extends JavaPlugin {
     private final BukkitAntiHealthIndicator ahi = new BukkitAntiHealthIndicator(this);
 
+    private static boolean isFolia() {
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
     @Override
     public void onEnable() {
         ahi.setScheduler(isFolia() ? new FoliaScheduler(this) : new BukkitScheduler(this));
@@ -39,14 +48,5 @@ public class AHIBukkit extends JavaPlugin {
     @Override
     public void onDisable() {
         ahi.commonOnDisable();
-    }
-
-    private static boolean isFolia() {
-        try {
-            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
     }
 }
