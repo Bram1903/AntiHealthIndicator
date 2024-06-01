@@ -1,10 +1,13 @@
 plugins {
     antihealthindicator.`java-conventions`
-    alias(libs.plugins.paperweight.userdev)
+}
+
+repositories {
+    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
     implementation(project(":common"))
-    paperweight.paperDevBundle(libs.versions.paper)
+    compileOnly(libs.paper)
     compileOnly(libs.packetevents.spigot)
 }

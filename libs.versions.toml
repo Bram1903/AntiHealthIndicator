@@ -22,6 +22,7 @@ packetevents-velocity = { group = "com.github.retrooper.packetevents", name = "v
 packetevents-bungeecord = { group = "com.github.retrooper.packetevents", name = "bungeecord", version.ref = "packetevents" }
 caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
 lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
+paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 bungeecord = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungeecord" }
 
@@ -32,4 +33,3 @@ adventure = ["adventure-api", "adventure-text-serializer-gson", "adventure-text-
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
 run-velocity = { id = "xyz.jpenilla.run-velocity", version.ref = "run-paper" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
-paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight-userdev" }
