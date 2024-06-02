@@ -128,8 +128,6 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         }
 
         packet.getEntityMetadata().forEach(entityData -> {
-            cachedEntity.processMetaData(entityData, user);
-
             if (ignoreWolf) return;
 
             if (entityType == EntityTypes.IRON_GOLEM && ignoreIronGolemsEnabled) {

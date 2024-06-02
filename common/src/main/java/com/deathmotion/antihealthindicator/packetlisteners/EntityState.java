@@ -32,10 +32,7 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 
 import java.util.UUID;
 
@@ -83,6 +80,8 @@ public class EntityState<P> implements PacketListener {
                 handleSpawnEntity(new WrapperPlayServerSpawnEntity(event), event.getUser());
             } else if (PacketType.Play.Server.JOIN_GAME == type) {
                 handleJoinGame(new WrapperPlayServerJoinGame(event), event.getUser());
+            } else if (PacketType.Play.Server.ENTITY_METADATA == type) {
+                handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), event.getUser());
             } else if (PacketType.Play.Server.DISCONNECT == type) {
                 handleLeaveGame(event.getUser().getUUID());
             } else if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
@@ -115,6 +114,17 @@ public class EntityState<P> implements PacketListener {
         livingEntityData.setEntityType(EntityTypes.PLAYER);
 
         cacheManager.addLivingEntity(user.getUUID(), packet.getEntityId(), livingEntityData);
+    }
+
+    private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, User user) {
+        int entityId = packet.getEntityId();
+
+        CachedEntity entityData = cacheManager.getCachedEntity(user.getUUID(), entityId).orElse(null);
+        if (entityData == null) return;
+
+        packet.getEntityMetadata().forEach(metaData -> {
+            entityData.processMetaData(metaData, user);
+        });
     }
 
     private void handleLeaveGame(UUID uuid) {
