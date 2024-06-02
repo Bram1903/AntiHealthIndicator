@@ -20,25 +20,24 @@ package com.deathmotion.antihealthindicator.packetlisteners;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.RidableEntities;
-import com.deathmotion.antihealthindicator.data.cache.LivingEntityData;
-import com.deathmotion.antihealthindicator.data.cache.RidableEntityData;
-import com.deathmotion.antihealthindicator.data.cache.WolfData;
+import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
+import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
+import com.deathmotion.antihealthindicator.data.cache.WolfEntity;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
-import com.deathmotion.antihealthindicator.util.MetadataIndex;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
-import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.wrapper.play.server.*;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerJoinGame;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnLivingEntity;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.UUID;
 
 /**
  * Listens for EntityState events and manages the caching of various entity state details.
@@ -46,11 +45,9 @@ import java.util.List;
  * @param <P> The platform type.
  */
 public class EntityState<P> implements PacketListener {
-    private final AHIPlatform<P> platform;
     private final CacheManager<P> cacheManager;
 
     private final boolean playersOnly;
-    private final boolean isBypassEnabled;
 
     /**
      * Constructs a new EntityState with the specified {@link AHIPlatform}.
@@ -58,11 +55,9 @@ public class EntityState<P> implements PacketListener {
      * @param platform The platform to use.
      */
     public EntityState(AHIPlatform<P> platform) {
-        this.platform = platform;
         this.cacheManager = platform.getCacheManager();
 
         this.playersOnly = platform.getConfigurationOption(ConfigOption.PLAYER_ONLY);
-        this.isBypassEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
 
         platform.getLogManager().debug("Entity State listener has been set up.");
     }
@@ -79,125 +74,71 @@ public class EntityState<P> implements PacketListener {
 
         if (playersOnly) {
             if (PacketType.Play.Server.JOIN_GAME == type) {
-                handleJoinGame(new WrapperPlayServerJoinGame(event));
+                handleJoinGame(new WrapperPlayServerJoinGame(event), event.getUser());
             }
         } else {
             if (PacketType.Play.Server.SPAWN_LIVING_ENTITY == type) {
-                handleSpawnLivingEntity(new WrapperPlayServerSpawnLivingEntity(event));
+                handleSpawnLivingEntity(new WrapperPlayServerSpawnLivingEntity(event), event.getUser());
             } else if (PacketType.Play.Server.SPAWN_ENTITY == type) {
-                handleSpawnEntity(new WrapperPlayServerSpawnEntity(event));
+                handleSpawnEntity(new WrapperPlayServerSpawnEntity(event), event.getUser());
             } else if (PacketType.Play.Server.JOIN_GAME == type) {
-                handleJoinGame(new WrapperPlayServerJoinGame(event));
-            } else if (PacketType.Play.Server.ENTITY_METADATA == type) {
-                handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), event.getUser());
-            } else if (PacketType.Play.Server.SET_PASSENGERS == type) {
-                handleSetPassengers(new WrapperPlayServerSetPassengers(event), event.getUser());
-            } else if (PacketType.Play.Server.ATTACH_ENTITY == type) {
-                handleAttachEntity(new WrapperPlayServerAttachEntity(event), event.getUser());
+                handleJoinGame(new WrapperPlayServerJoinGame(event), event.getUser());
+            } else if (PacketType.Play.Server.DISCONNECT == type) {
+                handleLeaveGame(event.getUser().getUUID());
+            } else if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
+                handleDestroyEntities(new WrapperPlayServerDestroyEntities(event), event.getUser());
             }
         }
     }
 
-    private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet) {
+    private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet, User user) {
         int entityId = packet.getEntityId();
         EntityType entityType = packet.getEntityType();
 
-        LivingEntityData entityData = createLivingEntity(entityType);
-        cacheManager.addLivingEntity(entityId, entityData);
+        CachedEntity entityData = createLivingEntity(entityType);
+        cacheManager.addLivingEntity(user.getUUID(), entityId, entityData);
     }
 
-    private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet) {
+    private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet, User user) {
         EntityType entityType = packet.getEntityType();
 
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.LIVINGENTITY)) {
             int entityId = packet.getEntityId();
 
-            LivingEntityData entityData = createLivingEntity(entityType);
-            cacheManager.addLivingEntity(entityId, entityData);
+            CachedEntity entityData = createLivingEntity(entityType);
+            cacheManager.addLivingEntity(user.getUUID(), entityId, entityData);
         }
     }
 
-    private void handleJoinGame(WrapperPlayServerJoinGame packet) {
-        LivingEntityData livingEntityData = new LivingEntityData();
+    private void handleJoinGame(WrapperPlayServerJoinGame packet, User user) {
+        CachedEntity livingEntityData = new CachedEntity();
         livingEntityData.setEntityType(EntityTypes.PLAYER);
 
-        cacheManager.addLivingEntity(packet.getEntityId(), livingEntityData);
+        cacheManager.addLivingEntity(user.getUUID(), packet.getEntityId(), livingEntityData);
     }
 
-    private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, User user) {
-        int entityId = packet.getEntityId();
-
-        LivingEntityData entityData = cacheManager.getLivingEntityData(entityId).orElse(null);
-        if (entityData == null) return;
-
-        packet.getEntityMetadata().forEach(metaData -> {
-            entityData.processMetaData(metaData, user);
-        });
+    private void handleLeaveGame(UUID uuid) {
+        cacheManager.removeUser(uuid);
     }
 
-    private void handleSetPassengers(WrapperPlayServerSetPassengers packet, User user) {
-        int entityId = packet.getEntityId();
-        if (entityId == user.getEntityId()) return;
-
-        int[] passengers = packet.getPassengers();
-
-        if (passengers.length > 0) {
-            cacheManager.updateVehiclePassenger(entityId, passengers[0]);
-            handlePassengerEvent(user, entityId, cacheManager.getVehicleHealth(entityId), true);
-        } else {
-            int passengerId = cacheManager.getPassengerId(entityId);
-            cacheManager.updateVehiclePassenger(entityId, -1);
-
-            if (user.getEntityId() == passengerId) {
-                handlePassengerEvent(user, entityId, 0.5F, false);
-            }
+    private void handleDestroyEntities(WrapperPlayServerDestroyEntities packet, User user) {
+        for (int entityId : packet.getEntityIds()) {
+            cacheManager.removeEntity(user.getUUID(), entityId);
         }
     }
 
-    private void handleAttachEntity(WrapperPlayServerAttachEntity packet, User user) {
-        int entityId = packet.getHoldingId();
-        if (entityId == user.getEntityId()) return;
-
-        int passengerId = packet.getAttachedId();
-
-        if (entityId > 0) {
-            cacheManager.updateVehiclePassenger(entityId, passengerId);
-            handlePassengerEvent(user, entityId, cacheManager.getVehicleHealth(entityId), true);
-        } else {
-            // With the Entity Attach packet, the entity ID is set to -1 when the entity is detached;
-            // Thus we need to retrieve the vehicle we stepped of by using a reverse lookup by passenger ID
-            int reversedEntityId = cacheManager.getEntityIdByPassengerId(passengerId);
-            cacheManager.updateVehiclePassenger(reversedEntityId, -1);
-
-            if (user.getEntityId() == passengerId) {
-                handlePassengerEvent(user, reversedEntityId, 0.5F, false);
-            }
-        }
-    }
-
-    private LivingEntityData createLivingEntity(EntityType entityType) {
-        LivingEntityData entityData;
+    private CachedEntity createLivingEntity(EntityType entityType) {
+        CachedEntity entityData;
 
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.WOLF)) {
-            entityData = new WolfData();
+            entityData = new WolfEntity();
         } else if (RidableEntities.RIDABLE_ENTITY_TYPES.contains(entityType)) {
-            entityData = new RidableEntityData();
+            entityData = new RidableEntity();
         } else {
-            entityData = new LivingEntityData();
+            entityData = new CachedEntity();
         }
 
         entityData.setEntityType(entityType);
         return entityData;
-    }
-
-    private void handlePassengerEvent(User user, int vehicleId, float healthValue, boolean entering) {
-        platform.getScheduler().runAsyncTask((o) -> {
-            if (!entering && isBypassEnabled) {
-                if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
-            }
-
-            List<EntityData> metadata = Collections.singletonList(new EntityData(MetadataIndex.HEALTH, EntityDataTypes.FLOAT, healthValue));
-            user.sendPacketSilently(new WrapperPlayServerEntityMetadata(vehicleId, metadata));
-        });
     }
 }

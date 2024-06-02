@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <P> The platform type.
  */
-public class PlayerJoin<P> extends PacketListenerAbstract {
+public class UpdateNotifier<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
     private final Component updateComponent;
 
@@ -46,7 +46,7 @@ public class PlayerJoin<P> extends PacketListenerAbstract {
      * @param platform      The platform to use.
      * @param latestVersion The latest version of the application.
      */
-    public PlayerJoin(AHIPlatform<P> platform, String latestVersion) {
+    public UpdateNotifier(AHIPlatform<P> platform, String latestVersion) {
         this.platform = platform;
 
         this.updateComponent = Component.text()

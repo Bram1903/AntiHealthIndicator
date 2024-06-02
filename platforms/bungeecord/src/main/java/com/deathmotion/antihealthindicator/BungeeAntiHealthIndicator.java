@@ -61,11 +61,6 @@ public class BungeeAntiHealthIndicator extends AHIPlatform<Plugin> {
     }
 
     @Override
-    public boolean isEntityRemoved(int entityId, @Nullable Object playerObject) {
-        return false;
-    }
-
-    @Override
     public boolean getConfigurationOption(ConfigOption option) {
         return this.bungeeConfigManager.getConfigurationOption(option);
     }

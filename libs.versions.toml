@@ -5,10 +5,8 @@ paper = "1.20.6-R0.1-SNAPSHOT"
 velocity = "3.3.0-SNAPSHOT"
 bungeecord = "1.20-R0.1-SNAPSHOT"
 run-paper = "2.3.0"
-caffeine = "2.5.6"
 lombok = "1.18.30"
 shadow = "8.1.1"
-paperweight-userdev = "1.7.1"
 
 [libraries]
 adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
@@ -20,7 +18,6 @@ packetevents-api = { group = "com.github.retrooper.packetevents", name = "api", 
 packetevents-spigot = { group = "com.github.retrooper.packetevents", name = "spigot", version.ref = "packetevents" }
 packetevents-velocity = { group = "com.github.retrooper.packetevents", name = "velocity", version.ref = "packetevents" }
 packetevents-bungeecord = { group = "com.github.retrooper.packetevents", name = "bungeecord", version.ref = "packetevents" }
-caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
 lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }

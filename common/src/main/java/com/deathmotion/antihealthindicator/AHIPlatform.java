@@ -80,15 +80,6 @@ public abstract class AHIPlatform<P> {
     public abstract void broadcastComponent(Component component, @Nullable String permission);
 
     /**
-     * Checks whether an entity has been removed.
-     *
-     * @param entityId The ID of the entity to check.
-     * @param player   The player to check for the entity removal. Can be null.
-     * @return true if the entity has been removed, false otherwise.
-     */
-    public abstract boolean isEntityRemoved(int entityId, @Nullable Object player);
-
-    /**
      * Retrieves the value of a configuration option.
      *
      * @param option The configuration option to retrieve.

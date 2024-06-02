@@ -19,8 +19,8 @@
 package com.deathmotion.antihealthindicator.packetlisteners.spoofers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.data.cache.LivingEntityData;
-import com.deathmotion.antihealthindicator.data.cache.WolfData;
+import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
+import com.deathmotion.antihealthindicator.data.cache.WolfEntity;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
@@ -107,12 +107,12 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         }
 
         if (!playersOnly && ignoreVehiclesEnabled) {
-            if (cacheManager.isUserPassenger(packet.getEntityId(), user.getEntityId())) return;
+            if (cacheManager.isUserPassenger(user.getUUID(), packet.getEntityId(), user.getEntityId())) return;
         }
 
-        LivingEntityData livingEntityData = cacheManager.getLivingEntityData(entityId).orElse(null);
-        if (livingEntityData == null) return;
-        EntityType entityType = livingEntityData.getEntityType();
+        CachedEntity cachedEntity = cacheManager.getCachedEntity(user.getUUID(), entityId).orElse(null);
+        if (cachedEntity == null) return;
+        EntityType entityType = cachedEntity.getEntityType();
 
         if (playersOnly && entityType != EntityTypes.PLAYER) return;
 
@@ -122,13 +122,13 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
 
         boolean ignoreWolf;
         if (entityType == EntityTypes.WOLF && ignoreWolvesEnabled) {
-            ignoreWolf = shouldIgnoreWolf(user, livingEntityData);
+            ignoreWolf = shouldIgnoreWolf(user, cachedEntity);
         } else {
             ignoreWolf = false;
         }
 
         packet.getEntityMetadata().forEach(entityData -> {
-            livingEntityData.processMetaData(entityData, user);
+            cachedEntity.processMetaData(entityData, user);
 
             if (ignoreWolf) return;
 
@@ -155,18 +155,18 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
     /**
      * Determines whether a given wolf should be ignored.
      *
-     * @param user             The user to which the wolf is displayed.
-     * @param livingEntityData The data of the wolf entity.
+     * @param user         The user to which the wolf is displayed.
+     * @param cachedEntity The data of the wolf entity.
      * @return Whether the wolf should be ignored.
      */
-    private boolean shouldIgnoreWolf(User user, LivingEntityData livingEntityData) {
+    private boolean shouldIgnoreWolf(User user, CachedEntity cachedEntity) {
         if (!ignoreTamedWolves && !ignoreOwnedWolves) {
             return true;
         }
 
-        WolfData wolfData = (WolfData) livingEntityData;
+        WolfEntity wolfEntityData = (WolfEntity) cachedEntity;
 
-        return (ignoreTamedWolves && wolfData.isTamed()) || (ignoreOwnedWolves && wolfData.isOwnerPresent() && wolfData.getOwnerUUID().equals(user.getUUID()));
+        return (ignoreTamedWolves && wolfEntityData.isTamed()) || (ignoreOwnedWolves && wolfEntityData.isOwnerPresent() && wolfEntityData.getOwnerUUID().equals(user.getUUID()));
     }
 
     /**

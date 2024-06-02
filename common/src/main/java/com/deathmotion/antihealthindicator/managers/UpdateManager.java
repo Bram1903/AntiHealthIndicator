@@ -20,7 +20,7 @@ package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
-import com.deathmotion.antihealthindicator.packetlisteners.PlayerJoin;
+import com.deathmotion.antihealthindicator.packetlisteners.UpdateNotifier;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -126,7 +126,7 @@ public class UpdateManager<P> {
         }
 
         if (shouldNotifyInGame()) {
-            PacketEvents.getAPI().getEventManager().registerListener(new PlayerJoin<>(platform, formattedVersion));
+            PacketEvents.getAPI().getEventManager().registerListener(new UpdateNotifier<>(platform, formattedVersion));
         }
     }
 

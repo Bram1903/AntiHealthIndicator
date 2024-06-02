@@ -73,11 +73,6 @@ public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
     }
 
     @Override
-    public boolean isEntityRemoved(int entityId, @Nullable Object player) {
-        return false;
-    }
-
-    @Override
     public boolean getConfigurationOption(ConfigOption option) {
         return this.velocityConfigManager.getConfigurationOption(option);
     }
