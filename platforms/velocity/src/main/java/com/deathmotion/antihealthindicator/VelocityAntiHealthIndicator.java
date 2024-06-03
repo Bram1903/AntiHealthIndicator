@@ -76,10 +76,4 @@ public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
     public boolean getConfigurationOption(ConfigOption option) {
         return this.velocityConfigManager.getConfigurationOption(option);
     }
-
-    @Override
-    public String getPluginVersion() {
-        // TODO: Implement a proper global versioning system
-        return "2.1.0";
-    }
 }

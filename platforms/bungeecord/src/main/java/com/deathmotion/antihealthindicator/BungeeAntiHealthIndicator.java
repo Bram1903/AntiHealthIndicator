@@ -65,11 +65,6 @@ public class BungeeAntiHealthIndicator extends AHIPlatform<Plugin> {
         return this.bungeeConfigManager.getConfigurationOption(option);
     }
 
-    @Override
-    public String getPluginVersion() {
-        return this.plugin.getDescription().getVersion();
-    }
-
     protected void enableBStats() {
         try {
             new Metrics(this.plugin, 20803);

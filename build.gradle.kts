@@ -19,6 +19,10 @@ dependencies {
 tasks {
     jar {
         enabled = false
+
+        manifest {
+            attributes["Implementation-Version"] = rootProject.version
+        }
     }
 
     shadowJar {
@@ -33,8 +37,6 @@ tasks {
             "net.kyori.adventure.text.serializer.legacy",
             "io.github.retrooper.packetevents.adventure.serializer.legacy"
         )
-
-        exclude("META-INF/**")
     }
 
     assemble {

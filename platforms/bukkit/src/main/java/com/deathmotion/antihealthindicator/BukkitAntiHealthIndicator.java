@@ -82,11 +82,6 @@ public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
         return this.bukkitConfigManager.getConfigurationOption(option);
     }
 
-    @Override
-    public String getPluginVersion() {
-        return this.plugin.getDescription().getVersion();
-    }
-
     protected void enableBStats() {
         try {
             new Metrics(this.plugin, 20803);

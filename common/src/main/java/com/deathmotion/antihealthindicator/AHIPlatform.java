@@ -86,11 +86,4 @@ public abstract class AHIPlatform<P> {
      * @return The value of the configuration option.
      */
     public abstract boolean getConfigurationOption(ConfigOption option);
-
-    /**
-     * Retrieves the version of the plugin.
-     *
-     * @return The version of the plugin.
-     */
-    public abstract String getPluginVersion();
 }

@@ -67,7 +67,7 @@ public class UpdateManager<P> {
     public void checkForUpdate(boolean printToConsole) {
         platform.getScheduler().runAsyncTask((o) -> {
             try {
-                List<Integer> currentVersion = parseVersion(platform.getPluginVersion());
+                List<Integer> currentVersion = parseVersion(AHIPlatform.class.getPackage().getImplementationVersion());
                 List<Integer> latestVersion = getLatestGitHubVersion();
 
                 compareVersions(currentVersion, latestVersion, printToConsole);
