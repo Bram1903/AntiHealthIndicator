@@ -34,8 +34,6 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 
-import java.util.UUID;
-
 /**
  * Listens for EntityState events and manages the caching of various entity state details.
  *
