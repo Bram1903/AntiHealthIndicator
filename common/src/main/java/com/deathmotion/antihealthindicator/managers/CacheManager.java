@@ -24,6 +24,7 @@ import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Ticker;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.protocol.player.User;
 import lombok.Getter;
@@ -51,7 +52,9 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
     private final boolean debugEnabled;
 
     public CacheManager(AHIPlatform<P> platform) {
-        Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder().weakKeys();
+        Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder()
+                .weakKeys()
+                .ticker(Ticker.systemTicker());
 
         this.platform = platform;
         this.logManager = platform.getLogManager();
@@ -67,13 +70,7 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
     }
 
     public Cache<Integer, CachedEntity> getUserCache(@NonNull User user) {
-        return cache.get(user, u -> {
-            Caffeine<Object, Object> innerBuilder = Caffeine.newBuilder();
-            if (platform.getConfigurationOption(ConfigOption.DEBUG_ENABLED)) {
-                innerBuilder.recordStats();
-            }
-            return innerBuilder.build();
-        });
+        return cache.get(user, u -> Caffeine.newBuilder().build());
     }
 
     public Optional<CachedEntity> getCachedEntity(User user, int entityId) {
@@ -126,9 +123,7 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
             int underlyingSize = cacheMap.values().stream().mapToInt(innerCache -> (int) innerCache.estimatedSize()).sum();
             double avgCacheSizePerUser = cacheMap.isEmpty() ? 0 : (double) underlyingSize / cacheMap.size();
 
-            long evictionCount = cacheMap.values().stream()
-                    .mapToLong(innerCache -> innerCache.stats().evictionCount())
-                    .sum();
+            long evictionCount = cache.stats().evictionCount();
 
             Component statsComponent = Component.text()
                     .append(Component.text("[DEBUG] Cache Stats", NamedTextColor.GREEN)
