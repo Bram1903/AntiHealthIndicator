@@ -21,7 +21,6 @@ package com.deathmotion.antihealthindicator.managers;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.packetlisteners.EntityState;
-import com.deathmotion.antihealthindicator.packetlisteners.UserTracker;
 import com.deathmotion.antihealthindicator.packetlisteners.VehicleState;
 import com.deathmotion.antihealthindicator.packetlisteners.spoofers.EntityEquipmentListener;
 import com.deathmotion.antihealthindicator.packetlisteners.spoofers.EntityMetadataListener;
@@ -65,7 +64,6 @@ public class PacketManager<P> {
      */
     private void setupEntityListeners() {
         if (platform.getConfigurationOption(ConfigOption.ENTITY_DATA_ENABLED)) {
-            PacketEvents.getAPI().getEventManager().registerListener(new UserTracker<>(platform), PacketListenerPriority.LOWEST);
             PacketEvents.getAPI().getEventManager().registerListener(new EntityState<>(platform), PacketListenerPriority.LOW);
             PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener<>(platform));
 

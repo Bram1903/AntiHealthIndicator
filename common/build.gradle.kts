@@ -4,6 +4,7 @@ plugins {
 }
 
 dependencies {
+    api(libs.caffeine)
     compileOnlyApi(libs.packetevents.api)
     compileOnlyApi(libs.bundles.adventure)
     compileOnlyApi(libs.lombok)

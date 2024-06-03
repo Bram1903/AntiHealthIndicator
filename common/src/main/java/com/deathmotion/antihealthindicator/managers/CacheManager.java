@@ -22,6 +22,9 @@ import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.protocol.player.User;
 import lombok.Getter;
@@ -33,6 +36,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,78 +46,67 @@ import java.util.concurrent.TimeUnit;
  */
 @Getter
 public class CacheManager<P> extends SimplePacketListenerAbstract {
-    private final ConcurrentHashMap<User, ConcurrentHashMap<Integer, CachedEntity>> cache;
+    private final Cache<User, ConcurrentHashMap<Integer, CachedEntity>> cache;
+
     private final AHIPlatform<P> platform;
     private final LogManager<P> logManager;
 
     public CacheManager(AHIPlatform<P> platform) {
-        this.cache = new ConcurrentHashMap<>();
+        Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder().weakKeys();
+
         this.platform = platform;
         this.logManager = platform.getLogManager();
 
         if (platform.getConfigurationOption(ConfigOption.DEBUG_ENABLED)) {
+            cacheBuilder.recordStats();
             LogCacheStats();
         }
 
+        this.cache = cacheBuilder.build();
         this.platform.getLogManager().debug("CacheManager initialized.");
     }
 
-    public void addUser(@NonNull User user) {
-        logManager.debug("Entity added to cache: " + user.getName());
-        cache.putIfAbsent(user, new ConcurrentHashMap<>());
+    public ConcurrentHashMap<Integer, CachedEntity> getUserCache(@NonNull User user) {
+        return cache.get(user, u -> new ConcurrentHashMap<>());
     }
 
-    public void removeUser(@NonNull User user) {
-        logManager.debug("Entity removed from cache: " + user.getName());
-        cache.remove(user);
+    public Optional<CachedEntity> getCachedEntity(User user, int entityId) {
+        return Optional.ofNullable(getUserCache(user).get(entityId));
     }
 
-    public Optional<CachedEntity> getCachedEntity(@NonNull User user, int entityId) {
-        ConcurrentHashMap<Integer, CachedEntity> entityMap = cache.get(user);
-        return Optional.ofNullable(entityMap != null ? entityMap.get(entityId) : null);
-    }
-
-    public Optional<RidableEntity> getVehicleData(@NonNull User user, int entityId) {
-        return getCachedEntity(user, entityId).filter(entityData -> entityData instanceof RidableEntity)
+    public Optional<RidableEntity> getVehicleData(User user, int entityId) {
+        return getCachedEntity(user, entityId)
+                .filter(entityData -> entityData instanceof RidableEntity)
                 .map(entityData -> (RidableEntity) entityData);
     }
 
-    public void addLivingEntity(@NonNull User user, int entityId, @NonNull CachedEntity cachedEntity) {
-        cache.compute(user, (key, entityMap) -> {
-            if (entityMap == null) {
-                entityMap = new ConcurrentHashMap<>();
-            }
-            entityMap.putIfAbsent(entityId, cachedEntity);
-            return entityMap;
-        });
+    public void addLivingEntity(User user, int entityId, CachedEntity cachedEntity) {
+        getUserCache(user).putIfAbsent(entityId, cachedEntity);
     }
 
-    public void removeEntity(@NonNull User user, int entityId) {
-        cache.computeIfPresent(user, (key, entityMap) -> {
-            entityMap.remove(entityId);
-            //logManager.debug("Entity removed from cache: " + entityId);
-            return entityMap;
-        });
+    public void removeEntity(User user, int entityId) {
+        getUserCache(user).remove(entityId);
     }
 
-    public void updateVehiclePassenger(@NonNull User user, int entityId, int passengerId) {
+    public void updateVehiclePassenger(User user, int entityId, int passengerId) {
         getVehicleData(user, entityId).ifPresent(ridableEntityData -> ridableEntityData.setPassengerId(passengerId));
     }
 
-    public float getVehicleHealth(@NonNull User user, int entityId) {
+    public float getVehicleHealth(User user, int entityId) {
         return getVehicleData(user, entityId).map(RidableEntity::getHealth).orElse(0.5f);
     }
 
-    public boolean isUserPassenger(@NonNull User user, int entityId, int userId) {
+    public boolean isUserPassenger(User user, int entityId, int userId) {
         return getVehicleData(user, entityId).map(ridableEntityData -> ridableEntityData.getPassengerId() == userId).orElse(false);
     }
 
-    public int getPassengerId(@NonNull User user, int entityId) {
+    public int getPassengerId(User user, int entityId) {
         return getVehicleData(user, entityId).map(RidableEntity::getPassengerId).orElse(0);
     }
 
-    public int getEntityIdByPassengerId(@NonNull User user, int passengerId) {
-        return cache.getOrDefault(user, new ConcurrentHashMap<>()).entrySet().stream()
+    public int getEntityIdByPassengerId(User user, int passengerId) {
+        return getUserCache(user)
+                .entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof RidableEntity
                         && ((RidableEntity) entry.getValue()).getPassengerId() == passengerId)
                 .map(Map.Entry::getKey)
@@ -123,24 +116,36 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
 
     private void LogCacheStats() {
         platform.getScheduler().runAsyncTaskAtFixedRate((o) -> {
-            int totalKeys = cache.size();
-            int totalValues = cache.values().stream().mapToInt(ConcurrentHashMap::size).sum();
+            CacheStats newStats = cache.stats();
 
-            double averageCacheSizePerEntry = totalKeys != 0 ? (double) totalValues / totalKeys : 0;
+            // Retrieve underlying cache map
+            ConcurrentMap<User, ConcurrentHashMap<Integer, CachedEntity>> cacheMap = cache.asMap();
+
+            // Calculate underlying cache size
+            int underlyingSize = cacheMap.values().stream().mapToInt(ConcurrentHashMap::size).sum();
+
+            // Calculate average cache size per user
+            double avgCacheSizePerUser = (double) underlyingSize / cacheMap.size();
 
             Component statsComponent = Component.text()
                     .append(Component.text("[DEBUG] Cache Stats", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
                     .appendNewline()
-                    .append(Component.text("\n\u25cf Cache Entries: ", NamedTextColor.GREEN)
+                    .append(Component.text("\n\u25cf Cache Size: ", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
-                    .append(Component.text(totalKeys, NamedTextColor.AQUA))
-                    .append(Component.text("\n\u25cf Total Cache Size: ", NamedTextColor.GREEN)
+                    .append(Component.text(cache.estimatedSize(), NamedTextColor.AQUA))
+                    .append(Component.text("\n\u25cf Underlying Cache Size: ", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
-                    .append(Component.text(totalValues, NamedTextColor.AQUA))
-                    .append(Component.text("\n\u25cf Average Cache Size Per Entry: ", NamedTextColor.GREEN)
+                    .append(Component.text(underlyingSize, NamedTextColor.AQUA))
+                    .append(Component.text("\n\u25cf Average Cache Size Per User: ", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
-                    .append(Component.text(averageCacheSizePerEntry, NamedTextColor.AQUA))
+                    .append(Component.text(avgCacheSizePerUser, NamedTextColor.AQUA))
+                    .append(Component.text("\n\u25cf Evicted Items: ", NamedTextColor.GREEN)
+                            .decoration(TextDecoration.BOLD, true))
+                    .append(Component.text(newStats.evictionCount(), NamedTextColor.AQUA))
+                    .append(Component.text("\n\u25cf Hit Count: ", NamedTextColor.GREEN)
+                            .decoration(TextDecoration.BOLD, true))
+                    .append(Component.text(newStats.hitCount(), NamedTextColor.AQUA))
                     .build();
 
             platform.broadcastComponent(statsComponent, "AntiHealthIndicator.Debug");
