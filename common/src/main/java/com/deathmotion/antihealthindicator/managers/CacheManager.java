@@ -24,7 +24,6 @@ import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.protocol.player.User;
 import lombok.Getter;
@@ -35,7 +34,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
@@ -46,18 +44,20 @@ import java.util.concurrent.TimeUnit;
  */
 @Getter
 public class CacheManager<P> extends SimplePacketListenerAbstract {
-    private final Cache<User, ConcurrentHashMap<Integer, CachedEntity>> cache;
+    private final Cache<User, Cache<Integer, CachedEntity>> cache;
 
     private final AHIPlatform<P> platform;
     private final LogManager<P> logManager;
+    private final boolean debugEnabled;
 
     public CacheManager(AHIPlatform<P> platform) {
         Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder().weakKeys();
 
         this.platform = platform;
         this.logManager = platform.getLogManager();
+        this.debugEnabled = platform.getConfigurationOption(ConfigOption.DEBUG_ENABLED);
 
-        if (platform.getConfigurationOption(ConfigOption.DEBUG_ENABLED)) {
+        if (debugEnabled) {
             cacheBuilder.recordStats();
             LogCacheStats();
         }
@@ -66,12 +66,18 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
         this.platform.getLogManager().debug("CacheManager initialized.");
     }
 
-    public ConcurrentHashMap<Integer, CachedEntity> getUserCache(@NonNull User user) {
-        return cache.get(user, u -> new ConcurrentHashMap<>());
+    public Cache<Integer, CachedEntity> getUserCache(@NonNull User user) {
+        return cache.get(user, u -> {
+            Caffeine<Object, Object> innerBuilder = Caffeine.newBuilder();
+            if (platform.getConfigurationOption(ConfigOption.DEBUG_ENABLED)) {
+                innerBuilder.recordStats();
+            }
+            return innerBuilder.build();
+        });
     }
 
     public Optional<CachedEntity> getCachedEntity(User user, int entityId) {
-        return Optional.ofNullable(getUserCache(user).get(entityId));
+        return Optional.ofNullable(getUserCache(user).getIfPresent(entityId));
     }
 
     public Optional<RidableEntity> getVehicleData(User user, int entityId) {
@@ -81,11 +87,11 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
     }
 
     public void addLivingEntity(User user, int entityId, CachedEntity cachedEntity) {
-        getUserCache(user).putIfAbsent(entityId, cachedEntity);
+        getUserCache(user).put(entityId, cachedEntity);
     }
 
     public void removeEntity(User user, int entityId) {
-        getUserCache(user).remove(entityId);
+        getUserCache(user).invalidate(entityId);
     }
 
     public void updateVehiclePassenger(User user, int entityId, int passengerId) {
@@ -105,8 +111,7 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
     }
 
     public int getEntityIdByPassengerId(User user, int passengerId) {
-        return getUserCache(user)
-                .entrySet().stream()
+        return getUserCache(user).asMap().entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof RidableEntity
                         && ((RidableEntity) entry.getValue()).getPassengerId() == passengerId)
                 .map(Map.Entry::getKey)
@@ -116,36 +121,31 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
 
     private void LogCacheStats() {
         platform.getScheduler().runAsyncTaskAtFixedRate((o) -> {
-            CacheStats newStats = cache.stats();
+            ConcurrentMap<User, Cache<Integer, CachedEntity>> cacheMap = cache.asMap();
 
-            // Retrieve underlying cache map
-            ConcurrentMap<User, ConcurrentHashMap<Integer, CachedEntity>> cacheMap = cache.asMap();
+            int underlyingSize = cacheMap.values().stream().mapToInt(innerCache -> (int) innerCache.estimatedSize()).sum();
+            double avgCacheSizePerUser = cacheMap.isEmpty() ? 0 : (double) underlyingSize / cacheMap.size();
 
-            // Calculate underlying cache size
-            int underlyingSize = cacheMap.values().stream().mapToInt(ConcurrentHashMap::size).sum();
-
-            // Calculate average cache size per user
-            double avgCacheSizePerUser = (double) underlyingSize / cacheMap.size();
+            long evictionCount = cacheMap.values().stream()
+                    .mapToLong(innerCache -> innerCache.stats().evictionCount())
+                    .sum();
 
             Component statsComponent = Component.text()
                     .append(Component.text("[DEBUG] Cache Stats", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
                     .appendNewline()
-                    .append(Component.text("\n\u25cf Cache Size: ", NamedTextColor.GREEN)
+                    .append(Component.text("\n\u25cf User Cache Size: ", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
                     .append(Component.text(cache.estimatedSize(), NamedTextColor.AQUA))
-                    .append(Component.text("\n\u25cf Underlying Cache Size: ", NamedTextColor.GREEN)
-                            .decoration(TextDecoration.BOLD, true))
-                    .append(Component.text(underlyingSize, NamedTextColor.AQUA))
                     .append(Component.text("\n\u25cf Average Cache Size Per User: ", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
                     .append(Component.text(avgCacheSizePerUser, NamedTextColor.AQUA))
                     .append(Component.text("\n\u25cf Evicted Items: ", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
-                    .append(Component.text(newStats.evictionCount(), NamedTextColor.AQUA))
-                    .append(Component.text("\n\u25cf Hit Count: ", NamedTextColor.GREEN)
+                    .append(Component.text(evictionCount, NamedTextColor.AQUA))
+                    .append(Component.text("\n\u25cf Underlying Cache Size: ", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
-                    .append(Component.text(newStats.hitCount(), NamedTextColor.AQUA))
+                    .append(Component.text(underlyingSize, NamedTextColor.AQUA))
                     .build();
 
             platform.broadcastComponent(statsComponent, "AntiHealthIndicator.Debug");
