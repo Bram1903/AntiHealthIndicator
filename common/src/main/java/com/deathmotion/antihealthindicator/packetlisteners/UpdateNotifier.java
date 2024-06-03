@@ -21,6 +21,7 @@ package com.deathmotion.antihealthindicator.packetlisteners;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import net.kyori.adventure.text.Component;
@@ -64,21 +65,19 @@ public class UpdateNotifier<P> extends PacketListenerAbstract {
     }
 
     /**
-     * This function is called when an {@link PacketSendEvent} is triggered.
+     * This function is called when an {@link UserLoginEvent} is triggered.
      * Sends a message to the player about the latest version of the application.
      *
      * @param event The event that has been triggered.
      */
     @Override
-    public void onPacketSend(PacketSendEvent event) {
-        if (PacketType.Play.Server.JOIN_GAME == event.getPacketType()) {
-            User user = event.getUser();
+    public void onUserLogin(UserLoginEvent event) {
+        User user = event.getUser();
 
-            platform.getScheduler().runAsyncTaskDelayed((o) -> {
-                if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Notify")) {
-                    user.sendMessage(updateComponent);
-                }
-            }, 2, TimeUnit.SECONDS);
-        }
+        platform.getScheduler().runAsyncTaskDelayed((o) -> {
+            if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Notify")) {
+                user.sendMessage(updateComponent);
+            }
+        }, 2, TimeUnit.SECONDS);
     }
 }

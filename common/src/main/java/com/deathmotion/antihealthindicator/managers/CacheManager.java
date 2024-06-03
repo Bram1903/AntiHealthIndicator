@@ -22,6 +22,7 @@ import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import lombok.Getter;
 import lombok.NonNull;
 import net.kyori.adventure.text.Component;
@@ -40,7 +41,7 @@ import java.util.concurrent.TimeUnit;
  * @param <P> The platform type.
  */
 @Getter
-public class CacheManager<P> {
+public class CacheManager<P> extends SimplePacketListenerAbstract {
     private final ConcurrentHashMap<UUID, ConcurrentHashMap<Integer, CachedEntity>> cache;
     private final AHIPlatform<P> platform;
     private final LogManager<P> logManager;
@@ -55,6 +56,16 @@ public class CacheManager<P> {
         }
 
         this.platform.getLogManager().debug("CacheManager initialized.");
+    }
+
+    public void addUser(@NonNull UUID uuid) {
+        logManager.debug("Entity added to cache: " + uuid);
+        cache.putIfAbsent(uuid, new ConcurrentHashMap<>());
+    }
+
+    public void removeUser(@NonNull UUID uuid) {
+        logManager.debug("Entity removed from cache: " + uuid);
+        cache.remove(uuid);
     }
 
     public Optional<CachedEntity> getCachedEntity(@NonNull UUID uuid, int entityId) {
@@ -75,11 +86,6 @@ public class CacheManager<P> {
             entityMap.putIfAbsent(entityId, cachedEntity);
             return entityMap;
         });
-    }
-
-    public void removeUser(@NonNull UUID uuid) {
-        logManager.debug("Entity removed from cache: " + uuid);
-        cache.remove(uuid);
     }
 
     public void removeEntity(@NonNull UUID uuid, int entityId) {
