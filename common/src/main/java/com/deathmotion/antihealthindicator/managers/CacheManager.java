@@ -122,7 +122,7 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
             ConcurrentHashMap<UUID, ConcurrentHashMap<Integer, CachedEntity>> cacheMap = cache;
 
             int underlyingSize = cacheMap.values().stream().mapToInt(Map::size).sum();
-            double avgCacheSizePerUser = cacheMap.isEmpty() ? 0 : (double) underlyingSize / cacheMap.size();
+            int avgCacheSizePerUser = cacheMap.isEmpty() ? 0 : Math.floorDiv(underlyingSize, cacheMap.size());
 
             Component statsComponent = Component.text()
                     .append(Component.text("[DEBUG] Cache Stats", NamedTextColor.GREEN)
