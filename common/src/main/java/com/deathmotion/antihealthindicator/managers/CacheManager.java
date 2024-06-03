@@ -70,7 +70,7 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
     }
 
     public Cache<Integer, CachedEntity> getUserCache(@NonNull User user) {
-        return cache.get(user, u -> Caffeine.newBuilder().build());
+        return cache.get(user, u -> Caffeine.newBuilder().ticker(Ticker.systemTicker()).build());
     }
 
     public Optional<CachedEntity> getCachedEntity(User user, int entityId) {
