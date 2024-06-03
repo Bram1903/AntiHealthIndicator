@@ -1,0 +1,17 @@
+{
+  "id": "antihealthindicator",
+  "name": "AntiHealthIndicator",
+  "version": "${version}",
+  "description": "Prevent health indicators from being displayed on the client",
+  "url": "https://github.com/Bram1903/AntiHealthIndicator",
+  "authors": [
+    "Bram"
+  ],
+  "dependencies": [
+    {
+      "id": "packetevents",
+      "optional": false
+    }
+  ],
+  "main": "com.deathmotion.antihealthindicator.AHIVelocity"
+}

@@ -4,7 +4,7 @@ plugins {
 
 group = rootProject.group
 version = rootProject.version
-description = rootProject.description
+description = project.description
 
 repositories {
     mavenLocal()
@@ -19,6 +19,12 @@ java {
 }
 
 tasks {
+    processResources {
+        filesMatching(listOf("plugin.yml", "bungee.yml", "velocity-plugin.json")) {
+            expand("version" to project.version)
+        }
+    }
+
     withType<JavaCompile> {
         options.encoding = Charsets.UTF_8.name()
         // Set the release flag. This configures what version bytecode the compiler will emit, as well as what JDK APIs are usable.

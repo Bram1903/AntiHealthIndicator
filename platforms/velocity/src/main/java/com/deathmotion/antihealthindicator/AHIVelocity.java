@@ -24,8 +24,6 @@ import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
-import com.velocitypowered.api.plugin.Dependency;
-import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import io.github.retrooper.packetevents.bstats.Metrics;
@@ -33,17 +31,6 @@ import org.slf4j.Logger;
 
 import java.nio.file.Path;
 
-@Plugin(
-        id = "antihealthindicator",
-        name = "AntiHealthIndicator",
-        version = "2.1.0",
-        description = "Prevent health indicators from being displayed on the client",
-        authors = {"Bram"},
-        url = "https://github.com/Bram1903/AntiHealthIndicator",
-        dependencies = {
-                @Dependency(id = "packetevents"),
-        }
-)
 public class AHIVelocity {
     private final ProxyServer server;
     private final Path dataDirectory;
@@ -59,7 +46,7 @@ public class AHIVelocity {
     }
 
     @Subscribe
-    public void onProxyInitialization(ProxyInitializeEvent event) {
+    public void onProxyInitialization(ProxyInitializeEvent ignoredEvent) {
         ahi.setScheduler(new VelocityScheduler(this, this.server));
         ahi.setConfigManager(new VelocityConfigManager(this.logger, this.dataDirectory));
 
@@ -68,7 +55,7 @@ public class AHIVelocity {
     }
 
     @Subscribe()
-    public void onProxyShutdown(ProxyShutdownEvent event) {
+    public void onProxyShutdown(ProxyShutdownEvent ignoredEvent) {
         ahi.commonOnDisable();
     }
 

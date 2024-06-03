@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.deathmotion.antihealthindicator"
-description = rootProject.name
+description = "A plugin that prevents hackers and modders from seeing the health of other players."
 version = "2.1.0"
 
 dependencies {
@@ -22,7 +22,7 @@ tasks {
     }
 
     shadowJar {
-        archiveFileName = "AntiHealthIndicator-${project.version}.jar"
+        archiveFileName = "${rootProject.name}-${project.version}.jar"
         archiveClassifier = null
 
         relocate(
