@@ -148,7 +148,7 @@ public class EntityTracker<P> implements PacketListener {
 
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.WOLF)) {
             entityData = new WolfEntity();
-        } else if (RidableEntities.RIDABLE_ENTITY_TYPES.contains(entityType)) {
+        } else if (RidableEntities.isRideable(entityType)) {
             entityData = new RidableEntity();
         } else {
             entityData = new CachedEntity();

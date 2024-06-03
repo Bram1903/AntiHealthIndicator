@@ -22,18 +22,14 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-/**
- * Class representing entities that are ridable.
- * This class provides a constant list of the entity types that are ridable.
- */
 public class RidableEntities {
-    public static final List<EntityType> RIDABLE_ENTITY_TYPES;
+    private static final Set<EntityType> RIDABLE_ENTITY_TYPES;
 
     static {
-        RIDABLE_ENTITY_TYPES = Collections.unmodifiableList(Arrays.asList(
+        RIDABLE_ENTITY_TYPES = new HashSet<>(Arrays.asList(
                 EntityTypes.CAMEL,
                 EntityTypes.CHESTED_HORSE,
                 EntityTypes.DONKEY,
@@ -44,5 +40,9 @@ public class RidableEntities {
                 EntityTypes.STRIDER,
                 EntityTypes.ZOMBIE_HORSE
         ));
+    }
+
+    public static boolean isRideable(EntityType entityType) {
+        return RIDABLE_ENTITY_TYPES.contains(entityType);
     }
 }
