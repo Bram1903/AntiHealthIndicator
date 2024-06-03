@@ -25,6 +25,7 @@ import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
 import com.deathmotion.antihealthindicator.data.cache.WolfEntity;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
+import com.deathmotion.antihealthindicator.managers.LogManager;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
@@ -41,6 +42,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.*;
  */
 public class EntityState<P> implements PacketListener {
     private final CacheManager<P> cacheManager;
+    private final LogManager<P> logManager;
 
     private final boolean playersOnly;
 
@@ -51,6 +53,7 @@ public class EntityState<P> implements PacketListener {
      */
     public EntityState(AHIPlatform<P> platform) {
         this.cacheManager = platform.getCacheManager();
+        this.logManager = platform.getLogManager();
 
         this.playersOnly = platform.getConfigurationOption(ConfigOption.PLAYER_ONLY);
 
@@ -68,16 +71,16 @@ public class EntityState<P> implements PacketListener {
         final PacketTypeCommon type = event.getPacketType();
 
         if (playersOnly) {
-            if (PacketType.Play.Server.JOIN_GAME == type) {
-                handleJoinGame(new WrapperPlayServerJoinGame(event), event.getUser());
+            if (PacketType.Play.Server.SPAWN_PLAYER == type) {
+                handleSpawnPlayer(new WrapperPlayServerSpawnPlayer(event), event.getUser());
             }
         } else {
             if (PacketType.Play.Server.SPAWN_LIVING_ENTITY == type) {
                 handleSpawnLivingEntity(new WrapperPlayServerSpawnLivingEntity(event), event.getUser());
             } else if (PacketType.Play.Server.SPAWN_ENTITY == type) {
                 handleSpawnEntity(new WrapperPlayServerSpawnEntity(event), event.getUser());
-            } else if (PacketType.Play.Server.JOIN_GAME == type) {
-                handleJoinGame(new WrapperPlayServerJoinGame(event), event.getUser());
+            } else if (PacketType.Play.Server.SPAWN_PLAYER == type) {
+                handleSpawnPlayer(new WrapperPlayServerSpawnPlayer(event), event.getUser());
             } else if (PacketType.Play.Server.ENTITY_METADATA == type) {
                 handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), event.getUser());
             } else if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
@@ -105,7 +108,7 @@ public class EntityState<P> implements PacketListener {
         }
     }
 
-    private void handleJoinGame(WrapperPlayServerJoinGame packet, User user) {
+    private void handleSpawnPlayer(WrapperPlayServerSpawnPlayer packet, User user) {
         CachedEntity livingEntityData = new CachedEntity();
         livingEntityData.setEntityType(EntityTypes.PLAYER);
 
