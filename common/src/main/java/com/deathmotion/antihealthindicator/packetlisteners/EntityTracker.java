@@ -25,7 +25,6 @@ import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
 import com.deathmotion.antihealthindicator.data.cache.WolfEntity;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
-import com.deathmotion.antihealthindicator.managers.LogManager;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
@@ -40,9 +39,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.*;
  *
  * @param <P> The platform type.
  */
-public class EntityState<P> implements PacketListener {
+public class EntityTracker<P> implements PacketListener {
     private final CacheManager<P> cacheManager;
-    private final LogManager<P> logManager;
 
     private final boolean playersOnly;
 
@@ -51,9 +49,8 @@ public class EntityState<P> implements PacketListener {
      *
      * @param platform The platform to use.
      */
-    public EntityState(AHIPlatform<P> platform) {
+    public EntityTracker(AHIPlatform<P> platform) {
         this.cacheManager = platform.getCacheManager();
-        this.logManager = platform.getLogManager();
 
         this.playersOnly = platform.getConfigurationOption(ConfigOption.PLAYER_ONLY);
 
