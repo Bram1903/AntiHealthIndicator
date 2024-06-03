@@ -22,9 +22,6 @@ import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.Ticker;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.protocol.player.User;
 import lombok.Getter;
@@ -33,9 +30,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentMap;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,36 +44,32 @@ import java.util.concurrent.TimeUnit;
  */
 @Getter
 public class CacheManager<P> extends SimplePacketListenerAbstract {
-    private final Cache<User, Cache<Integer, CachedEntity>> cache;
+    private final Map<User, Map<Integer, CachedEntity>> cache;
 
     private final AHIPlatform<P> platform;
     private final LogManager<P> logManager;
     private final boolean debugEnabled;
 
     public CacheManager(AHIPlatform<P> platform) {
-        Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder()
-                .weakKeys()
-                .ticker(Ticker.systemTicker());
+        this.cache = Collections.synchronizedMap(new WeakHashMap<>());
 
         this.platform = platform;
         this.logManager = platform.getLogManager();
         this.debugEnabled = platform.getConfigurationOption(ConfigOption.DEBUG_ENABLED);
 
         if (debugEnabled) {
-            cacheBuilder.recordStats();
             LogCacheStats();
         }
 
-        this.cache = cacheBuilder.build();
         this.platform.getLogManager().debug("CacheManager initialized.");
     }
 
-    public Cache<Integer, CachedEntity> getUserCache(@NonNull User user) {
-        return cache.get(user, u -> Caffeine.newBuilder().ticker(Ticker.systemTicker()).build());
+    public Map<Integer, CachedEntity> getUserCache(@NonNull User user) {
+        return this.cache.computeIfAbsent(user, u -> new ConcurrentHashMap<>());
     }
 
     public Optional<CachedEntity> getCachedEntity(User user, int entityId) {
-        return Optional.ofNullable(getUserCache(user).getIfPresent(entityId));
+        return Optional.ofNullable(getUserCache(user).get(entityId));
     }
 
     public Optional<RidableEntity> getVehicleData(User user, int entityId) {
@@ -88,11 +83,11 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
     }
 
     public void removeEntity(User user, int entityId) {
-        getUserCache(user).invalidate(entityId);
+        getUserCache(user).remove(entityId);
     }
 
     public void resetUserCache(User user) {
-        getUserCache(user).invalidateAll();
+        getUserCache(user).clear();
     }
 
     public void updateVehiclePassenger(User user, int entityId, int passengerId) {
@@ -112,7 +107,7 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
     }
 
     public int getEntityIdByPassengerId(User user, int passengerId) {
-        return getUserCache(user).asMap().entrySet().stream()
+        return getUserCache(user).entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof RidableEntity
                         && ((RidableEntity) entry.getValue()).getPassengerId() == passengerId)
                 .map(Map.Entry::getKey)
@@ -122,12 +117,10 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
 
     private void LogCacheStats() {
         platform.getScheduler().runAsyncTaskAtFixedRate((o) -> {
-            ConcurrentMap<User, Cache<Integer, CachedEntity>> cacheMap = cache.asMap();
+            Map<User, Map<Integer, CachedEntity>> cacheMap = cache;
 
-            int underlyingSize = cacheMap.values().stream().mapToInt(innerCache -> (int) innerCache.estimatedSize()).sum();
+            int underlyingSize = cacheMap.values().stream().mapToInt(Map::size).sum();
             double avgCacheSizePerUser = cacheMap.isEmpty() ? 0 : (double) underlyingSize / cacheMap.size();
-
-            long evictionCount = cache.stats().evictionCount();
 
             Component statsComponent = Component.text()
                     .append(Component.text("[DEBUG] Cache Stats", NamedTextColor.GREEN)
@@ -135,13 +128,10 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
                     .appendNewline()
                     .append(Component.text("\n\u25cf User Cache Size: ", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
-                    .append(Component.text(cache.estimatedSize(), NamedTextColor.AQUA))
+                    .append(Component.text(cache.size(), NamedTextColor.AQUA))
                     .append(Component.text("\n\u25cf Average Cache Size Per User: ", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
                     .append(Component.text(avgCacheSizePerUser, NamedTextColor.AQUA))
-                    .append(Component.text("\n\u25cf Evicted Items: ", NamedTextColor.GREEN)
-                            .decoration(TextDecoration.BOLD, true))
-                    .append(Component.text(evictionCount, NamedTextColor.AQUA))
                     .append(Component.text("\n\u25cf Underlying Cache Size: ", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, true))
                     .append(Component.text(underlyingSize, NamedTextColor.AQUA))
