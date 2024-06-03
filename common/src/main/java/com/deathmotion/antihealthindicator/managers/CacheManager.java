@@ -91,6 +91,10 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
         getUserCache(user).invalidate(entityId);
     }
 
+    public void resetUserCache(User user) {
+        getUserCache(user).invalidateAll();
+    }
+
     public void updateVehiclePassenger(User user, int entityId, int passengerId) {
         getVehicleData(user, entityId).ifPresent(ridableEntityData -> ridableEntityData.setPassengerId(passengerId));
     }

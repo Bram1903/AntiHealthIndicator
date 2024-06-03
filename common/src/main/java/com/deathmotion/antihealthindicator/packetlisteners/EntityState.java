@@ -73,6 +73,12 @@ public class EntityState<P> implements PacketListener {
         if (playersOnly) {
             if (PacketType.Play.Server.SPAWN_PLAYER == type) {
                 handleSpawnPlayer(new WrapperPlayServerSpawnPlayer(event), event.getUser());
+            } else if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
+                handleDestroyEntities(new WrapperPlayServerDestroyEntities(event), event.getUser());
+            } else if (PacketType.Play.Server.RESPAWN == type) {
+                handleRespawn(event.getUser());
+            } else if (PacketType.Play.Server.JOIN_GAME == type) {
+                handleJoinGame(event.getUser());
             }
         } else {
             if (PacketType.Play.Server.SPAWN_LIVING_ENTITY == type) {
@@ -85,6 +91,10 @@ public class EntityState<P> implements PacketListener {
                 handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), event.getUser());
             } else if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
                 handleDestroyEntities(new WrapperPlayServerDestroyEntities(event), event.getUser());
+            } else if (PacketType.Play.Server.RESPAWN == type) {
+                handleRespawn(event.getUser());
+            } else if (PacketType.Play.Server.JOIN_GAME == type) {
+                handleJoinGame(event.getUser());
             }
         }
     }
@@ -121,15 +131,21 @@ public class EntityState<P> implements PacketListener {
         CachedEntity entityData = cacheManager.getCachedEntity(user, entityId).orElse(null);
         if (entityData == null) return;
 
-        packet.getEntityMetadata().forEach(metaData -> {
-            entityData.processMetaData(metaData, user);
-        });
+        packet.getEntityMetadata().forEach(metaData -> entityData.processMetaData(metaData, user));
     }
 
     private void handleDestroyEntities(WrapperPlayServerDestroyEntities packet, User user) {
         for (int entityId : packet.getEntityIds()) {
             cacheManager.removeEntity(user, entityId);
         }
+    }
+
+    private void handleRespawn(User user) {
+        cacheManager.resetUserCache(user);
+    }
+
+    private void handleJoinGame(User user) {
+        cacheManager.resetUserCache(user);
     }
 
     private CachedEntity createLivingEntity(EntityType entityType) {
