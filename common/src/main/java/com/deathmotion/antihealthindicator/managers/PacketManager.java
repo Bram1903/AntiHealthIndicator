@@ -55,8 +55,6 @@ public class PacketManager<P> {
     public void setupPacketListeners() {
         setupEntityListeners();
         setupAdditionalListeners();
-
-        PacketEvents.getAPI().init();
     }
 
     /**

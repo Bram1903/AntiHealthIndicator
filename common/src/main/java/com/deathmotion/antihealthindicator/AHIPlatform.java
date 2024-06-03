@@ -52,7 +52,6 @@ public abstract class AHIPlatform<P> {
      * Called when the platform gets disabled.
      */
     public void commonOnDisable() {
-        PacketEvents.getAPI().terminate();
     }
 
     /**
