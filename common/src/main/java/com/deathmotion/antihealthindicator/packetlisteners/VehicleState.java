@@ -85,11 +85,11 @@ public class VehicleState<P> extends PacketListenerAbstract {
         int[] passengers = packet.getPassengers();
 
         if (passengers.length > 0) {
-            cacheManager.updateVehiclePassenger(user.getUUID(), entityId, passengers[0]);
-            handlePassengerEvent(user, entityId, cacheManager.getVehicleHealth(user.getUUID(), entityId), true);
+            cacheManager.updateVehiclePassenger(user, entityId, passengers[0]);
+            handlePassengerEvent(user, entityId, cacheManager.getVehicleHealth(user, entityId), true);
         } else {
-            int passengerId = cacheManager.getPassengerId(user.getUUID(), entityId);
-            cacheManager.updateVehiclePassenger(user.getUUID(), entityId, -1);
+            int passengerId = cacheManager.getPassengerId(user, entityId);
+            cacheManager.updateVehiclePassenger(user, entityId, -1);
 
             if (user.getEntityId() == passengerId) {
                 handlePassengerEvent(user, entityId, 0.5F, false);
@@ -104,13 +104,13 @@ public class VehicleState<P> extends PacketListenerAbstract {
         int passengerId = packet.getAttachedId();
 
         if (entityId > 0) {
-            cacheManager.updateVehiclePassenger(user.getUUID(), entityId, passengerId);
-            handlePassengerEvent(user, entityId, cacheManager.getVehicleHealth(user.getUUID(), entityId), true);
+            cacheManager.updateVehiclePassenger(user, entityId, passengerId);
+            handlePassengerEvent(user, entityId, cacheManager.getVehicleHealth(user, entityId), true);
         } else {
             // With the Entity Attach packet, the entity ID is set to -1 when the entity is detached;
             // Thus we need to retrieve the vehicle we stepped of by using a reverse lookup by passenger ID
-            int reversedEntityId = cacheManager.getEntityIdByPassengerId(user.getUUID(), passengerId);
-            cacheManager.updateVehiclePassenger(user.getUUID(), reversedEntityId, -1);
+            int reversedEntityId = cacheManager.getEntityIdByPassengerId(user, passengerId);
+            cacheManager.updateVehiclePassenger(user, reversedEntityId, -1);
 
             if (user.getEntityId() == passengerId) {
                 handlePassengerEvent(user, reversedEntityId, 0.5F, false);

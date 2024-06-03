@@ -39,11 +39,11 @@ public class UserTracker<P> implements PacketListener {
 
     @Override
     public void onUserLogin(UserLoginEvent event) {
-        this.cacheManager.addUser(event.getUser().getUUID());
+        this.cacheManager.addUser(event.getUser());
     }
 
     @Override
     public void onUserDisconnect(UserDisconnectEvent event) {
-        this.cacheManager.removeUser(event.getUser().getUUID());
+        this.cacheManager.removeUser(event.getUser());
     }
 }

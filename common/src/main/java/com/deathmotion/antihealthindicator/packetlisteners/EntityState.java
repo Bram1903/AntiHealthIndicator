@@ -82,8 +82,6 @@ public class EntityState<P> implements PacketListener {
                 handleJoinGame(new WrapperPlayServerJoinGame(event), event.getUser());
             } else if (PacketType.Play.Server.ENTITY_METADATA == type) {
                 handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), event.getUser());
-            } else if (PacketType.Play.Server.DISCONNECT == type) {
-                handleLeaveGame(event.getUser().getUUID());
             } else if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
                 handleDestroyEntities(new WrapperPlayServerDestroyEntities(event), event.getUser());
             }
@@ -95,7 +93,7 @@ public class EntityState<P> implements PacketListener {
         EntityType entityType = packet.getEntityType();
 
         CachedEntity entityData = createLivingEntity(entityType);
-        cacheManager.addLivingEntity(user.getUUID(), entityId, entityData);
+        cacheManager.addLivingEntity(user, entityId, entityData);
     }
 
     private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet, User user) {
@@ -105,7 +103,7 @@ public class EntityState<P> implements PacketListener {
             int entityId = packet.getEntityId();
 
             CachedEntity entityData = createLivingEntity(entityType);
-            cacheManager.addLivingEntity(user.getUUID(), entityId, entityData);
+            cacheManager.addLivingEntity(user, entityId, entityData);
         }
     }
 
@@ -113,13 +111,13 @@ public class EntityState<P> implements PacketListener {
         CachedEntity livingEntityData = new CachedEntity();
         livingEntityData.setEntityType(EntityTypes.PLAYER);
 
-        cacheManager.addLivingEntity(user.getUUID(), packet.getEntityId(), livingEntityData);
+        cacheManager.addLivingEntity(user, packet.getEntityId(), livingEntityData);
     }
 
     private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, User user) {
         int entityId = packet.getEntityId();
 
-        CachedEntity entityData = cacheManager.getCachedEntity(user.getUUID(), entityId).orElse(null);
+        CachedEntity entityData = cacheManager.getCachedEntity(user, entityId).orElse(null);
         if (entityData == null) return;
 
         packet.getEntityMetadata().forEach(metaData -> {
@@ -127,13 +125,9 @@ public class EntityState<P> implements PacketListener {
         });
     }
 
-    private void handleLeaveGame(UUID uuid) {
-        cacheManager.removeUser(uuid);
-    }
-
     private void handleDestroyEntities(WrapperPlayServerDestroyEntities packet, User user) {
         for (int entityId : packet.getEntityIds()) {
-            cacheManager.removeEntity(user.getUUID(), entityId);
+            cacheManager.removeEntity(user, entityId);
         }
     }
 
