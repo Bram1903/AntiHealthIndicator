@@ -27,12 +27,15 @@ import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
+
+import java.util.UUID;
 
 /**
  * Listens for EntityState events and manages the caching of various entity state details.
@@ -90,12 +93,20 @@ public class EntityTracker<P> implements PacketListener {
         }
     }
 
+    @Override
+    public void onUserDisconnect(UserDisconnectEvent event) {
+        UUID userUUID = event.getUser().getUUID();
+        if (userUUID == null) return;
+
+        cacheManager.removeUserCache(userUUID);
+    }
+
     private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet, User user) {
         int entityId = packet.getEntityId();
         EntityType entityType = packet.getEntityType();
 
         CachedEntity entityData = createLivingEntity(entityType);
-        cacheManager.addLivingEntity(user, entityId, entityData);
+        cacheManager.addLivingEntity(user.getUUID(), entityId, entityData);
     }
 
     private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet, User user) {
@@ -105,7 +116,7 @@ public class EntityTracker<P> implements PacketListener {
             int entityId = packet.getEntityId();
 
             CachedEntity entityData = createLivingEntity(entityType);
-            cacheManager.addLivingEntity(user, entityId, entityData);
+            cacheManager.addLivingEntity(user.getUUID(), entityId, entityData);
         }
     }
 
@@ -113,13 +124,13 @@ public class EntityTracker<P> implements PacketListener {
         CachedEntity livingEntityData = new CachedEntity();
         livingEntityData.setEntityType(EntityTypes.PLAYER);
 
-        cacheManager.addLivingEntity(user, packet.getEntityId(), livingEntityData);
+        cacheManager.addLivingEntity(user.getUUID(), packet.getEntityId(), livingEntityData);
     }
 
     private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, User user) {
         int entityId = packet.getEntityId();
 
-        CachedEntity entityData = cacheManager.getCachedEntity(user, entityId).orElse(null);
+        CachedEntity entityData = cacheManager.getCachedEntity(user.getUUID(), entityId).orElse(null);
         if (entityData == null) return;
 
         packet.getEntityMetadata().forEach(metaData -> entityData.processMetaData(metaData, user));
@@ -127,20 +138,20 @@ public class EntityTracker<P> implements PacketListener {
 
     private void handleDestroyEntities(WrapperPlayServerDestroyEntities packet, User user) {
         for (int entityId : packet.getEntityIds()) {
-            cacheManager.removeEntity(user, entityId);
+            cacheManager.removeEntity(user.getUUID(), entityId);
         }
     }
 
     private void handleRespawn(User user) {
-        cacheManager.resetUserCache(user);
+        cacheManager.resetUserCache(user.getUUID());
     }
 
     private void handleJoinGame(User user) {
-        cacheManager.resetUserCache(user);
+        cacheManager.resetUserCache(user.getUUID());
     }
 
     private void handleConfigurationStart(User user) {
-        cacheManager.resetUserCache(user);
+        cacheManager.resetUserCache(user.getUUID());
     }
 
     private CachedEntity createLivingEntity(EntityType entityType) {

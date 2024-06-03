@@ -22,14 +22,11 @@ import com.deathmotion.antihealthindicator.commands.AHICommand;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.deathmotion.antihealthindicator.managers.BukkitConfigManager;
-import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import lombok.Getter;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -67,14 +64,6 @@ public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
         if (commandSender == null) return false;
 
         return commandSender.hasPermission(permission);
-    }
-
-    @Override
-    public void broadcastComponent(Component component, @Nullable String permission) {
-        Bukkit.getOnlinePlayers().stream()
-                .filter(player -> permission == null || player.hasPermission(permission))
-                .map(player -> PacketEvents.getAPI().getPlayerManager().getUser(player))
-                .forEach(user -> user.sendMessage(component));
     }
 
     @Override

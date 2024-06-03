@@ -52,15 +52,6 @@ public class BungeeAntiHealthIndicator extends AHIPlatform<Plugin> {
     }
 
     @Override
-    public void broadcastComponent(Component component, @Nullable String permission) {
-        ProxyServer.getInstance().getPlayers().stream()
-                .filter(player -> permission == null || player.hasPermission(permission))
-                .map(player -> PacketEvents.getAPI().getPlayerManager().getUser(player))
-                .filter(Objects::nonNull)
-                .forEach(player -> player.sendMessage(component));
-    }
-
-    @Override
     public boolean getConfigurationOption(ConfigOption option) {
         return this.bungeeConfigManager.getConfigurationOption(option);
     }

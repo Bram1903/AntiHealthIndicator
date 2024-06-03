@@ -107,10 +107,10 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         }
 
         if (!playersOnly && ignoreVehiclesEnabled) {
-            if (cacheManager.isUserPassenger(user, packet.getEntityId(), user.getEntityId())) return;
+            if (cacheManager.isUserPassenger(user.getUUID(), packet.getEntityId(), user.getEntityId())) return;
         }
 
-        CachedEntity cachedEntity = cacheManager.getCachedEntity(user, entityId).orElse(null);
+        CachedEntity cachedEntity = cacheManager.getCachedEntity(user.getUUID(), entityId).orElse(null);
         if (cachedEntity == null) return;
         EntityType entityType = cachedEntity.getEntityType();
 

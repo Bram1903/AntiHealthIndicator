@@ -66,13 +66,6 @@ public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
     }
 
     @Override
-    public void broadcastComponent(Component component, @Nullable String permission) {
-        this.proxy.getAllPlayers().stream()
-                .filter(player -> permission == null || player.hasPermission(permission))
-                .forEach(player -> player.sendMessage(component));
-    }
-
-    @Override
     public boolean getConfigurationOption(ConfigOption option) {
         return this.velocityConfigManager.getConfigurationOption(option);
     }

@@ -23,17 +23,15 @@ import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
-import com.github.retrooper.packetevents.protocol.player.User;
 import lombok.Getter;
 import lombok.NonNull;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.WeakHashMap;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -44,14 +42,14 @@ import java.util.concurrent.TimeUnit;
  */
 @Getter
 public class CacheManager<P> extends SimplePacketListenerAbstract {
-    private final Map<User, Map<Integer, CachedEntity>> cache;
+    private final ConcurrentHashMap<UUID, ConcurrentHashMap<Integer, CachedEntity>> cache;
 
     private final AHIPlatform<P> platform;
     private final LogManager<P> logManager;
     private final boolean debugEnabled;
 
     public CacheManager(AHIPlatform<P> platform) {
-        this.cache = Collections.synchronizedMap(new WeakHashMap<>());
+        this.cache = new ConcurrentHashMap<>();
 
         this.platform = platform;
         this.logManager = platform.getLogManager();
@@ -64,50 +62,54 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
         this.platform.getLogManager().debug("CacheManager initialized.");
     }
 
-    public Map<Integer, CachedEntity> getUserCache(@NonNull User user) {
-        return this.cache.computeIfAbsent(user, u -> new ConcurrentHashMap<>());
+    public Map<Integer, CachedEntity> getUserCache(@NonNull UUID uuid) {
+        return this.cache.computeIfAbsent(uuid, u -> new ConcurrentHashMap<>());
     }
 
-    public Optional<CachedEntity> getCachedEntity(User user, int entityId) {
-        return Optional.ofNullable(getUserCache(user).get(entityId));
+    public void removeUserCache(@NonNull UUID uuid) {
+        this.cache.remove(uuid);
     }
 
-    public Optional<RidableEntity> getVehicleData(User user, int entityId) {
-        return getCachedEntity(user, entityId)
+    public Optional<CachedEntity> getCachedEntity(@NonNull UUID uuid, int entityId) {
+        return Optional.ofNullable(getUserCache(uuid).get(entityId));
+    }
+
+    public Optional<RidableEntity> getVehicleData(@NonNull UUID uuid, int entityId) {
+        return getCachedEntity(uuid, entityId)
                 .filter(entityData -> entityData instanceof RidableEntity)
                 .map(entityData -> (RidableEntity) entityData);
     }
 
-    public void addLivingEntity(User user, int entityId, CachedEntity cachedEntity) {
-        getUserCache(user).put(entityId, cachedEntity);
+    public void addLivingEntity(@NonNull UUID uuid, int entityId, @NonNull CachedEntity cachedEntity) {
+        getUserCache(uuid).put(entityId, cachedEntity);
     }
 
-    public void removeEntity(User user, int entityId) {
-        getUserCache(user).remove(entityId);
+    public void removeEntity(@NonNull UUID uuid, int entityId) {
+        getUserCache(uuid).remove(entityId);
     }
 
-    public void resetUserCache(User user) {
-        getUserCache(user).clear();
+    public void resetUserCache(@NonNull UUID uuid) {
+        getUserCache(uuid).clear();
     }
 
-    public void updateVehiclePassenger(User user, int entityId, int passengerId) {
-        getVehicleData(user, entityId).ifPresent(ridableEntityData -> ridableEntityData.setPassengerId(passengerId));
+    public void updateVehiclePassenger(@NonNull UUID uuid, int entityId, int passengerId) {
+        getVehicleData(uuid, entityId).ifPresent(ridableEntityData -> ridableEntityData.setPassengerId(passengerId));
     }
 
-    public float getVehicleHealth(User user, int entityId) {
-        return getVehicleData(user, entityId).map(RidableEntity::getHealth).orElse(0.5f);
+    public float getVehicleHealth(@NonNull UUID uuid, int entityId) {
+        return getVehicleData(uuid, entityId).map(RidableEntity::getHealth).orElse(0.5f);
     }
 
-    public boolean isUserPassenger(User user, int entityId, int userId) {
-        return getVehicleData(user, entityId).map(ridableEntityData -> ridableEntityData.getPassengerId() == userId).orElse(false);
+    public boolean isUserPassenger(@NonNull UUID uuid, int entityId, int userId) {
+        return getVehicleData(uuid, entityId).map(ridableEntityData -> ridableEntityData.getPassengerId() == userId).orElse(false);
     }
 
-    public int getPassengerId(User user, int entityId) {
-        return getVehicleData(user, entityId).map(RidableEntity::getPassengerId).orElse(0);
+    public int getPassengerId(@NonNull UUID uuid, int entityId) {
+        return getVehicleData(uuid, entityId).map(RidableEntity::getPassengerId).orElse(0);
     }
 
-    public int getEntityIdByPassengerId(User user, int passengerId) {
-        return getUserCache(user).entrySet().stream()
+    public int getEntityIdByPassengerId(@NonNull UUID uuid, int passengerId) {
+        return getUserCache(uuid).entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof RidableEntity
                         && ((RidableEntity) entry.getValue()).getPassengerId() == passengerId)
                 .map(Map.Entry::getKey)
@@ -117,7 +119,7 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
 
     private void LogCacheStats() {
         platform.getScheduler().runAsyncTaskAtFixedRate((o) -> {
-            Map<User, Map<Integer, CachedEntity>> cacheMap = cache;
+            ConcurrentHashMap<UUID, ConcurrentHashMap<Integer, CachedEntity>> cacheMap = cache;
 
             int underlyingSize = cacheMap.values().stream().mapToInt(Map::size).sum();
             double avgCacheSizePerUser = cacheMap.isEmpty() ? 0 : (double) underlyingSize / cacheMap.size();

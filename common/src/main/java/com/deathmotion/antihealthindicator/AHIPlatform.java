@@ -56,6 +56,18 @@ public abstract class AHIPlatform<P> {
     }
 
     /**
+     * Sends a broadcast message with a specific component and permission.
+     *
+     * @param component  The component to broadcast.
+     * @param permission The permission required to receive the broadcast. Can be null.
+     */
+    public void broadcastComponent(Component component, @Nullable String permission) {
+        PacketEvents.getAPI().getProtocolManager().getUsers().stream()
+                .filter(user -> permission == null || hasPermission(user.getUUID(), permission))
+                .forEach(user -> user.sendMessage(component));
+    }
+
+    /**
      * Gets the platform.
      *
      * @return The platform.
@@ -70,14 +82,6 @@ public abstract class AHIPlatform<P> {
      * @return true if the entity has the permission, false otherwise.
      */
     public abstract boolean hasPermission(UUID sender, String permission);
-
-    /**
-     * Sends a broadcast message with a specific component and permission.
-     *
-     * @param component  The component to broadcast.
-     * @param permission The permission required to receive the broadcast. Can be null.
-     */
-    public abstract void broadcastComponent(Component component, @Nullable String permission);
 
     /**
      * Retrieves the value of a configuration option.
