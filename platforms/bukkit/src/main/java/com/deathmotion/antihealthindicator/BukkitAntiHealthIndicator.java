@@ -73,7 +73,9 @@ public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
 
     protected void enableBStats() {
         try {
-            new Metrics(this.plugin, 20803);
+            Metrics metrics = new Metrics(this.plugin, 20803);
+            metrics.addCustomChart(new Metrics.SimplePie("antihealthindicator_version", () -> AHIPlatform.class.getPackage().getImplementationVersion()));
+            metrics.addCustomChart(new Metrics.SimplePie("antihealthindicator_platform", () -> "Bukkit"));
         } catch (Exception e) {
             this.plugin.getLogger().warning("Something went wrong while enabling bStats.\n" + e.getMessage());
         }

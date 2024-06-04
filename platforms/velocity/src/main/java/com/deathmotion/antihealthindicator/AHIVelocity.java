@@ -64,7 +64,9 @@ public class AHIVelocity {
 
     private void enableBStats() {
         try {
-            Metrics.createInstance(this, this.ahi.getPlatform(), logger, dataDirectory, 20803);
+            Metrics metrics = Metrics.createInstance(this, this.ahi.getPlatform(), logger, dataDirectory, 20803);
+            metrics.addCustomChart(new Metrics.SimplePie("antihealthindicator_version", () -> AHIPlatform.class.getPackage().getImplementationVersion()));
+            metrics.addCustomChart(new Metrics.SimplePie("antihealthindicator_platform", () -> "Velocity"));
         } catch (Exception e) {
             this.logger.warn("Something went wrong while enabling bStats.\n{}", e.getMessage());
         }
