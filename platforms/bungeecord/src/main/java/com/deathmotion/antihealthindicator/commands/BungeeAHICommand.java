@@ -22,8 +22,6 @@ import com.deathmotion.antihealthindicator.AHIBungee;
 import com.deathmotion.antihealthindicator.util.ComponentCreator;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -51,17 +49,10 @@ public class BungeeAHICommand extends Command {
     @Override
     public void execute(CommandSender commandSender, String[] strings) {
         if (commandSender instanceof ProxiedPlayer) {
-            User user = PacketEvents.getAPI().getProtocolManager().getUser(commandSender);
+            User user = PacketEvents.getAPI().getPlayerManager().getUser(commandSender);
             user.sendMessage(ComponentCreator.createAHICommandComponent());
         } else {
-            sendPlainMessage(commandSender, ComponentCreator.createAHICommandComponent());
+            commandSender.sendMessage(ComponentCreator.createLegacyAHICommandComponent());
         }
-    }
-
-    private void sendPlainMessage(CommandSender sender, Component component) {
-        sender.sendMessage(STRIP_COLOR_PATTERN
-                .matcher(LegacyComponentSerializer.legacyAmpersand().serialize(component))
-                .replaceAll("")
-                .trim());
     }
 }

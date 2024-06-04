@@ -24,8 +24,6 @@ import com.deathmotion.antihealthindicator.managers.VelocityConfigManager;
 import com.google.inject.Inject;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
