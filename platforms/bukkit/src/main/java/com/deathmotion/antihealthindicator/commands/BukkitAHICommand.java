@@ -34,11 +34,6 @@ public class BukkitAHICommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!sender.hasPermission("AntiHealthIndicator.Version")) {
-            sender.sendMessage("Unknown command. Type \"/help\" for help.");
-            return false;
-        }
-
         if (sender instanceof Player) {
             PacketEvents.getAPI()
                     .getProtocolManager()
