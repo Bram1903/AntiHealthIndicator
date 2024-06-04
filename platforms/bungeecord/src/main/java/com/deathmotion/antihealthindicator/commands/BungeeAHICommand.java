@@ -26,23 +26,10 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
-import java.util.Arrays;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
 public class BungeeAHICommand extends Command {
-    private static final String NAME = "antihealthindicator";
-    private static final String[] ALIASES = {"ahi"};
-
-    private static final String[] SLASH_ALIASES = Stream.concat(
-            Stream.of(NAME),
-            Arrays.stream(ALIASES)
-    ).map(s -> '/' + s).toArray(String[]::new);
-
-    private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + '&' + "[0-9A-FK-ORX]|\\\u25cf");
 
     public BungeeAHICommand(AHIBungee plugin) {
-        super(NAME, null, SLASH_ALIASES);
+        super("AntiHealthIndicator", null, "ahi");
         plugin.getProxy().getPluginManager().registerCommand(plugin, this);
     }
 
