@@ -62,6 +62,7 @@ public abstract class AHIPlatform<P> {
      */
     public void broadcastComponent(Component component, @Nullable String permission) {
         PacketEvents.getAPI().getProtocolManager().getUsers().stream()
+                .filter(user -> user != null && user.getUUID() != null)
                 .filter(user -> permission == null || hasPermission(user.getUUID(), permission))
                 .forEach(user -> user.sendMessage(component));
     }
