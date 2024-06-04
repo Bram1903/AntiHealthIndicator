@@ -18,7 +18,7 @@
 
 package com.deathmotion.antihealthindicator;
 
-import com.deathmotion.antihealthindicator.commands.AHICommand;
+import com.deathmotion.antihealthindicator.commands.BukkitAHICommand;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.deathmotion.antihealthindicator.managers.BukkitConfigManager;
@@ -80,6 +80,6 @@ public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
     }
 
     protected void registerCommands() {
-        this.plugin.getCommand("antihealthindicator").setExecutor(new AHICommand(this.getPlatform()));
+        this.plugin.getCommand("antihealthindicator").setExecutor(new BukkitAHICommand());
     }
 }

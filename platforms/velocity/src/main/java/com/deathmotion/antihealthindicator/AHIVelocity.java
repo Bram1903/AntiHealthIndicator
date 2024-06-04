@@ -18,6 +18,7 @@
 
 package com.deathmotion.antihealthindicator;
 
+import com.deathmotion.antihealthindicator.commands.VelocityAHICommand;
 import com.deathmotion.antihealthindicator.managers.VelocityConfigManager;
 import com.deathmotion.antihealthindicator.schedulers.VelocityScheduler;
 import com.google.inject.Inject;
@@ -51,6 +52,8 @@ public class AHIVelocity {
         ahi.setConfigManager(new VelocityConfigManager(this.logger, this.dataDirectory));
 
         ahi.commonOnEnable();
+
+        registerCommands();
         enableBStats();
     }
 
@@ -65,5 +68,9 @@ public class AHIVelocity {
         } catch (Exception e) {
             this.logger.warn("Something went wrong while enabling bStats.\n{}", e.getMessage());
         }
+    }
+
+    private void registerCommands() {
+        new VelocityAHICommand(server);
     }
 }
