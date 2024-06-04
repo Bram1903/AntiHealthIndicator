@@ -72,7 +72,6 @@ Operators (OPs) have these permissions by default:
 - `AntiHealthIndicator.Notify` - Notifies player of updates.
 - `AntiHealthIndicator.Bypass` - Prevents receiving spoofed data (if enabled in config).
 - `AntiHealthIndicator.Debug` - Receives debug messages if debugging is enabled.
-- `AntiHealthIndicator.Version` - Allows running `/ahi` to check the plugin version.
 
 ## Installation
 
