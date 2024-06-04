@@ -6,9 +6,13 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+
+import java.util.regex.Pattern;
 
 public class ComponentCreator {
 
+    private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + '&' + "[0-9A-FK-ORX]|\\\u25cf");
     private static String pluginVersion;
 
     private static String getPluginVersion() {
@@ -35,5 +39,12 @@ public class ComponentCreator {
                         .decorate(TextDecoration.UNDERLINED)))
                 .clickEvent(ClickEvent.openUrl("https://github.com/Bram1903/AntiHealthIndicator"))
                 .build();
+    }
+
+    public static String createLegacyAHICommandComponent() {
+        return STRIP_COLOR_PATTERN
+                .matcher(LegacyComponentSerializer.legacyAmpersand().serialize(ComponentCreator.createAHICommandComponent()))
+                .replaceAll("")
+                .trim();
     }
 }
