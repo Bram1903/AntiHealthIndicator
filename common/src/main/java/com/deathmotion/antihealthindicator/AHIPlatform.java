@@ -20,10 +20,7 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
-import com.deathmotion.antihealthindicator.managers.CacheManager;
-import com.deathmotion.antihealthindicator.managers.LogManager;
-import com.deathmotion.antihealthindicator.managers.PacketManager;
-import com.deathmotion.antihealthindicator.managers.UpdateManager;
+import com.deathmotion.antihealthindicator.managers.*;
 import com.deathmotion.antihealthindicator.util.AHIVersion;
 import com.github.retrooper.packetevents.PacketEvents;
 import lombok.Getter;
@@ -46,6 +43,7 @@ public abstract class AHIPlatform<P> {
     public void commonOnEnable() {
         cacheManager = new CacheManager<>(this);
 
+        new ConfigManager<>(this);
         new UpdateManager<>(this);
         new PacketManager<>(this);
     }
@@ -92,4 +90,6 @@ public abstract class AHIPlatform<P> {
      * @return The value of the configuration option.
      */
     public abstract boolean getConfigurationOption(ConfigOption option);
+
+    public abstract String getPluginDirectory();
 }

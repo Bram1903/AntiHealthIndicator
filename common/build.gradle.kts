@@ -6,6 +6,7 @@ plugins {
 dependencies {
     compileOnlyApi(libs.packetevents.api)
     compileOnlyApi(libs.bundles.adventure)
+    compileOnlyApi(libs.snakeyaml)
     compileOnlyApi(libs.lombok)
     annotationProcessor(libs.lombok)
 }

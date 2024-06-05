@@ -43,7 +43,7 @@ public class AHIVelocity {
         this.server = server;
         this.dataDirectory = dataDirectory;
         this.logger = logger;
-        this.ahi = new VelocityAntiHealthIndicator(server);
+        this.ahi = new VelocityAntiHealthIndicator(server, dataDirectory);
     }
 
     @Subscribe
