@@ -26,7 +26,7 @@ import java.util.Map;
 
 public class BukkitConfigManager {
     private final JavaPlugin plugin;
-    private final Map<ConfigOption, Object> configurationOptions = new EnumMap<>(ConfigOption.class);
+    private final Map<ConfigOption, Boolean> configurationOptions = new EnumMap<>(ConfigOption.class);
 
     public BukkitConfigManager(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -46,6 +46,6 @@ public class BukkitConfigManager {
     }
 
     public Boolean getConfigurationOption(ConfigOption option) {
-        return (Boolean) configurationOptions.get(option);
+        return configurationOptions.get(option);
     }
 }

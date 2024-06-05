@@ -37,7 +37,7 @@ public class VelocityConfigManager {
     private final Logger logger;
     private final Path dataDirectory;
 
-    private final Map<ConfigOption, Object> configurationOptions = new EnumMap<>(ConfigOption.class);
+    private final Map<ConfigOption, Boolean> configurationOptions = new EnumMap<>(ConfigOption.class);
 
     @Inject
     public VelocityConfigManager(Logger logger, @DataDirectory Path dataDirectory) {
@@ -89,6 +89,6 @@ public class VelocityConfigManager {
     }
 
     public Boolean getConfigurationOption(ConfigOption option) {
-        return (Boolean) configurationOptions.get(option);
+        return configurationOptions.get(option);
     }
 }

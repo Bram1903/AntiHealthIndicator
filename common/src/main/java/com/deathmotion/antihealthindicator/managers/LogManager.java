@@ -36,18 +36,9 @@ public class LogManager<P> {
 
     private final AHIPlatform<P> platform;
     private final Logger logger = Logger.getLogger("AntiHealthIndicator");
-    private Boolean debugEnabled;
 
     public LogManager(AHIPlatform<P> platform) {
         this.platform = platform;
-        debugEnabled = null;
-    }
-
-    public boolean isDebugEnabled() {
-        if (debugEnabled == null) {
-            debugEnabled = platform.getConfigurationOption(ConfigOption.DEBUG_ENABLED);
-        }
-        return debugEnabled;
     }
 
     protected void log(Level level, @Nullable NamedTextColor color, String message) {
@@ -68,7 +59,7 @@ public class LogManager<P> {
     }
 
     public void debug(String message) {
-        if (this.isDebugEnabled()) {
+        if (platform.getConfigurationOption(ConfigOption.DEBUG_ENABLED)) {
             log(Level.FINE, null, message);
         }
     }

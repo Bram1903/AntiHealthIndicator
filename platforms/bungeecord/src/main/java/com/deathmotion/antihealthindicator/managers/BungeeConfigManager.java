@@ -36,7 +36,7 @@ import java.util.Map;
 
 public class BungeeConfigManager {
     private final Plugin plugin;
-    private final Map<ConfigOption, Object> configurationOptions = new EnumMap<>(ConfigOption.class);
+    private final Map<ConfigOption, Boolean> configurationOptions = new EnumMap<>(ConfigOption.class);
 
     public BungeeConfigManager(Plugin plugin) {
         this.plugin = plugin;
@@ -76,6 +76,6 @@ public class BungeeConfigManager {
     }
 
     public Boolean getConfigurationOption(ConfigOption option) {
-        return (Boolean) configurationOptions.get(option);
+        return configurationOptions.get(option);
     }
 }
