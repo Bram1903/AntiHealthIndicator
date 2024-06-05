@@ -23,11 +23,11 @@ import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Map;
-
-import java.io.File;
 
 public class ConfigManager<P> {
     private final AHIPlatform<P> platform;
@@ -70,8 +70,6 @@ public class ConfigManager<P> {
             for (ConfigOption option : ConfigOption.values()) {
                 setConfigOption(yamlData, settings, option);
             }
-
-            this.platform.getLogManager().info("Debug mode is " + (settings.isDebug() ? "enabled" : "disabled"));
 
             this.settings = settings;
         } catch (IOException e) {
