@@ -7,7 +7,7 @@ plugins {
 
 group = "com.deathmotion.antihealthindicator"
 description = "A plugin that prevents hackers and modders from seeing the health of other players."
-version = "2.1.0"
+version = "2.2.0-SNAPSHOT"
 
 dependencies {
     implementation(project(":common"))
