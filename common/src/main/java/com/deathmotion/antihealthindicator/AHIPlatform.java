@@ -24,6 +24,7 @@ import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.managers.LogManager;
 import com.deathmotion.antihealthindicator.managers.PacketManager;
 import com.deathmotion.antihealthindicator.managers.UpdateManager;
+import com.deathmotion.antihealthindicator.util.AHIVersion;
 import com.github.retrooper.packetevents.PacketEvents;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -33,15 +34,20 @@ import java.util.UUID;
 
 @Getter
 public abstract class AHIPlatform<P> {
+    private final AHIVersion version = AHIVersion.createFromPackageVersion();
+
     protected Scheduler scheduler;
-    private LogManager<P> logManager;
+    protected LogManager<P> logManager = new LogManager<>(this);
     private CacheManager<P> cacheManager;
+
+    public static boolean getStaticConfigOption(ConfigOption option) {
+        return false;
+    }
 
     /**
      * Called when the platform is enabled.
      */
     public void commonOnEnable() {
-        logManager = new LogManager<>(this);
         cacheManager = new CacheManager<>(this);
 
         new UpdateManager<>(this);

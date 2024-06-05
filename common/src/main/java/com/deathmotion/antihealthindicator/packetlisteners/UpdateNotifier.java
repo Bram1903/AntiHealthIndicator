@@ -19,6 +19,7 @@
 package com.deathmotion.antihealthindicator.packetlisteners;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.deathmotion.antihealthindicator.util.AHIVersion;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -45,13 +46,13 @@ public class UpdateNotifier<P> extends PacketListenerAbstract {
      * @param platform      The platform to use.
      * @param latestVersion The latest version of the application.
      */
-    public UpdateNotifier(AHIPlatform<P> platform, String latestVersion) {
+    public UpdateNotifier(AHIPlatform<P> platform, AHIVersion latestVersion) {
         this.platform = platform;
 
         this.updateComponent = Component.text()
                 .append(Component.text("[AntiHealthIndicator] ", NamedTextColor.RED)
                         .decoration(TextDecoration.BOLD, true))
-                .append(Component.text("Version " + latestVersion + " is ", NamedTextColor.GREEN))
+                .append(Component.text("Version " + latestVersion.toString() + " is ", NamedTextColor.GREEN))
                 .append(Component.text("now available", NamedTextColor.GREEN)
                         .decorate(TextDecoration.UNDERLINED)
                         .hoverEvent(HoverEvent.showText(Component.text("Click to download", NamedTextColor.GREEN)))

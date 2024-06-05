@@ -21,6 +21,7 @@ package com.deathmotion.antihealthindicator;
 import com.deathmotion.antihealthindicator.managers.BukkitConfigManager;
 import com.deathmotion.antihealthindicator.schedulers.BukkitScheduler;
 import com.deathmotion.antihealthindicator.schedulers.FoliaScheduler;
+import com.deathmotion.antihealthindicator.util.BukkitLogManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class AHIBukkit extends JavaPlugin {
@@ -35,10 +36,16 @@ public class AHIBukkit extends JavaPlugin {
         }
     }
 
+    public BukkitAntiHealthIndicator getAhi() {
+        return this.ahi;
+    }
+
     @Override
     public void onEnable() {
         ahi.setScheduler(isFolia() ? new FoliaScheduler(this) : new BukkitScheduler(this));
         ahi.setBukkitConfigManager(new BukkitConfigManager(this));
+
+        ahi.setLogManager(new BukkitLogManager(this));
 
         ahi.commonOnEnable();
         ahi.registerCommands();

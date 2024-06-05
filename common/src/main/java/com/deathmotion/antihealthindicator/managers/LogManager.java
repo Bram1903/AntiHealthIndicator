@@ -20,63 +20,56 @@ package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * LogManager class to handle all kinds of logging messages.
  * This class supports logging info, warning, error and debug messages.
- *
- * @param <P> the platform type.
  */
-public final class LogManager<P> {
+public class LogManager<P> {
+    private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]");
+
+    private final AHIPlatform<P> platform;
     private final Logger logger = Logger.getLogger("AntiHealthIndicator");
-    private final boolean debugEnabled;
+    private Boolean debugEnabled;
 
-    /**
-     * A constructor to initialize LogManager.
-     *
-     * @param platform AHIPlatform instance with platform-specific configurations.
-     */
     public LogManager(AHIPlatform<P> platform) {
-        this.debugEnabled = platform.getConfigurationOption(ConfigOption.DEBUG_ENABLED);
+        this.platform = platform;
+        debugEnabled = null;
     }
 
-    /**
-     * Logs the information messages
-     *
-     * @param message the message to be logged as info
-     */
+    public boolean isDebugEnabled() {
+        if (debugEnabled == null) {
+            debugEnabled = platform.getConfigurationOption(ConfigOption.DEBUG_ENABLED);
+        }
+        return debugEnabled;
+    }
+
+    protected void log(Level level, @Nullable NamedTextColor color, String message) {
+        message = STRIP_COLOR_PATTERN.matcher(message).replaceAll("");
+        logger.log(level, color != null ? (color.toString()) : "" + message);
+    }
+
     public void info(String message) {
-        logger.info(message);
+        log(Level.INFO, null, message);
     }
 
-    /**
-     * Logs the warning messages
-     *
-     * @param message the message to be logged as warning
-     */
-    public void warning(String message) {
-        logger.warning(message);
+    public void warn(final String message) {
+        log(Level.WARNING, null, message);
     }
 
-    /**
-     * Logs the error messages
-     *
-     * @param message the message to be logged as error
-     */
-    public void error(String message) {
-        logger.severe(message);
+    public void severe(String message) {
+        log(Level.SEVERE, null, message);
     }
 
-    /**
-     * Logs the debug messages, but only if debug mode is enabled.
-     *
-     * @param message the message to be logged as debug
-     */
     public void debug(String message) {
-        if (debugEnabled) {
-            logger.info("[DEBUG] " + message);
+        if (this.isDebugEnabled()) {
+            log(Level.FINE, null, message);
         }
     }
 }

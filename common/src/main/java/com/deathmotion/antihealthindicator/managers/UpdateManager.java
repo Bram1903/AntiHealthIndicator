@@ -21,125 +21,103 @@ package com.deathmotion.antihealthindicator.managers;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.packetlisteners.UpdateNotifier;
+import com.deathmotion.antihealthindicator.util.AHIVersion;
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.util.ColorUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class UpdateManager<P> {
     private final static String GITHUB_API_URL = "https://api.github.com/repos/Bram1903/AntiHealthIndicator/releases/latest";
-    private final static String GITHUB_RELEASES_URL = "https://github.com/Bram1903/AntiHealthIndicator/releases/latest";
 
     private final AHIPlatform<P> platform;
+    private final LogManager<P> logManager;
+
+    private final boolean isUpdateCheckerEnabled;
+    private final boolean printToConsole;
+    private final boolean notifyInGame;
 
     public UpdateManager(AHIPlatform<P> platform) {
         this.platform = platform;
+        this.logManager = platform.getLogManager();
+
+        this.printToConsole = platform.getConfigurationOption(ConfigOption.UPDATE_CHECKER_PRINT_TO_CONSOLE);
+        this.notifyInGame = platform.getConfigurationOption(ConfigOption.NOTIFY_IN_GAME);
+        this.isUpdateCheckerEnabled = platform.getConfigurationOption(ConfigOption.UPDATE_CHECKER_ENABLED);
 
         initializeUpdateCheck();
     }
 
     private void initializeUpdateCheck() {
-        if (isUpdateCheckerEnabled()) {
-            checkForUpdate(shouldPrintUpdateToConsole());
-        }
+        if (!isUpdateCheckerEnabled) return;
+
+        checkForUpdate();
     }
 
-    private boolean isUpdateCheckerEnabled() {
-        return platform.getConfigurationOption(ConfigOption.UPDATE_CHECKER_ENABLED);
-    }
-
-    private boolean shouldPrintUpdateToConsole() {
-        return platform.getConfigurationOption(ConfigOption.UPDATE_CHECKER_PRINT_TO_CONSOLE);
-    }
-
-    private boolean shouldNotifyInGame() {
-        return platform.getConfigurationOption(ConfigOption.NOTIFY_IN_GAME);
-    }
-
-    public void checkForUpdate(boolean printToConsole) {
+    public void checkForUpdate() {
         platform.getScheduler().runAsyncTask((o) -> {
             try {
-                List<Integer> currentVersion = parseVersion(AHIPlatform.class.getPackage().getImplementationVersion());
-                List<Integer> latestVersion = getLatestGitHubVersion();
+                AHIVersion localVersion = platform.getVersion();
+                AHIVersion newVersion = new AHIVersion(getLatestGitHubVersion());
 
-                compareVersions(currentVersion, latestVersion, printToConsole);
-            } catch (IOException e) {
-                LogUpdateError(e);
+                compareVersions(localVersion, newVersion);
+            } catch (Exception ex) {
+                logManager.warn("Failed to check for updates. " + (ex.getCause() != null ? ex.getCause().getClass().getName() + ": " + ex.getCause().getMessage() : ex.getMessage()));
             }
         });
     }
 
-    private List<Integer> parseVersion(String version) {
-        return Arrays.stream(version.split("\\."))
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
+    private String getLatestGitHubVersion() {
+        try {
+            URLConnection connection = new URL(GITHUB_API_URL).openConnection();
+            connection.addRequestProperty("User-Agent", "Mozilla/4.0");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String jsonResponse = reader.readLine();
+            reader.close();
+            JsonObject jsonObject = new Gson().fromJson(jsonResponse, JsonObject.class);
+
+            return jsonObject.get("tag_name").getAsString().replaceFirst("^[vV]", "");
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to parse AntiHealthIndicator version!", e);
+        }
     }
 
-    private List<Integer> getLatestGitHubVersion() throws IOException {
-        URLConnection connection = new URL(GITHUB_API_URL).openConnection();
-        connection.addRequestProperty("User-Agent", "Mozilla/4.0");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String jsonResponse = reader.readLine();
-        reader.close();
-        JsonObject jsonObject = new Gson().fromJson(jsonResponse, JsonObject.class);
-
-        return parseVersion(jsonObject.get("tag_name").getAsString().replaceFirst("^[vV]", ""));
-    }
-
-    private void compareVersions(List<Integer> currentVersion, List<Integer> latestVersion, boolean printToConsole) {
-        boolean isNewVersionAvailable = false;
-        int length = Math.max(latestVersion.size(), currentVersion.size());
-
-        for (int i = 0; i < length; i++) {
-            int currentVersionPart = i < currentVersion.size() ? currentVersion.get(i) : 0;
-            int latestVersionPart = i < latestVersion.size() ? latestVersion.get(i) : 0;
-
-            if (latestVersionPart > currentVersionPart) {
-                isNewVersionAvailable = true;
-                break;
-            } else if (currentVersionPart > latestVersionPart) {
-                break;
+    private void compareVersions(AHIVersion localVersion, AHIVersion newVersion) {
+        if (localVersion.isOlderThan(newVersion)) {
+            if (printToConsole) {
+                logManager.warn("There is an update available for AntiHealthIndicator! Your build: ("
+                        + ColorUtil.toString(NamedTextColor.YELLOW) + localVersion
+                        + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest released build: ("
+                        + ColorUtil.toString(NamedTextColor.GREEN) + newVersion
+                        + ColorUtil.toString(NamedTextColor.WHITE) + ")");
+            }
+            if (notifyInGame) {
+                PacketEvents.getAPI().getEventManager().registerListener(new UpdateNotifier<>(platform, newVersion));
+            }
+        } else if (localVersion.isNewerThan(newVersion)) {
+            if (printToConsole) {
+                logManager.info("You are on a dev or pre released build of AntiHealthIndicator. Your build: ("
+                        + ColorUtil.toString(NamedTextColor.AQUA) + localVersion
+                        + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest released build: ("
+                        + ColorUtil.toString(NamedTextColor.DARK_AQUA) + newVersion
+                        + ColorUtil.toString(NamedTextColor.WHITE) + ")");
+            }
+        } else if (localVersion.equals(newVersion)) {
+            if (printToConsole) {
+                logManager.info("You are on the latest released version of AntiHealthIndicator. Your build: ("
+                        + ColorUtil.toString(NamedTextColor.GREEN) + newVersion + ColorUtil.toString(NamedTextColor.WHITE) + ")");
+            }
+        } else {
+            if (printToConsole) {
+                logManager.warn("Failed to check for updates. Your build: (" + localVersion + ")");
             }
         }
-
-        if (isNewVersionAvailable) {
-            String formattedVersion = latestVersion.stream()
-                    .map(String::valueOf)
-                    .collect(Collectors.joining("."));
-
-            printUpdateInfo(printToConsole, formattedVersion);
-        }
-    }
-
-    private void printUpdateInfo(boolean printToConsole, String formattedVersion) {
-        if (printToConsole) {
-            platform.getLogManager().info("Found a new version " + formattedVersion);
-            platform.getLogManager().info(GITHUB_RELEASES_URL);
-        }
-
-        if (shouldNotifyInGame()) {
-            PacketEvents.getAPI().getEventManager().registerListener(new UpdateNotifier<>(platform, formattedVersion));
-        }
-    }
-
-    /**
-     * Method to log the error if checking for new update fails.
-     *
-     * @param e An instance of IOException representing the occurred error.
-     */
-    private void LogUpdateError(IOException e) {
-        platform.getLogManager().error("<--------------------------------------------------------------->");
-        platform.getLogManager().error("Failed to check for a new release!");
-        platform.getLogManager().error("Error message:\n" + e.getMessage());
-        platform.getLogManager().info(GITHUB_RELEASES_URL);
-        platform.getLogManager().error("<--------------------------------------------------------------->");
     }
 }

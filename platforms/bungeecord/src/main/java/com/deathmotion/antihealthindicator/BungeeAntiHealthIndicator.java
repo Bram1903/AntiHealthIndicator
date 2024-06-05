@@ -72,7 +72,7 @@ public class BungeeAntiHealthIndicator extends AHIPlatform<Plugin> {
 
     protected void enableBStats() {
         try {
-            Metrics metrics = new Metrics(this.plugin, 20803);
+            Metrics metrics = new Metrics(this.plugin, 21063);
             metrics.addCustomChart(new Metrics.SimplePie("antihealthindicator_version", () -> AHIPlatform.class.getPackage().getImplementationVersion()));
             metrics.addCustomChart(new Metrics.SimplePie("antihealthindicator_platform", () -> "BungeeCord"));
         } catch (Exception e) {

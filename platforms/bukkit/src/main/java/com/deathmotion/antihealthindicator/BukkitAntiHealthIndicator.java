@@ -22,6 +22,7 @@ import com.deathmotion.antihealthindicator.commands.BukkitAHICommand;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.deathmotion.antihealthindicator.managers.BukkitConfigManager;
+import com.deathmotion.antihealthindicator.managers.LogManager;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -58,6 +59,10 @@ public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
         this.scheduler = scheduler;
     }
 
+    protected void setLogManager(LogManager<JavaPlugin> logManager) {
+        this.logManager = logManager;
+    }
+
     @Override
     public boolean hasPermission(UUID sender, String permission) {
         CommandSender commandSender = Bukkit.getPlayer(sender);
@@ -73,7 +78,7 @@ public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
 
     protected void enableBStats() {
         try {
-            Metrics metrics = new Metrics(this.plugin, 20803);
+            Metrics metrics = new Metrics(this.plugin, 21063);
             metrics.addCustomChart(new Metrics.SimplePie("antihealthindicator_version", () -> AHIPlatform.class.getPackage().getImplementationVersion()));
             metrics.addCustomChart(new Metrics.SimplePie("antihealthindicator_platform", () -> "Bukkit"));
         } catch (Exception e) {
