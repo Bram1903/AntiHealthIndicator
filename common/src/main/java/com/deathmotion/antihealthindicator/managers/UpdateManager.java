@@ -110,10 +110,7 @@ public class UpdateManager<P> {
                         + ColorUtil.toString(NamedTextColor.WHITE) + ")");
             }
         } else if (localVersion.equals(newVersion)) {
-            if (printToConsole) {
-                logManager.info("You are on the latest released version of AntiHealthIndicator. Your build: ("
-                        + ColorUtil.toString(NamedTextColor.GREEN) + newVersion + ColorUtil.toString(NamedTextColor.WHITE) + ")");
-            }
+            return;
         } else {
             if (printToConsole) {
                 logManager.warn("Failed to check for updates. Your build: (" + localVersion + ")");
