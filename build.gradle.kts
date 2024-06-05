@@ -56,7 +56,7 @@ tasks {
 
     runServer {
         minecraftVersion(version)
-        runDirectory = file("/run/paper/$version")
+        runDirectory = file("run/paper/$version")
 
         javaLauncher = project.javaToolchains.launcherFor {
             languageVersion = javaVersion
