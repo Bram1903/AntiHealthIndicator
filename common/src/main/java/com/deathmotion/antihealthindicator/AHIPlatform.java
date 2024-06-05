@@ -40,10 +40,6 @@ public abstract class AHIPlatform<P> {
     protected LogManager<P> logManager = new LogManager<>(this);
     private CacheManager<P> cacheManager;
 
-    public static boolean getStaticConfigOption(ConfigOption option) {
-        return false;
-    }
-
     /**
      * Called when the platform is enabled.
      */
