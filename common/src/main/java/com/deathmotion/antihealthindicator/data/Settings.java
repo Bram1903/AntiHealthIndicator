@@ -24,55 +24,65 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Settings {
-    public boolean Debug = false;
+    private boolean Debug = false;
+
+    private UpdateChecker UpdateChecker = new UpdateChecker();
 
     @Getter
     @Setter
-    public class UpdateChecker {
+    public static class UpdateChecker {
         public boolean Enabled = true;
         public boolean PrintToConsole = true;
         public boolean NotifyInGame = true;
     }
 
-    public boolean AllowBypass = false;
-    public boolean WorldSeed = false;
-    public boolean FoodSaturation = true;
+    private boolean AllowBypass = false;
+    private boolean WorldSeed = false;
+    private boolean FoodSaturation = true;
+
+    private EntityData EntityData = new EntityData();
 
     @Getter
     @Setter
-    public class EntityData {
-        public boolean Enabled = true;
-        public boolean PlayersOnly = false;
-        public boolean AirTicks = true;
+    public static class EntityData {
+        private boolean Enabled = true;
+        private boolean PlayersOnly = false;
+        private boolean AirTicks = true;
 
-        public boolean Health = true;
-        public boolean IgnoreVehicles = true;
+        private boolean Health = true;
+        private boolean IgnoreVehicles = true;
+
+        private Wolves Wolves = new Wolves();
 
         @Getter
         @Setter
-        public class Wolves {
-            public boolean Enabled = true;
-            public boolean Tamed = false;
-            public boolean Owner = true;
+        public static class Wolves {
+            private boolean Enabled = true;
+            private boolean Tamed = false;
+            private boolean Owner = true;
         }
 
+        private IronGolems IronGolems = new IronGolems();
+
         @Getter
         @Setter
-        public class IronGolems {
-            public boolean Enabled = true;
-            public boolean Gradual = true;
+        public static class IronGolems {
+            private boolean Enabled = true;
+            private boolean Gradual = true;
         }
     }
 
-    public boolean Absorption = true;
-    public boolean Xp = true;
+    private boolean Absorption = true;
+    private boolean Xp = true;
+
+    private Items Items = new Items();
 
     @Getter
     @Setter
-    public class Items {
-        public boolean Enabled = true;
-        public boolean StackAmount = true;
-        public boolean Durability = true;
-        public boolean Enchantments = true;
+    public static class Items {
+        private boolean Enabled = true;
+        private boolean StackAmount = true;
+        private boolean Durability = true;
+        private boolean Enchantments = true;
     }
 }
