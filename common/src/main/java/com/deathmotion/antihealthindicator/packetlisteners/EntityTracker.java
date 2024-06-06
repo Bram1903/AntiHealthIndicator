@@ -20,10 +20,10 @@ package com.deathmotion.antihealthindicator.packetlisteners;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.RidableEntities;
+import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
 import com.deathmotion.antihealthindicator.data.cache.WolfEntity;
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
@@ -44,8 +44,7 @@ import java.util.UUID;
  */
 public class EntityTracker<P> implements PacketListener {
     private final CacheManager<P> cacheManager;
-
-    private final boolean playersOnly;
+    private final Settings settings;
 
     /**
      * Constructs a new EntityState with the specified {@link AHIPlatform}.
@@ -54,8 +53,7 @@ public class EntityTracker<P> implements PacketListener {
      */
     public EntityTracker(AHIPlatform<P> platform) {
         this.cacheManager = platform.getCacheManager();
-
-        this.playersOnly = platform.getConfigurationOption(ConfigOption.PLAYER_ONLY);
+        this.settings = platform.getConfigManager().getSettings();
 
         platform.getLogManager().debug("Entity State listener has been set up.");
     }
@@ -82,7 +80,7 @@ public class EntityTracker<P> implements PacketListener {
             handleConfigurationStart(event.getUser());
         }
 
-        if (!playersOnly) {
+        if (!settings.getEntityData().isPlayersOnly()) {
             if (PacketType.Play.Server.SPAWN_LIVING_ENTITY == type) {
                 handleSpawnLivingEntity(new WrapperPlayServerSpawnLivingEntity(event), event.getUser());
             } else if (PacketType.Play.Server.SPAWN_ENTITY == type) {

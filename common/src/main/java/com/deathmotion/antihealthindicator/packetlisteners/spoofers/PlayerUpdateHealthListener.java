@@ -19,7 +19,7 @@
 package com.deathmotion.antihealthindicator.packetlisteners.spoofers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import com.deathmotion.antihealthindicator.data.Settings;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -32,7 +32,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUp
  */
 public class PlayerUpdateHealthListener<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
-    private final boolean bypassPermissionEnabled;
+    private final Settings settings;
 
     /**
      * Constructs a new PlayerUpdateHealthListener with the specified {@link AHIPlatform}.
@@ -41,7 +41,7 @@ public class PlayerUpdateHealthListener<P> extends PacketListenerAbstract {
      */
     public PlayerUpdateHealthListener(AHIPlatform<P> platform) {
         this.platform = platform;
-        this.bypassPermissionEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
+        this.settings = platform.getConfigManager().getSettings();
 
         platform.getLogManager().debug("Player Update Health listener has been set up.");
     }
@@ -55,7 +55,7 @@ public class PlayerUpdateHealthListener<P> extends PacketListenerAbstract {
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() == PacketType.Play.Server.UPDATE_HEALTH) {
-            if (bypassPermissionEnabled) {
+            if (settings.isAllowBypass()) {
                 if (platform.hasPermission(event.getUser().getUUID(), "AntiHealthIndicator.Bypass")) return;
             }
 

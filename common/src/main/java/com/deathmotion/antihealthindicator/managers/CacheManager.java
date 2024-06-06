@@ -19,9 +19,9 @@
 package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import lombok.Getter;
 import lombok.NonNull;
@@ -45,17 +45,17 @@ public class CacheManager<P> extends SimplePacketListenerAbstract {
     private final ConcurrentHashMap<UUID, ConcurrentHashMap<Integer, CachedEntity>> cache;
 
     private final AHIPlatform<P> platform;
+    private final Settings settings;
     private final LogManager<P> logManager;
-    private final boolean debugEnabled;
 
     public CacheManager(AHIPlatform<P> platform) {
         this.cache = new ConcurrentHashMap<>();
 
         this.platform = platform;
         this.logManager = platform.getLogManager();
-        this.debugEnabled = platform.getConfigurationOption(ConfigOption.DEBUG_ENABLED);
+        this.settings = platform.getConfigManager().getSettings();
 
-        if (debugEnabled) {
+        if (settings.isDebug()) {
             LogCacheStats();
         }
 

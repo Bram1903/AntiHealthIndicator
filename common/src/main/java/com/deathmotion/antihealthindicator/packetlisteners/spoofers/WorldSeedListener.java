@@ -19,7 +19,7 @@
 package com.deathmotion.antihealthindicator.packetlisteners.spoofers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import com.deathmotion.antihealthindicator.data.Settings;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -33,8 +33,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRe
  */
 public class WorldSeedListener<P> extends PacketListenerAbstract {
 
-    protected final boolean bypassPermissionEnabled;
     private final AHIPlatform<P> platform;
+    private final Settings settings;
 
     /**
      * Constructs a new WorldSeedListener with the specified {@link AHIPlatform}.
@@ -43,7 +43,7 @@ public class WorldSeedListener<P> extends PacketListenerAbstract {
      */
     public WorldSeedListener(AHIPlatform<P> platform) {
         this.platform = platform;
-        this.bypassPermissionEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
+        this.settings = platform.getConfigManager().getSettings();
 
         platform.getLogManager().debug("World Seed listener has been set up.");
     }
@@ -58,7 +58,7 @@ public class WorldSeedListener<P> extends PacketListenerAbstract {
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType().equals(PacketType.Play.Server.JOIN_GAME)) {
-            if (bypassPermissionEnabled) {
+            if (settings.isAllowBypass()) {
                 if (platform.hasPermission(event.getUser().getUUID(), "AntiHealthIndicator.Bypass")) return;
             }
 
@@ -67,7 +67,7 @@ public class WorldSeedListener<P> extends PacketListenerAbstract {
             event.markForReEncode(true);
         }
         if (event.getPacketType().equals(PacketType.Play.Server.RESPAWN)) {
-            if (bypassPermissionEnabled) {
+            if (settings.isAllowBypass()) {
                 if (platform.hasPermission(event.getUser().getUUID(), "AntiHealthIndicator.Bypass")) return;
             }
 

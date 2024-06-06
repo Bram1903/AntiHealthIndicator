@@ -1,7 +1,7 @@
 package com.deathmotion.antihealthindicator.util;
 
 import com.deathmotion.antihealthindicator.AHIBukkit;
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.managers.LogManager;
 import com.github.retrooper.packetevents.util.ColorUtil;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -13,11 +13,12 @@ import java.util.logging.Level;
 
 public class BukkitLogManager extends LogManager<JavaPlugin> {
     private final String prefixText = ColorUtil.toString(NamedTextColor.AQUA) + "[AntiHealthIndicator] " + ColorUtil.toString(NamedTextColor.WHITE);
-    private final boolean isDebugEnabled;
+
+    private final Settings settings;
 
     public BukkitLogManager(AHIBukkit plugin) {
         super(plugin.getAhi());
-        this.isDebugEnabled = plugin.getAhi().getConfigurationOption(ConfigOption.DEBUG_ENABLED);
+        this.settings = plugin.getAhi().getConfigManager().getSettings();
     }
 
     @Override
@@ -42,7 +43,7 @@ public class BukkitLogManager extends LogManager<JavaPlugin> {
 
     @Override
     public void debug(String message) {
-        if (isDebugEnabled) {
+        if (settings.isDebug()) {
             log(Level.FINE, NamedTextColor.GRAY, message);
         }
     }

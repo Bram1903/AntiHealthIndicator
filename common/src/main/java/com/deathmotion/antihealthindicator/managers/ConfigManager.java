@@ -21,6 +21,7 @@ package com.deathmotion.antihealthindicator.managers;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import lombok.Getter;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -31,6 +32,8 @@ import java.util.Map;
 
 public class ConfigManager<P> {
     private final AHIPlatform<P> platform;
+
+    @Getter
     private Settings settings;
 
     public ConfigManager(AHIPlatform<P> platform) {
@@ -135,10 +138,10 @@ public class ConfigManager<P> {
                 settings.getEntityData().getIronGolems().setGradual((Boolean) value);
                 break;
             case ABSORPTION_ENABLED:
-                settings.setAbsorption((Boolean) value);
+                settings.getEntityData().setAbsorption((Boolean) value);
                 break;
             case XP_ENABLED:
-                settings.setXp((Boolean) value);
+                settings.getEntityData().setXp((Boolean) value);
                 break;
             case ITEMS_ENABLED:
                 settings.getItems().setEnabled((Boolean) value);

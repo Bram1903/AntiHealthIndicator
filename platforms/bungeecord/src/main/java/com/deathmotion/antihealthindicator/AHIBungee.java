@@ -19,7 +19,6 @@
 package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.commands.BungeeAHICommand;
-import com.deathmotion.antihealthindicator.managers.BungeeConfigManager;
 import com.deathmotion.antihealthindicator.schedulers.BungeeScheduler;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -28,8 +27,9 @@ public final class AHIBungee extends Plugin {
 
     @Override
     public void onEnable() {
+        ahi.commonOnInitialize();
+
         ahi.setScheduler(new BungeeScheduler(this));
-        ahi.setBukkitConfigManager(new BungeeConfigManager(this));
 
         ahi.commonOnEnable();
 

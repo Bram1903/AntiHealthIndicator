@@ -19,7 +19,7 @@
 package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.packetlisteners.UpdateNotifier;
 import com.deathmotion.antihealthindicator.util.AHIVersion;
 import com.github.retrooper.packetevents.PacketEvents;
@@ -38,25 +38,19 @@ public class UpdateManager<P> {
     private final static String GITHUB_API_URL = "https://api.github.com/repos/Bram1903/AntiHealthIndicator/releases/latest";
 
     private final AHIPlatform<P> platform;
+    private final Settings settings;
     private final LogManager<P> logManager;
-
-    private final boolean isUpdateCheckerEnabled;
-    private final boolean printToConsole;
-    private final boolean notifyInGame;
 
     public UpdateManager(AHIPlatform<P> platform) {
         this.platform = platform;
+        this.settings = platform.getConfigManager().getSettings();
         this.logManager = platform.getLogManager();
-
-        this.printToConsole = platform.getConfigurationOption(ConfigOption.UPDATE_CHECKER_PRINT_TO_CONSOLE);
-        this.notifyInGame = platform.getConfigurationOption(ConfigOption.NOTIFY_IN_GAME);
-        this.isUpdateCheckerEnabled = platform.getConfigurationOption(ConfigOption.UPDATE_CHECKER_ENABLED);
 
         initializeUpdateCheck();
     }
 
     private void initializeUpdateCheck() {
-        if (!isUpdateCheckerEnabled) return;
+        if (!settings.getUpdateChecker().isEnabled()) return;
 
         checkForUpdate();
     }
@@ -91,18 +85,18 @@ public class UpdateManager<P> {
 
     private void compareVersions(AHIVersion localVersion, AHIVersion newVersion) {
         if (localVersion.isOlderThan(newVersion)) {
-            if (printToConsole) {
+            if (settings.getUpdateChecker().isPrintToConsole()) {
                 logManager.warn("There is an update available for AntiHealthIndicator! Your build: ("
                         + ColorUtil.toString(NamedTextColor.YELLOW) + localVersion
                         + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest released build: ("
                         + ColorUtil.toString(NamedTextColor.GREEN) + newVersion
                         + ColorUtil.toString(NamedTextColor.WHITE) + ")");
             }
-            if (notifyInGame) {
+            if (settings.getUpdateChecker().isNotifyInGame()) {
                 PacketEvents.getAPI().getEventManager().registerListener(new UpdateNotifier<>(platform, newVersion));
             }
         } else if (localVersion.isNewerThan(newVersion)) {
-            if (printToConsole) {
+            if (settings.getUpdateChecker().isPrintToConsole()) {
                 logManager.info("You are on a dev or pre released build of AntiHealthIndicator. Your build: ("
                         + ColorUtil.toString(NamedTextColor.AQUA) + localVersion
                         + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest released build: ("
@@ -112,7 +106,7 @@ public class UpdateManager<P> {
         } else if (localVersion.equals(newVersion)) {
             return;
         } else {
-            if (printToConsole) {
+            if (settings.getUpdateChecker().isPrintToConsole()) {
                 logManager.warn("Failed to check for updates. Your build: (" + localVersion + ")");
             }
         }

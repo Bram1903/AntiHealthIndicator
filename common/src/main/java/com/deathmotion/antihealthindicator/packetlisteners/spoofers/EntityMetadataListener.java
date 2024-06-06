@@ -19,9 +19,9 @@
 package com.deathmotion.antihealthindicator.packetlisteners.spoofers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
 import com.deathmotion.antihealthindicator.data.cache.WolfEntity;
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
 import com.github.retrooper.packetevents.PacketEvents;
@@ -42,22 +42,10 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
  */
 public class EntityMetadataListener<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
+    private final Settings settings;
     private final CacheManager<P> cacheManager;
 
-    private final boolean playersOnly;
-
     private final boolean healthTexturesSupported;
-    private final boolean allowBypassEnabled;
-    private final boolean ignoreVehiclesEnabled;
-    private final boolean ignoreWolvesEnabled;
-    private final boolean ignoreTamedWolves;
-    private final boolean ignoreOwnedWolves;
-    private final boolean ignoreIronGolemsEnabled;
-    private final boolean gradualIronGolemHealthEnabled;
-    private final boolean healthEnabled;
-    private final boolean airTicksEnabled;
-    private final boolean absorptionEnabled;
-    private final boolean xpEnabled;
 
     /**
      * Constructs a new EntityMetadataListener with the specified {@link AHIPlatform}.
@@ -66,22 +54,10 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
      */
     public EntityMetadataListener(AHIPlatform<P> platform) {
         this.platform = platform;
+        this.settings = platform.getConfigManager().getSettings();
         this.cacheManager = platform.getCacheManager();
 
-        this.playersOnly = platform.getConfigurationOption(ConfigOption.PLAYER_ONLY);
-
         healthTexturesSupported = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_15);
-        allowBypassEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
-        ignoreVehiclesEnabled = platform.getConfigurationOption(ConfigOption.IGNORE_VEHICLES_ENABLED);
-        ignoreWolvesEnabled = platform.getConfigurationOption(ConfigOption.IGNORE_WOLVES_ENABLED);
-        ignoreTamedWolves = platform.getConfigurationOption(ConfigOption.FOR_TAMED_WOLVES_ENABLED);
-        ignoreOwnedWolves = platform.getConfigurationOption(ConfigOption.FOR_OWNED_WOLVES_ENABLED);
-        ignoreIronGolemsEnabled = platform.getConfigurationOption(ConfigOption.IGNORE_IRON_GOLEMS_ENABLED);
-        gradualIronGolemHealthEnabled = platform.getConfigurationOption(ConfigOption.GRADUAL_IRON_GOLEM_HEALTH_ENABLED);
-        healthEnabled = platform.getConfigurationOption(ConfigOption.HEALTH_ENABLED);
-        airTicksEnabled = platform.getConfigurationOption(ConfigOption.AIR_TICKS_ENABLED);
-        absorptionEnabled = platform.getConfigurationOption(ConfigOption.ABSORPTION_ENABLED);
-        xpEnabled = platform.getConfigurationOption(ConfigOption.XP_ENABLED);
 
         platform.getLogManager().debug("Entity Metadata listener initialized.");
     }
@@ -102,11 +78,11 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
 
         if (entityId == user.getEntityId()) return;
 
-        if (allowBypassEnabled) {
+        if (settings.isAllowBypass()) {
             if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
         }
 
-        if (!playersOnly && ignoreVehiclesEnabled) {
+        if (!settings.getEntityData().isPlayersOnly() && settings.getEntityData().isIgnoreVehicles()) {
             if (cacheManager.isUserPassenger(user.getUUID(), packet.getEntityId(), user.getEntityId())) return;
         }
 
@@ -114,14 +90,14 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         if (cachedEntity == null) return;
         EntityType entityType = cachedEntity.getEntityType();
 
-        if (playersOnly && entityType != EntityTypes.PLAYER) return;
+        if (settings.getEntityData().isPlayersOnly() && entityType != EntityTypes.PLAYER) return;
 
         if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) {
             return;
         }
 
         boolean ignoreWolf;
-        if (entityType == EntityTypes.WOLF && ignoreWolvesEnabled) {
+        if (entityType == EntityTypes.WOLF && settings.getEntityData().getWolves().isEnabled()) {
             ignoreWolf = shouldIgnoreWolf(user, cachedEntity);
         } else {
             ignoreWolf = false;
@@ -130,8 +106,8 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         packet.getEntityMetadata().forEach(entityData -> {
             if (ignoreWolf) return;
 
-            if (entityType == EntityTypes.IRON_GOLEM && ignoreIronGolemsEnabled) {
-                if (!gradualIronGolemHealthEnabled || !healthTexturesSupported) {
+            if (entityType == EntityTypes.IRON_GOLEM && settings.getEntityData().getIronGolems().isEnabled()) {
+                if (!settings.getEntityData().getIronGolems().isGradual() || !healthTexturesSupported) {
                     spoofLivingEntityMetadata(entityData);
                 } else {
                     spoofIronGolemMetadata(entityData);
@@ -158,13 +134,14 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
      * @return Whether the wolf should be ignored.
      */
     private boolean shouldIgnoreWolf(User user, CachedEntity cachedEntity) {
-        if (!ignoreTamedWolves && !ignoreOwnedWolves) {
+        if (!settings.getEntityData().getWolves().isTamed() && !settings.getEntityData().getWolves().isOwner()) {
             return true;
         }
 
         WolfEntity wolfEntityData = (WolfEntity) cachedEntity;
 
-        return (ignoreTamedWolves && wolfEntityData.isTamed()) || (ignoreOwnedWolves && wolfEntityData.isOwnerPresent() && wolfEntityData.getOwnerUUID().equals(user.getUUID()));
+        return (settings.getEntityData().getWolves().isTamed() && wolfEntityData.isTamed()) ||
+                (settings.getEntityData().getWolves().isOwner() && wolfEntityData.isOwnerPresent() && wolfEntityData.getOwnerUUID().equals(user.getUUID()));
     }
 
     /**
@@ -174,12 +151,12 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
      */
     private void spoofIronGolemMetadata(EntityData obj) {
         // Checks if the metadata index is related to air ticks and if the configuration option for it is enabled
-        if (obj.getIndex() == MetadataIndex.AIR_TICKS && airTicksEnabled) {
+        if (obj.getIndex() == MetadataIndex.AIR_TICKS && settings.getEntityData().isAirTicks()) {
             // Sets a dynamic value for air ticks
             setDynamicValue(obj, 1);
         }
         // Checks if the metadata index is related to health and if the configuration option for it is enabled
-        if (obj.getIndex() == MetadataIndex.HEALTH && healthEnabled) {
+        if (obj.getIndex() == MetadataIndex.HEALTH && settings.getEntityData().isHealth()) {
             // Retrieves the current health of the Iron Golem
             float health = (float) obj.getValue();
 
@@ -202,10 +179,10 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
      * @param obj The data of the Living Entity to be modified.
      */
     private void spoofLivingEntityMetadata(EntityData obj) {
-        if (obj.getIndex() == MetadataIndex.AIR_TICKS && airTicksEnabled) {
+        if (obj.getIndex() == MetadataIndex.AIR_TICKS && settings.getEntityData().isAirTicks()) {
             setDynamicValue(obj, 1);
         }
-        if (obj.getIndex() == MetadataIndex.HEALTH && healthEnabled) {
+        if (obj.getIndex() == MetadataIndex.HEALTH && settings.getEntityData().isHealth()) {
             if (((Float) obj.getValue()) > 0) {
                 obj.setValue(0.5f);
             }
@@ -218,10 +195,10 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
      * @param obj The data of the Player to be modified.
      */
     private void spoofPlayerMetadata(EntityData obj) {
-        if (obj.getIndex() == MetadataIndex.ABSORPTION && absorptionEnabled) {
+        if (obj.getIndex() == MetadataIndex.ABSORPTION && settings.getEntityData().isAbsorption()) {
             setDynamicValue(obj, 0);
         }
-        if (obj.getIndex() == MetadataIndex.XP && xpEnabled) {
+        if (obj.getIndex() == MetadataIndex.XP && settings.getEntityData().isXp()) {
             setDynamicValue(obj, 0);
         }
     }

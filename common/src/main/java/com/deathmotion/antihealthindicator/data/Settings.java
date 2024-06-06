@@ -27,20 +27,19 @@ public class Settings {
     private boolean Debug = false;
 
     private UpdateChecker UpdateChecker = new UpdateChecker();
+    private boolean AllowBypass = false;
+    private boolean WorldSeed = false;
+    private boolean FoodSaturation = true;
+    private EntityData EntityData = new EntityData();
+    private Items Items = new Items();
 
     @Getter
     @Setter
     public static class UpdateChecker {
-        public boolean Enabled = true;
-        public boolean PrintToConsole = true;
-        public boolean NotifyInGame = true;
+        private boolean Enabled = true;
+        private boolean PrintToConsole = true;
+        private boolean NotifyInGame = true;
     }
-
-    private boolean AllowBypass = false;
-    private boolean WorldSeed = false;
-    private boolean FoodSaturation = true;
-
-    private EntityData EntityData = new EntityData();
 
     @Getter
     @Setter
@@ -53,6 +52,9 @@ public class Settings {
         private boolean IgnoreVehicles = true;
 
         private Wolves Wolves = new Wolves();
+        private IronGolems IronGolems = new IronGolems();
+        private boolean Absorption = true;
+        private boolean Xp = true;
 
         @Getter
         @Setter
@@ -62,8 +64,6 @@ public class Settings {
             private boolean Owner = true;
         }
 
-        private IronGolems IronGolems = new IronGolems();
-
         @Getter
         @Setter
         public static class IronGolems {
@@ -71,11 +71,6 @@ public class Settings {
             private boolean Gradual = true;
         }
     }
-
-    private boolean Absorption = true;
-    private boolean Xp = true;
-
-    private Items Items = new Items();
 
     @Getter
     @Setter

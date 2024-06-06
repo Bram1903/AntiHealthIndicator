@@ -18,9 +18,7 @@
 
 package com.deathmotion.antihealthindicator;
 
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
-import com.deathmotion.antihealthindicator.managers.BungeeConfigManager;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
@@ -33,14 +31,9 @@ import java.util.UUID;
 public class BungeeAntiHealthIndicator extends AHIPlatform<Plugin> {
 
     private final Plugin plugin;
-    private BungeeConfigManager bungeeConfigManager;
 
     public BungeeAntiHealthIndicator(Plugin plugin) {
         this.plugin = plugin;
-    }
-
-    protected void setBukkitConfigManager(BungeeConfigManager bungeeConfigManager) {
-        this.bungeeConfigManager = bungeeConfigManager;
     }
 
     @Override
@@ -63,11 +56,6 @@ public class BungeeAntiHealthIndicator extends AHIPlatform<Plugin> {
         if (player == null) return false;
 
         return player.hasPermission(permission);
-    }
-
-    @Override
-    public boolean getConfigurationOption(ConfigOption option) {
-        return this.bungeeConfigManager.getConfigurationOption(option);
     }
 
     @Override

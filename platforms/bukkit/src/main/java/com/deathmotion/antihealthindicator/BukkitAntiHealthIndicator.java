@@ -19,9 +19,7 @@
 package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.commands.BukkitAHICommand;
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
-import com.deathmotion.antihealthindicator.managers.BukkitConfigManager;
 import com.deathmotion.antihealthindicator.managers.LogManager;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import lombok.Getter;
@@ -35,14 +33,9 @@ import java.util.UUID;
 public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
 
     private final JavaPlugin plugin;
-    private BukkitConfigManager bukkitConfigManager;
 
     public BukkitAntiHealthIndicator(JavaPlugin plugin) {
         this.plugin = plugin;
-    }
-
-    protected void setBukkitConfigManager(BukkitConfigManager bukkitConfigManager) {
-        this.bukkitConfigManager = bukkitConfigManager;
     }
 
     @Override
@@ -69,11 +62,6 @@ public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
         if (commandSender == null) return false;
 
         return commandSender.hasPermission(permission);
-    }
-
-    @Override
-    public boolean getConfigurationOption(ConfigOption option) {
-        return this.bukkitConfigManager.getConfigurationOption(option);
     }
 
     @Override

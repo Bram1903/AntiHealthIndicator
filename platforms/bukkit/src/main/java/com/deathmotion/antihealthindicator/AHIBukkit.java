@@ -18,7 +18,6 @@
 
 package com.deathmotion.antihealthindicator;
 
-import com.deathmotion.antihealthindicator.managers.BukkitConfigManager;
 import com.deathmotion.antihealthindicator.schedulers.BukkitScheduler;
 import com.deathmotion.antihealthindicator.schedulers.FoliaScheduler;
 import com.deathmotion.antihealthindicator.util.BukkitLogManager;
@@ -42,8 +41,9 @@ public class AHIBukkit extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        ahi.commonOnInitialize();
+
         ahi.setScheduler(isFolia() ? new FoliaScheduler(this) : new BukkitScheduler(this));
-        ahi.setBukkitConfigManager(new BukkitConfigManager(this));
 
         ahi.setLogManager(new BukkitLogManager(this));
 

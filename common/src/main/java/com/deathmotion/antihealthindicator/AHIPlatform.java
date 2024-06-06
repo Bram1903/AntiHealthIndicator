@@ -18,7 +18,6 @@
 
 package com.deathmotion.antihealthindicator;
 
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.deathmotion.antihealthindicator.managers.*;
 import com.deathmotion.antihealthindicator.util.AHIVersion;
@@ -33,9 +32,16 @@ import java.util.UUID;
 public abstract class AHIPlatform<P> {
     private final AHIVersion version = AHIVersion.createFromPackageVersion();
 
+    protected ConfigManager<P> configManager;
+    protected LogManager<P> logManager;
+
     protected Scheduler scheduler;
-    protected LogManager<P> logManager = new LogManager<>(this);
     private CacheManager<P> cacheManager;
+
+    public void commonOnInitialize() {
+        configManager = new ConfigManager<>(this);
+        logManager = new LogManager<>(this);
+    }
 
     /**
      * Called when the platform is enabled.
@@ -43,7 +49,6 @@ public abstract class AHIPlatform<P> {
     public void commonOnEnable() {
         cacheManager = new CacheManager<>(this);
 
-        new ConfigManager<>(this);
         new UpdateManager<>(this);
         new PacketManager<>(this);
     }
@@ -84,12 +89,9 @@ public abstract class AHIPlatform<P> {
     public abstract boolean hasPermission(UUID sender, String permission);
 
     /**
-     * Retrieves the value of a configuration option.
+     * Gets the plugin directory.
      *
-     * @param option The configuration option to retrieve.
-     * @return The value of the configuration option.
+     * @return The plugin directory.
      */
-    public abstract boolean getConfigurationOption(ConfigOption option);
-
     public abstract String getPluginDirectory();
 }

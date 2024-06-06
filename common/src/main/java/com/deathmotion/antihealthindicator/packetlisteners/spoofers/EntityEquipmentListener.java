@@ -19,7 +19,7 @@
 package com.deathmotion.antihealthindicator.packetlisteners.spoofers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import com.deathmotion.antihealthindicator.data.Settings;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
@@ -42,12 +42,9 @@ import java.util.List;
  */
 public class EntityEquipmentListener<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
+    private final Settings settings;
 
     private final boolean useDamageableInterface;
-    private final boolean bypassPermissionEnabled;
-    private final boolean spoofStackAmount;
-    private final boolean spoofDurability;
-    private final boolean spoofEnchantments;
 
     /**
      * The enchantment list to spoof the item with
@@ -64,12 +61,9 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
      */
     public EntityEquipmentListener(AHIPlatform<P> platform) {
         this.platform = platform;
+        this.settings = platform.getConfigManager().getSettings();
 
         this.useDamageableInterface = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13);
-        this.bypassPermissionEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
-        this.spoofStackAmount = platform.getConfigurationOption(ConfigOption.STACK_AMOUNT_ENABLED);
-        this.spoofDurability = platform.getConfigurationOption(ConfigOption.DURABILITY_ENABLED);
-        this.spoofEnchantments = platform.getConfigurationOption(ConfigOption.ENCHANTMENTS_ENABLED);
 
         platform.getLogManager().debug("Entity Equipment listener initialized.");
     }
@@ -84,7 +78,7 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
         if (event.getPacketType() == PacketType.Play.Server.ENTITY_EQUIPMENT) {
             WrapperPlayServerEntityEquipment packet = new WrapperPlayServerEntityEquipment(event);
 
-            if (bypassPermissionEnabled) {
+            if (settings.isAllowBypass()) {
                 if (platform.hasPermission(event.getUser().getUUID(), "AntiHealthIndicator.Bypass")) return;
             }
 
@@ -116,12 +110,12 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
         ItemStack itemStack = equipment.getItem();
         if (itemStack == null) return;
 
-        if (spoofStackAmount && itemStack.getAmount() > 1) {
+        if (settings.getItems().isStackAmount() && itemStack.getAmount() > 1) {
             itemStack.setAmount(1);
             equipment.setItem(itemStack);
         }
 
-        if (spoofDurability && itemStack.isDamageableItem()) {
+        if (settings.getItems().isDurability() && itemStack.isDamageableItem()) {
             if (useDamageableInterface) {
                 itemStack.setDamageValue(0);
             } else {
@@ -130,7 +124,7 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
             equipment.setItem(itemStack);
         }
 
-        if (spoofEnchantments && itemStack.isEnchanted(clientVersion)) {
+        if (settings.getItems().isEnchantments() && itemStack.isEnchanted(clientVersion)) {
             itemStack.setEnchantments(enchantmentList, clientVersion);
             equipment.setItem(itemStack);
         }

@@ -19,7 +19,7 @@
 package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.packetlisteners.EntityTracker;
 import com.deathmotion.antihealthindicator.packetlisteners.VehicleState;
 import com.deathmotion.antihealthindicator.packetlisteners.spoofers.EntityEquipmentListener;
@@ -36,6 +36,7 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
  */
 public class PacketManager<P> {
     private final AHIPlatform<P> platform;
+    private final Settings settings;
 
     /**
      * Constructs a new PacketManager with the specified {@link AHIPlatform}.
@@ -44,6 +45,7 @@ public class PacketManager<P> {
      */
     public PacketManager(AHIPlatform<P> platform) {
         this.platform = platform;
+        this.settings = platform.getConfigManager().getSettings();
 
         setupPacketListeners();
         platform.getLogManager().debug("Packet listeners have been set up.");
@@ -61,11 +63,11 @@ public class PacketManager<P> {
      * Sets up entity listeners
      */
     private void setupEntityListeners() {
-        if (platform.getConfigurationOption(ConfigOption.ENTITY_DATA_ENABLED)) {
+        if (settings.getEntityData().isEnabled()) {
             PacketEvents.getAPI().getEventManager().registerListener(new EntityTracker<>(platform), PacketListenerPriority.LOW);
             PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener<>(platform));
 
-            if (!platform.getConfigurationOption(ConfigOption.PLAYER_ONLY)) {
+            if (!settings.getEntityData().isPlayersOnly()) {
                 PacketEvents.getAPI().getEventManager().registerListener(new VehicleState<>(platform));
             }
         }
@@ -75,13 +77,13 @@ public class PacketManager<P> {
      * Sets up additional listeners
      */
     private void setupAdditionalListeners() {
-        if (platform.getConfigurationOption(ConfigOption.ITEMS_ENABLED)) {
+        if (settings.getItems().isEnabled()) {
             PacketEvents.getAPI().getEventManager().registerListener(new EntityEquipmentListener<>(platform));
         }
-        if (platform.getConfigurationOption(ConfigOption.SPOOF_FOOD_SATURATION_ENABLED)) {
+        if (settings.isFoodSaturation()) {
             PacketEvents.getAPI().getEventManager().registerListener(new PlayerUpdateHealthListener<>(platform));
         }
-        if (platform.getConfigurationOption(ConfigOption.SPOOF_WORLD_SEED_ENABLED)) {
+        if (settings.isWorldSeed()) {
             PacketEvents.getAPI().getEventManager().registerListener(new WorldSeedListener<>(platform));
         }
     }

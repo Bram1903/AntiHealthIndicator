@@ -19,7 +19,7 @@
 package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import com.deathmotion.antihealthindicator.data.Settings;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,11 +34,11 @@ import java.util.regex.Pattern;
 public class LogManager<P> {
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]");
 
-    private final AHIPlatform<P> platform;
+    private final Settings settings;
     private final Logger logger = Logger.getLogger("AntiHealthIndicator");
 
     public LogManager(AHIPlatform<P> platform) {
-        this.platform = platform;
+        this.settings = platform.getConfigManager().getSettings();
     }
 
     protected void log(Level level, @Nullable NamedTextColor color, String message) {
@@ -59,7 +59,7 @@ public class LogManager<P> {
     }
 
     public void debug(String message) {
-        if (platform.getConfigurationOption(ConfigOption.DEBUG_ENABLED)) {
+        if (settings.isDebug()) {
             log(Level.FINE, null, message);
         }
     }

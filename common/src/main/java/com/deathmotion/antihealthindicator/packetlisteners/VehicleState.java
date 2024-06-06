@@ -19,7 +19,7 @@
 package com.deathmotion.antihealthindicator.packetlisteners;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
+import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
@@ -43,9 +43,8 @@ import java.util.List;
  */
 public class VehicleState<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
+    private final Settings settings;
     private final CacheManager<P> cacheManager;
-
-    private final boolean isBypassEnabled;
 
     /**
      * Constructs a new VehicleState with the specified {@link AHIPlatform}.
@@ -54,9 +53,8 @@ public class VehicleState<P> extends PacketListenerAbstract {
      */
     public VehicleState(AHIPlatform<P> platform) {
         this.platform = platform;
+        this.settings = platform.getConfigManager().getSettings();
         this.cacheManager = platform.getCacheManager();
-
-        this.isBypassEnabled = platform.getConfigurationOption(ConfigOption.ALLOW_BYPASS_ENABLED);
 
         platform.getLogManager().debug("Vehicle State listener has been set up.");
     }
@@ -120,7 +118,7 @@ public class VehicleState<P> extends PacketListenerAbstract {
 
     private void handlePassengerEvent(User user, int vehicleId, float healthValue, boolean entering) {
         platform.getScheduler().runAsyncTask((o) -> {
-            if (!entering && isBypassEnabled) {
+            if (!entering && settings.isAllowBypass()) {
                 if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
             }
 
