@@ -39,8 +39,8 @@ public abstract class AHIPlatform<P> {
     private CacheManager<P> cacheManager;
 
     public void commonOnInitialize() {
-        configManager = new ConfigManager<>(this);
         logManager = new LogManager<>(this);
+        configManager = new ConfigManager<>(this);
     }
 
     /**

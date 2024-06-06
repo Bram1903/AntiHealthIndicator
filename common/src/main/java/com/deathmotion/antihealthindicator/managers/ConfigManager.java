@@ -42,7 +42,14 @@ public class ConfigManager<P> {
     }
 
     private void saveDefaultConfiguration() {
-        File configFile = new File(platform.getPluginDirectory(), "config.yml");
+        File pluginDirectory = new File(platform.getPluginDirectory());
+        File configFile = new File(pluginDirectory, "config.yml");
+
+        if (!pluginDirectory.exists() && !pluginDirectory.mkdirs()) {
+            platform.getLogManager().severe("Failed to create plugin directory: " + pluginDirectory.getAbsolutePath());
+            return;
+        }
+
         if (!configFile.exists()) {
             try (InputStream inputStream = getClass().getResourceAsStream("/config.yml")) {
                 if (inputStream != null) {
@@ -58,9 +65,9 @@ public class ConfigManager<P> {
 
     private void loadConfig() {
         File configFile = new File(platform.getPluginDirectory(), "config.yml");
+
         if (!configFile.exists()) {
             platform.getLogManager().severe("Config file not found!");
-            platform.commonOnDisable();
             return;
         }
 
@@ -68,15 +75,14 @@ public class ConfigManager<P> {
             Yaml yaml = new Yaml();
             Map<String, Object> yamlData = yaml.load(inputStream);
 
-            Settings settings = new Settings();
-            setConfigOptions(yamlData, settings);
-
-            this.settings = settings;
+            this.settings = new Settings();
+            setConfigOptions(yamlData, this.settings);
         } catch (IOException e) {
             platform.getLogManager().severe("Failed to load configuration: " + e.getMessage());
             platform.commonOnDisable();
         }
     }
+
 
     private void setConfigOptions(Map<String, Object> yamlData, Settings settings) {
         settings.setDebug(getBoolean(yamlData, "debug.enabled", false));
@@ -87,6 +93,11 @@ public class ConfigManager<P> {
         settings.setWorldSeed(getBoolean(yamlData, "spoof.world-seed.enabled", false));
         settings.setFoodSaturation(getBoolean(yamlData, "spoof.food-saturation.enabled", true));
 
+        setEntityDataOptions(yamlData, settings);
+        setItemOptions(yamlData, settings);
+    }
+
+    private void setEntityDataOptions(Map<String, Object> yamlData, Settings settings) {
         settings.getEntityData().setEnabled(getBoolean(yamlData, "spoof.entity-data.enabled", true));
         settings.getEntityData().setPlayersOnly(getBoolean(yamlData, "spoof.entity-data.players-only.enabled", false));
         settings.getEntityData().setAirTicks(getBoolean(yamlData, "spoof.entity-data.air-ticks.enabled", true));
@@ -99,6 +110,9 @@ public class ConfigManager<P> {
         settings.getEntityData().getIronGolems().setGradual(getBoolean(yamlData, "spoof.entity-data.health.ignore-iron-golems.gradual.enabled", true));
         settings.getEntityData().setAbsorption(getBoolean(yamlData, "spoof.entity-data.absorption.enabled", true));
         settings.getEntityData().setXp(getBoolean(yamlData, "spoof.entity-data.xp.enabled", true));
+    }
+
+    private void setItemOptions(Map<String, Object> yamlData, Settings settings) {
         settings.getItems().setEnabled(getBoolean(yamlData, "spoof.entity-data.items.enabled", true));
         settings.getItems().setStackAmount(getBoolean(yamlData, "spoof.entity-data.items.stack-amount.enabled", true));
         settings.getItems().setDurability(getBoolean(yamlData, "spoof.entity-data.items.durability.enabled", true));
@@ -106,8 +120,7 @@ public class ConfigManager<P> {
     }
 
     private boolean getBoolean(Map<String, Object> yamlData, String key, boolean defaultValue) {
-        String[] keys = key.split("\\.");
-        Object value = findNestedValue(yamlData, keys, defaultValue);
+        Object value = findNestedValue(yamlData, key.split("\\."), defaultValue);
         return value instanceof Boolean ? (Boolean) value : defaultValue;
     }
 
