@@ -19,7 +19,6 @@
 package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.data.Settings;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 
