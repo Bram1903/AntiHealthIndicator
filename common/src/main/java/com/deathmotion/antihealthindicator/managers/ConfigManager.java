@@ -20,7 +20,6 @@ package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.Settings;
-import com.deathmotion.antihealthindicator.enums.ConfigOption;
 import lombok.Getter;
 import org.yaml.snakeyaml.Yaml;
 
@@ -70,9 +69,7 @@ public class ConfigManager<P> {
             Map<String, Object> yamlData = yaml.load(inputStream);
 
             Settings settings = new Settings();
-            for (ConfigOption option : ConfigOption.values()) {
-                setConfigOption(yamlData, settings, option);
-            }
+            setConfigOptions(yamlData, settings);
 
             this.settings = settings;
         } catch (IOException e) {
@@ -81,83 +78,37 @@ public class ConfigManager<P> {
         }
     }
 
-    private void setConfigOption(Map<String, Object> yamlData, Settings settings, ConfigOption option) {
-        String[] keys = option.getKey().split("\\.");
-        Object value = findNestedValue(yamlData, keys, option.getDefaultValue());
+    private void setConfigOptions(Map<String, Object> yamlData, Settings settings) {
+        settings.setDebug(getBoolean(yamlData, "debug.enabled", false));
+        settings.getUpdateChecker().setEnabled(getBoolean(yamlData, "update-checker.enabled", true));
+        settings.getUpdateChecker().setPrintToConsole(getBoolean(yamlData, "update-checker.print-to-console", true));
+        settings.getUpdateChecker().setNotifyInGame(getBoolean(yamlData, "update-checker.notify-in-game", true));
+        settings.setAllowBypass(getBoolean(yamlData, "allow-bypass.enabled", false));
+        settings.setWorldSeed(getBoolean(yamlData, "spoof.world-seed.enabled", false));
+        settings.setFoodSaturation(getBoolean(yamlData, "spoof.food-saturation.enabled", true));
 
-        switch (option) {
-            case DEBUG_ENABLED:
-                settings.setDebug((Boolean) value);
-                break;
-            case UPDATE_CHECKER_ENABLED:
-                settings.getUpdateChecker().setEnabled((Boolean) value);
-                break;
-            case UPDATE_CHECKER_PRINT_TO_CONSOLE:
-                settings.getUpdateChecker().setPrintToConsole((Boolean) value);
-                break;
-            case NOTIFY_IN_GAME:
-                settings.getUpdateChecker().setNotifyInGame((Boolean) value);
-                break;
-            case ALLOW_BYPASS_ENABLED:
-                settings.setAllowBypass((Boolean) value);
-                break;
-            case SPOOF_WORLD_SEED_ENABLED:
-                settings.setWorldSeed((Boolean) value);
-                break;
-            case SPOOF_FOOD_SATURATION_ENABLED:
-                settings.setFoodSaturation((Boolean) value);
-                break;
-            case ENTITY_DATA_ENABLED:
-                settings.getEntityData().setEnabled((Boolean) value);
-                break;
-            case PLAYER_ONLY:
-                settings.getEntityData().setPlayersOnly((Boolean) value);
-                break;
-            case AIR_TICKS_ENABLED:
-                settings.getEntityData().setAirTicks((Boolean) value);
-                break;
-            case HEALTH_ENABLED:
-                settings.getEntityData().setHealth((Boolean) value);
-                break;
-            case IGNORE_VEHICLES_ENABLED:
-                settings.getEntityData().setIgnoreVehicles((Boolean) value);
-                break;
-            case IGNORE_WOLVES_ENABLED:
-                settings.getEntityData().getWolves().setEnabled((Boolean) value);
-                break;
-            case FOR_TAMED_WOLVES_ENABLED:
-                settings.getEntityData().getWolves().setTamed((Boolean) value);
-                break;
-            case FOR_OWNED_WOLVES_ENABLED:
-                settings.getEntityData().getWolves().setOwner((Boolean) value);
-                break;
-            case IGNORE_IRON_GOLEMS_ENABLED:
-                settings.getEntityData().getIronGolems().setEnabled((Boolean) value);
-                break;
-            case GRADUAL_IRON_GOLEM_HEALTH_ENABLED:
-                settings.getEntityData().getIronGolems().setGradual((Boolean) value);
-                break;
-            case ABSORPTION_ENABLED:
-                settings.getEntityData().setAbsorption((Boolean) value);
-                break;
-            case XP_ENABLED:
-                settings.getEntityData().setXp((Boolean) value);
-                break;
-            case ITEMS_ENABLED:
-                settings.getItems().setEnabled((Boolean) value);
-                break;
-            case STACK_AMOUNT_ENABLED:
-                settings.getItems().setStackAmount((Boolean) value);
-                break;
-            case DURABILITY_ENABLED:
-                settings.getItems().setDurability((Boolean) value);
-                break;
-            case ENCHANTMENTS_ENABLED:
-                settings.getItems().setEnchantments((Boolean) value);
-                break;
-            default:
-                platform.getLogManager().severe("Unknown config option: " + option);
-        }
+        settings.getEntityData().setEnabled(getBoolean(yamlData, "spoof.entity-data.enabled", true));
+        settings.getEntityData().setPlayersOnly(getBoolean(yamlData, "spoof.entity-data.players-only.enabled", false));
+        settings.getEntityData().setAirTicks(getBoolean(yamlData, "spoof.entity-data.air-ticks.enabled", true));
+        settings.getEntityData().setHealth(getBoolean(yamlData, "spoof.entity-data.health.enabled", true));
+        settings.getEntityData().setIgnoreVehicles(getBoolean(yamlData, "spoof.entity-data.health.ignore-vehicles", true));
+        settings.getEntityData().getWolves().setEnabled(getBoolean(yamlData, "spoof.entity-data.health.ignore-wolves.enabled", true));
+        settings.getEntityData().getWolves().setTamed(getBoolean(yamlData, "spoof.entity-data.health.ignore-wolves.when.for-tamed-wolves", false));
+        settings.getEntityData().getWolves().setOwner(getBoolean(yamlData, "spoof.entity-data.health.ignore-wolves.when.for-owned-wolves", true));
+        settings.getEntityData().getIronGolems().setEnabled(getBoolean(yamlData, "spoof.entity-data.health.ignore-iron-golems.enabled", true));
+        settings.getEntityData().getIronGolems().setGradual(getBoolean(yamlData, "spoof.entity-data.health.ignore-iron-golems.gradual.enabled", true));
+        settings.getEntityData().setAbsorption(getBoolean(yamlData, "spoof.entity-data.absorption.enabled", true));
+        settings.getEntityData().setXp(getBoolean(yamlData, "spoof.entity-data.xp.enabled", true));
+        settings.getItems().setEnabled(getBoolean(yamlData, "spoof.entity-data.items.enabled", true));
+        settings.getItems().setStackAmount(getBoolean(yamlData, "spoof.entity-data.items.stack-amount.enabled", true));
+        settings.getItems().setDurability(getBoolean(yamlData, "spoof.entity-data.items.durability.enabled", true));
+        settings.getItems().setEnchantments(getBoolean(yamlData, "spoof.entity-data.items.enchantments.enabled", true));
+    }
+
+    private boolean getBoolean(Map<String, Object> yamlData, String key, boolean defaultValue) {
+        String[] keys = key.split("\\.");
+        Object value = findNestedValue(yamlData, keys, defaultValue);
+        return value instanceof Boolean ? (Boolean) value : defaultValue;
     }
 
     private Object findNestedValue(Map<String, Object> yamlData, String[] keys, Object defaultValue) {
