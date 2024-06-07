@@ -7,7 +7,7 @@
   <a href="https://www.spigotmc.org/resources/antihealthindicator.114851/"><img alt="SpigotMC" src="https://img.shields.io/badge/-SpigotMC-blue?style=for-the-badge&logo=SpigotMC"></a>
   <a href="https://modrinth.com/plugin/antihealthindicator"><img alt="Modrinth" src="https://img.shields.io/badge/-Modrinth-green?style=for-the-badge&logo=Modrinth"></a>
   <br>
-  <a href="https://discord.gg/Sd4bd6s99z"><img alt="Discord" src="https://img.shields.io/badge/-Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white"></a>
+  <a href="https://ahi.deathmotion.com/"><img alt="Discord" src="https://img.shields.io/badge/-Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white"></a>
 </div>
 
 ## Overview
