@@ -153,17 +153,33 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         }
     }
 
-    private void setDynamicValue(EntityData entityData, int spoofValue) {
-        Object value = entityData.getValue();
+    /**
+     * This method is designed to handle and set dynamic values for different types of data objects.
+     * This is necessary because the value of the data object is stored as an Object, and not as a primitive type.
+     * Besides, the value of the data object is not always an integer,
+     * but can be a float, double, long, short or byte, etc.
+     * <p>
+     * The reason why I am not simply using a byte since my value will never be bigger than zero or one is because
+     * legacy versions for some retarded reason don't support upcasting of bytes to integers.
+     *
+     * @param obj        The EntityData containing the value to be set.
+     * @param spoofValue The value to be set in the EntityData object.
+     */
+    private void setDynamicValue(EntityData obj, int spoofValue) {
+        Object value = obj.getValue();
 
-        if (value instanceof Integer || value instanceof Short || value instanceof Byte) {
-            entityData.setValue(spoofValue);
+        if (value instanceof Integer) {
+            obj.setValue(spoofValue);
+        } else if (value instanceof Short) {
+            obj.setValue((short) spoofValue);
+        } else if (value instanceof Byte) {
+            obj.setValue((byte) spoofValue);
         } else if (value instanceof Long) {
-            entityData.setValue((long) spoofValue);
+            obj.setValue((long) spoofValue);
         } else if (value instanceof Float) {
-            entityData.setValue((float) spoofValue);
+            obj.setValue((float) spoofValue);
         } else if (value instanceof Double) {
-            entityData.setValue((double) spoofValue);
+            obj.setValue((double) spoofValue);
         }
     }
 }
