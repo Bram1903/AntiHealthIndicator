@@ -68,8 +68,14 @@ public class EntityTracker<P> implements PacketListener {
     public void onPacketSend(PacketSendEvent event) {
         final PacketTypeCommon type = event.getPacketType();
 
-        if (PacketType.Play.Server.SPAWN_PLAYER == type) {
+        if (PacketType.Play.Server.SPAWN_LIVING_ENTITY == type) {
+            handleSpawnLivingEntity(new WrapperPlayServerSpawnLivingEntity(event), event.getUser());
+        } else if (PacketType.Play.Server.SPAWN_ENTITY == type) {
+            handleSpawnEntity(new WrapperPlayServerSpawnEntity(event), event.getUser());
+        } else if (PacketType.Play.Server.SPAWN_PLAYER == type) {
             handleSpawnPlayer(new WrapperPlayServerSpawnPlayer(event), event.getUser());
+        } else if (PacketType.Play.Server.ENTITY_METADATA == type) {
+            handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), event.getUser());
         } else if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
             handleDestroyEntities(new WrapperPlayServerDestroyEntities(event), event.getUser());
         } else if (PacketType.Play.Server.RESPAWN == type) {
@@ -78,16 +84,6 @@ public class EntityTracker<P> implements PacketListener {
             handleJoinGame(event.getUser());
         } else if (PacketType.Play.Server.CONFIGURATION_START == type) {
             handleConfigurationStart(event.getUser());
-        }
-
-        if (!settings.getEntityData().isPlayersOnly()) {
-            if (PacketType.Play.Server.SPAWN_LIVING_ENTITY == type) {
-                handleSpawnLivingEntity(new WrapperPlayServerSpawnLivingEntity(event), event.getUser());
-            } else if (PacketType.Play.Server.SPAWN_ENTITY == type) {
-                handleSpawnEntity(new WrapperPlayServerSpawnEntity(event), event.getUser());
-            } else if (PacketType.Play.Server.ENTITY_METADATA == type) {
-                handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), event.getUser());
-            }
         }
     }
 
@@ -100,8 +96,13 @@ public class EntityTracker<P> implements PacketListener {
     }
 
     private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet, User user) {
-        int entityId = packet.getEntityId();
         EntityType entityType = packet.getEntityType();
+
+        if (settings.getEntityData().isPlayersOnly()) {
+            if (!EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) return;
+        }
+
+        int entityId = packet.getEntityId();
 
         CachedEntity entityData = createLivingEntity(entityType);
         cacheManager.addLivingEntity(user.getUUID(), entityId, entityData);
@@ -111,6 +112,10 @@ public class EntityTracker<P> implements PacketListener {
         EntityType entityType = packet.getEntityType();
 
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.LIVINGENTITY)) {
+            if (settings.getEntityData().isPlayersOnly()) {
+                if (!EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) return;
+            }
+
             int entityId = packet.getEntityId();
 
             CachedEntity entityData = createLivingEntity(entityType);
@@ -126,6 +131,8 @@ public class EntityTracker<P> implements PacketListener {
     }
 
     private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, User user) {
+        if (settings.getEntityData().isPlayersOnly()) return;
+
         int entityId = packet.getEntityId();
 
         CachedEntity entityData = cacheManager.getCachedEntity(user.getUUID(), entityId).orElse(null);
