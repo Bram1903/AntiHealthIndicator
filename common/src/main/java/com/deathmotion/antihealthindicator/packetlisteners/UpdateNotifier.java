@@ -19,6 +19,7 @@
 package com.deathmotion.antihealthindicator.packetlisteners;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.deathmotion.antihealthindicator.data.Constants;
 import com.deathmotion.antihealthindicator.util.AHIVersion;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
@@ -56,7 +57,7 @@ public class UpdateNotifier<P> extends PacketListenerAbstract {
                 .append(Component.text("now available", NamedTextColor.GREEN)
                         .decorate(TextDecoration.UNDERLINED)
                         .hoverEvent(HoverEvent.showText(Component.text("Click to download", NamedTextColor.GREEN)))
-                        .clickEvent(ClickEvent.openUrl("https://www.spigotmc.org/resources/antihealthindicator.114851/")))
+                        .clickEvent(ClickEvent.openUrl(Constants.SPIGOT_URL)))
                 .append(Component.text("!", NamedTextColor.GREEN))
                 .build();
 

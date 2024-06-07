@@ -10,8 +10,6 @@ load: POSTWORLD
 commands:
   AntiHealthIndicator:
     description: Base command for AntiHealthIndicator.
-    permission: AntiHealthIndicator.Version
-    permission-message: Unknown command. Type "/help" for help
     aliases:
       - ahi
 permissions:

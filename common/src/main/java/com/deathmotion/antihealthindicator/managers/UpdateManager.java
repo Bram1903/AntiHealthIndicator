@@ -19,6 +19,7 @@
 package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.deathmotion.antihealthindicator.data.Constants;
 import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.packetlisteners.UpdateNotifier;
 import com.deathmotion.antihealthindicator.util.AHIVersion;
@@ -35,8 +36,6 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class UpdateManager<P> {
-    private final static String GITHUB_API_URL = "https://api.github.com/repos/Bram1903/AntiHealthIndicator/releases/latest";
-
     private final AHIPlatform<P> platform;
     private final Settings settings;
     private final LogManager<P> logManager;
@@ -70,7 +69,7 @@ public class UpdateManager<P> {
 
     private String getLatestGitHubVersion() {
         try {
-            URLConnection connection = new URL(GITHUB_API_URL).openConnection();
+            URLConnection connection = new URL(Constants.GITHUB_API_URL).openConnection();
             connection.addRequestProperty("User-Agent", "Mozilla/4.0");
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String jsonResponse = reader.readLine();

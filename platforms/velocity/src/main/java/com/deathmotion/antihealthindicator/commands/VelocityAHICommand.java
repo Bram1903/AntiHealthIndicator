@@ -18,20 +18,57 @@
 
 package com.deathmotion.antihealthindicator.commands;
 
-import com.deathmotion.antihealthindicator.util.ComponentCreator;
-import com.velocitypowered.api.command.CommandManager;
+import com.deathmotion.antihealthindicator.data.Constants;
+import com.deathmotion.antihealthindicator.data.SubCommand;
+import com.deathmotion.antihealthindicator.util.CommandComponentCreator;
+import com.velocitypowered.api.command.CommandMeta;
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ProxyServer;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class VelocityAHICommand implements SimpleCommand {
 
     public VelocityAHICommand(ProxyServer proxyServer) {
-        CommandManager manager = proxyServer.getCommandManager();
-        manager.register(manager.metaBuilder("antihealthindicator").aliases("ahi").build(), this);
+        CommandMeta commandMeta = proxyServer.getCommandManager().metaBuilder("antihealthindicator")
+                .aliases("ahi")
+                .build();
+        proxyServer.getCommandManager().register(commandMeta, this);
     }
 
     @Override
     public void execute(Invocation invocation) {
-        invocation.source().sendMessage(ComponentCreator.createAHICommandComponent());
+        String[] args = invocation.arguments();
+        CommandSource source = invocation.source();
+
+        if (args.length == 0) {
+            source.sendMessage(CommandComponentCreator.createAHICommandComponent());
+        } else {
+            switch (args[0].toLowerCase()) {
+                case "help":
+                    source.sendMessage(CommandComponentCreator.createHelpComponent());
+                    break;
+                case "discord":
+                    source.sendMessage(CommandComponentCreator.createDiscordComponent());
+                    break;
+                default:
+                    source.sendMessage(CommandComponentCreator.createUnknownSubcommandComponent());
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public List<String> suggest(Invocation invocation) {
+        String[] args = invocation.arguments();
+        if (args.length == 1) {
+            return Constants.SUB_COMMANDS.stream()
+                    .map(SubCommand::getName)
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 }
