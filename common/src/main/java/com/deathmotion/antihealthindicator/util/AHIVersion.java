@@ -19,160 +19,200 @@
 package com.deathmotion.antihealthindicator.util;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
- * AntiHealthIndicator version.
- * This class represents a AntiHealthIndicator version.
+ * Represents an AntiHealthIndicator version using Semantic Versioning.
+ * Supports version comparison, cloning, and provides a string representation.
  */
-public class AHIVersion {
-    /**
-     * Array containing the digits in the version.
-     * For example, "1.8.9" will be stored as {1, 8, 9} in an array.
-     */
-    private final int[] versionIntArray;
+public class AHIVersion implements Comparable<AHIVersion> {
+
+    private final int major;
+    private final int minor;
+    private final int patch;
+    private final boolean snapshot;
 
     /**
-     * Specify your version using an array.
+     * Constructs a {@link AHIVersion} instance.
      *
-     * @param version Array version.
+     * @param major    the major version number.
+     * @param minor    the minor version number.
+     * @param patch    the patch version number.
+     * @param snapshot whether the version is a snapshot.
      */
-    public AHIVersion(final int... version) {
-        this.versionIntArray = version;
+    public AHIVersion(final int major, final int minor, final int patch, final boolean snapshot) {
+        this.major = major;
+        this.minor = minor;
+        this.patch = patch;
+        this.snapshot = snapshot;
     }
 
     /**
-     * Specify your version using a string, for example: "1.8.9".
+     * Constructs a {@link AHIVersion} instance with snapshot defaulted to false.
      *
-     * @param version String version.
+     * @param major the major version number.
+     * @param minor the minor version number.
+     * @param patch the patch version number.
      */
-    public AHIVersion(final String version) {
-        String[] versionIntegers = version.split("\\.");
-        int length = versionIntegers.length;
-        this.versionIntArray = new int[length];
-        for (int i = 0; i < length; i++) {
-            versionIntArray[i] = Integer.parseInt(versionIntegers[i]);
+    public AHIVersion(final int major, final int minor, final int patch) {
+        this(major, minor, patch, false);
+    }
+
+    /**
+     * Constructs a {@link AHIVersion} instance from a version string.
+     *
+     * @param version the version string (e.g., "1.8.9-SNAPSHOT").
+     * @throws IllegalArgumentException if the version string format is incorrect.
+     */
+    public AHIVersion(@NotNull final String version) {
+        this.snapshot = version.endsWith("-SNAPSHOT");
+        String versionWithoutSnapshot = version.replace("-SNAPSHOT", "");
+        String[] parts = versionWithoutSnapshot.split("\\.");
+
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Version string must be in the format 'major.minor.patch[-SNAPSHOT]'");
         }
+
+        this.major = Integer.parseInt(parts[0]);
+        this.minor = Integer.parseInt(parts[1]);
+        this.patch = Integer.parseInt(parts[2]);
     }
 
     /**
-     * Create a AHIVersion from the package version.
+     * Creates a {@link AHIVersion} instance from the package implementation version.
      *
-     * @return AHIVersion from the package version.
+     * @return a {@link AHIVersion} instance.
      */
     public static AHIVersion createFromPackageVersion() {
-        // Grabbing the version from the class manifest.
-        final String version = AHIPlatform.class.getPackage().getImplementationVersion();
-
-        // Making sure the version is not null (This happens during Unit Testing), and remove the -SNAPSHOT part.
-        final String[] versionParts = (version != null) ? version.split("-") : new String[]{"0.0.0"};
-        final String[] parts = versionParts[0].split("\\.");
-
-        int major = Integer.parseInt(parts[0]);
-        int minor = Integer.parseInt(parts[1]);
-        int patch = Integer.parseInt(parts[2]);
-
-        return new AHIVersion(major, minor, patch);
+        String version = Optional.ofNullable(AHIPlatform.class.getPackage().getImplementationVersion()).orElse("0.0.0");
+        return new AHIVersion(version);
     }
 
     /**
-     * Compare to another AHIVersion.
-     * If we are newer than the compared version,
-     * this method will return 1.
-     * If we are older than the compared version,
-     * this method will return -1.
-     * If we are equal to the compared version,
-     * this method will return 0.
-     * Similar to {@link Integer#compareTo(Integer)}.
+     * Gets the major version number.
      *
-     * @param version Compared version
-     * @return Comparing to another Version.
+     * @return the major version number.
      */
-    public int compareTo(AHIVersion version) {
-        int localLength = versionIntArray.length;
-        int oppositeLength = version.versionIntArray.length;
-        int length = Math.max(localLength, oppositeLength);
-        for (int i = 0; i < length; i++) {
-            int localInteger = i < localLength ? versionIntArray[i] : 0;
-            int oppositeInteger = i < oppositeLength ? version.versionIntArray[i] : 0;
-            if (localInteger > oppositeInteger) {
-                return 1;
-            } else if (localInteger < oppositeInteger) {
-                return -1;
-            }
-        }
-        return 0;
+    public int major() {
+        return major;
     }
 
     /**
-     * Does the {@link #compareTo(AHIVersion)} return 1?
+     * Gets the minor version number.
      *
-     * @param version Compared version.
-     * @return Is this newer than the compared version.
+     * @return the minor version number.
      */
-    public boolean isNewerThan(AHIVersion version) {
-        return compareTo(version) == 1;
+    public int minor() {
+        return minor;
     }
 
     /**
-     * Does the {@link #compareTo(AHIVersion)} return -1?
+     * Gets the patch version number.
      *
-     * @param version Compared version.
-     * @return Is this older than the compared version.
+     * @return the patch version number.
      */
-    public boolean isOlderThan(AHIVersion version) {
-        return compareTo(version) == -1;
+    public int patch() {
+        return patch;
     }
 
     /**
-     * Represented as an array.
+     * Checks if the version is a snapshot.
      *
-     * @return Array version.
+     * @return true if snapshot, false otherwise.
      */
-    public int[] asArray() {
-        return versionIntArray;
+    public boolean snapshot() {
+        return snapshot;
     }
 
     /**
-     * Is this version equal to the compared object.
-     * The object must be a AHIVersion and the array values must be equal.
+     * Compares this {@link AHIVersion} with another {@link AHIVersion}.
      *
-     * @param obj Compared object.
-     * @return Are they equal?
+     * @param other the other {@link AHIVersion}.
+     * @return a negative integer, zero, or a positive integer as this version is less than,
+     * equal to, or greater than the specified version.
      */
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj instanceof AHIVersion) {
-            return Arrays.equals(versionIntArray, ((AHIVersion) obj).versionIntArray);
-        }
-        return false;
+    public int compareTo(@NotNull final AHIVersion other) {
+        int majorCompare = Integer.compare(this.major, other.major);
+        if (majorCompare != 0) return majorCompare;
+
+        int minorCompare = Integer.compare(this.minor, other.minor);
+        if (minorCompare != 0) return minorCompare;
+
+        int patchCompare = Integer.compare(this.patch, other.patch);
+        if (patchCompare != 0) return patchCompare;
+
+        return Boolean.compare(other.snapshot, this.snapshot);
     }
 
     /**
-     * Clone the AHIVersion.
+     * Checks if the provided object is equal to this {@link AHIVersion}.
      *
-     * @return A clone.
+     * @param obj the object to compare.
+     * @return true if the provided object is equal to this {@link AHIVersion}, false otherwise.
+     */
+    @Override
+    public boolean equals(@NotNull final Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof AHIVersion)) return false;
+        AHIVersion other = (AHIVersion) obj;
+
+        return this.major == other.major &&
+                this.minor == other.minor &&
+                this.patch == other.patch &&
+                this.snapshot == other.snapshot;
+    }
+
+    /**
+     * Checks if this version is newer than the provided version.
+     *
+     * @param otherVersion the other {@link AHIVersion}.
+     * @return true if this version is newer, false otherwise.
+     */
+    public boolean isNewerThan(@NotNull final AHIVersion otherVersion) {
+        return this.compareTo(otherVersion) > 0;
+    }
+
+    /**
+     * Checks if this version is older than the provided version.
+     *
+     * @param otherVersion the other {@link AHIVersion}.
+     * @return true if this version is older, false otherwise.
+     */
+    public boolean isOlderThan(@NotNull final AHIVersion otherVersion) {
+        return this.compareTo(otherVersion) < 0;
+    }
+
+    /**
+     * Returns a hash code value for this {@link AHIVersion}.
+     *
+     * @return a hash code value.
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(major, minor, patch, snapshot);
+    }
+
+    /**
+     * Creates and returns a copy of this {@link AHIVersion}.
+     *
+     * @return a clone of this instance.
      */
     @Override
     public AHIVersion clone() {
-        return new AHIVersion(versionIntArray);
+        return new AHIVersion(major, minor, patch, snapshot);
     }
 
     /**
-     * Represent the version as a string.
+     * Converts the {@link AHIVersion} to a string representation.
      *
-     * @return String representation.
+     * @return a string representation of the version.
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(versionIntArray.length * 2 - 1).append(versionIntArray[0]);
-        for (int i = 1; i < versionIntArray.length; i++) {
-            sb.append(".").append(versionIntArray[i]);
-        }
-        return sb.toString();
+        return major + "." + minor + "." + patch + (snapshot ? "-SNAPSHOT" : "");
     }
 }
