@@ -18,7 +18,6 @@
 
 package com.deathmotion.antihealthindicator;
 
-import com.deathmotion.antihealthindicator.commands.BungeeAHICommand;
 import com.deathmotion.antihealthindicator.schedulers.BungeeScheduler;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -30,19 +29,14 @@ public final class AHIBungee extends Plugin {
         ahi.commonOnInitialize();
 
         ahi.setScheduler(new BungeeScheduler(this));
-
         ahi.commonOnEnable();
 
-        registerCommands();
+        ahi.registerCommands();
         ahi.enableBStats();
     }
 
     @Override
     public void onDisable() {
         ahi.commonOnDisable();
-    }
-
-    private void registerCommands() {
-        new BungeeAHICommand(this);
     }
 }
