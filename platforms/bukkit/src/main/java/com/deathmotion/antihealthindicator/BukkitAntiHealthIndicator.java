@@ -80,6 +80,6 @@ public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
     }
 
     protected void registerCommands() {
-        this.plugin.getCommand("antihealthindicator").setExecutor(new BukkitAHICommand());
+        new BukkitAHICommand(this.plugin);
     }
 }
