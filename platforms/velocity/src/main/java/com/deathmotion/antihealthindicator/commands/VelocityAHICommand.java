@@ -18,17 +18,11 @@
 
 package com.deathmotion.antihealthindicator.commands;
 
-import com.deathmotion.antihealthindicator.data.Constants;
-import com.deathmotion.antihealthindicator.data.SubCommand;
 import com.deathmotion.antihealthindicator.util.CommandComponentCreator;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ProxyServer;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class VelocityAHICommand implements SimpleCommand {
 
@@ -44,31 +38,6 @@ public class VelocityAHICommand implements SimpleCommand {
         String[] args = invocation.arguments();
         CommandSource source = invocation.source();
 
-        if (args.length == 0) {
-            source.sendMessage(CommandComponentCreator.createAHICommandComponent());
-        } else {
-            switch (args[0].toLowerCase()) {
-                case "help":
-                    source.sendMessage(CommandComponentCreator.createHelpComponent());
-                    break;
-                case "discord":
-                    source.sendMessage(CommandComponentCreator.createDiscordComponent());
-                    break;
-                default:
-                    source.sendMessage(CommandComponentCreator.createUnknownSubcommandComponent());
-                    break;
-            }
-        }
-    }
-
-    @Override
-    public List<String> suggest(Invocation invocation) {
-        String[] args = invocation.arguments();
-        if (args.length == 1) {
-            return Constants.SUB_COMMANDS.stream()
-                    .map(SubCommand::getName)
-                    .collect(Collectors.toList());
-        }
-        return Collections.emptyList();
+        source.sendMessage(CommandComponentCreator.createAHICommandComponent());
     }
 }

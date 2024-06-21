@@ -20,19 +20,15 @@ package com.deathmotion.antihealthindicator.util;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.Constants;
-import com.deathmotion.antihealthindicator.data.SubCommand;
+import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-
-import java.util.regex.Pattern;
 
 public class CommandComponentCreator {
 
-    private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)&[0-9A-FK-ORX]|\\u25cf");
     private static String pluginVersion;
 
     private static String getPluginVersion() {
@@ -60,65 +56,8 @@ public class CommandComponentCreator {
                 .build();
     }
 
-    public static Component createHelpComponent() {
-        Component baseComponent = Component.text()
-                .append(createColoredText("\u25cf ", NamedTextColor.BLUE, true))
-                .append(createColoredText("AntiHealthIndicator Help", NamedTextColor.BLUE, true))
-                .append(Component.newline())
-                .append(Component.newline())
-                .append(Component.text("Main Command: ", NamedTextColor.GRAY))
-                .append(Component.newline())
-                .append(Component.text(" - ")
-                        .append(createColoredText("/ahi", NamedTextColor.AQUA, true))
-                        .append(Component.text(" : Main Command (Shows plugin version)")))
-                .append(Component.newline())
-                .append(Component.newline())
-                .append(Component.text("Sub Commands: ", NamedTextColor.GRAY))
-                .append(Component.newline())
-                .build();
-
-        for (SubCommand subCommand : Constants.SUB_COMMANDS) {
-            baseComponent = baseComponent.append(createSubCommandComponent("/" + subCommand.getName(), subCommand.getDescription()));
-        }
-
-        return baseComponent;
-    }
-
-    private static Component createSubCommandComponent(String command, String description) {
-        return Component.text(" - ")
-                .append(createColoredText(command, NamedTextColor.AQUA, true))
-                .append(Component.text(" : " + description))
-                .append(Component.newline());
-    }
-
-    public static Component createDiscordComponent() {
-        return Component.text()
-                .append(createColoredText("\u25cf", NamedTextColor.GREEN, true))
-                .append(createColoredText(" Join the ", NamedTextColor.GRAY, false))
-                .append(createColoredText("AntiHealthIndicator Discord", NamedTextColor.GREEN, true)
-                        .decorate(TextDecoration.UNDERLINED))
-                .append(createColoredText(" server!", NamedTextColor.GRAY, false))
-                .hoverEvent(HoverEvent.showText(createColoredText("Join Discord Server!", NamedTextColor.GREEN, true)
-                        .decorate(TextDecoration.UNDERLINED)))
-                .clickEvent(ClickEvent.openUrl(Constants.DISCORD_URL))
-                .build();
-    }
-
-    public static Component createUnknownSubcommandComponent() {
-        return Component.text()
-                .append(createColoredText("\u25cf", NamedTextColor.RED, true))
-                .append(createColoredText(" Unknown subcommand! Use ", NamedTextColor.GRAY, false))
-                .append(createColoredText("/ahi help", NamedTextColor.RED, true))
-                .append(createColoredText(" for a list of sub commands.", NamedTextColor.GRAY, false))
-                .build();
-    }
-
-    public static String createLegacyMessage(Component component) {
-        return STRIP_COLOR_PATTERN.matcher(LegacyComponentSerializer.legacyAmpersand().serialize(component)).replaceAll("").trim();
-    }
-
-    public static String createLegacyDiscordMessage() {
-        return "Join the AntiHealthIndicator Discord server! Link: " + Constants.DISCORD_URL;
+    public static String createLegacyMessage(Component message) {
+        return LegacyComponentSerializer.legacySection().serialize(message);
     }
 }
 

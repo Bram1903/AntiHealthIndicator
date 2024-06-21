@@ -18,73 +18,33 @@
 
 package com.deathmotion.antihealthindicator.commands;
 
-import com.deathmotion.antihealthindicator.data.Constants;
-import com.deathmotion.antihealthindicator.data.SubCommand;
 import com.deathmotion.antihealthindicator.util.CommandComponentCreator;
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.protocol.player.User;
+import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.api.plugin.TabExecutor;
 
-import java.util.Collections;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
-public class BungeeAHICommand extends Command implements TabExecutor {
+public class BungeeAHICommand extends Command {
 
     public BungeeAHICommand(Plugin plugin) {
         super("AntiHealthIndicator", null, "ahi");
         plugin.getProxy().getPluginManager().registerCommand(plugin, this);
     }
 
-    private void handleCommand(CommandSender sender, Supplier<Component> componentSupplier, Supplier<String> legacyMessageSupplier) {
-        if (sender instanceof ProxiedPlayer) {
-            User user = PacketEvents.getAPI().getPlayerManager().getUser(sender);
-            user.sendMessage(componentSupplier.get());
-        } else {
-            sender.sendMessage(legacyMessageSupplier.get());
-        }
-    }
-
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (args.length == 0) {
-            handleCommand(sender,
-                    CommandComponentCreator::createAHICommandComponent,
-                    () -> CommandComponentCreator.createLegacyMessage(CommandComponentCreator.createAHICommandComponent()));
-        } else {
-            switch (args[0].toLowerCase()) {
-                case "help":
-                    handleCommand(sender,
-                            CommandComponentCreator::createHelpComponent,
-                            () -> CommandComponentCreator.createLegacyMessage(CommandComponentCreator.createHelpComponent()));
-                    break;
-                case "discord":
-                    handleCommand(sender,
-                            CommandComponentCreator::createDiscordComponent,
-                            CommandComponentCreator::createLegacyDiscordMessage);
-                    break;
-                default:
-                    handleCommand(sender,
-                            CommandComponentCreator::createUnknownSubcommandComponent,
-                            () -> CommandComponentCreator.createLegacyMessage(CommandComponentCreator.createUnknownSubcommandComponent()));
-                    break;
-            }
-        }
+        sendMessage(sender, CommandComponentCreator.createAHICommandComponent());
     }
 
-    @Override
-    public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
-        if (args.length == 1) {
-            return Constants.SUB_COMMANDS.stream()
-                    .map(SubCommand::getName)
-                    .collect(Collectors.toList());
+    private void sendMessage(CommandSender sender, Component message) {
+        if (sender instanceof ProxiedPlayer) {
+            PacketEvents.getAPI().getPlayerManager().getUser(sender).sendMessage(message);
+        } else {
+            sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(message));
         }
-        return Collections.emptyList();
     }
 }
 

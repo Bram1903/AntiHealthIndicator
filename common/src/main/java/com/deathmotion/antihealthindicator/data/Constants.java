@@ -18,18 +18,9 @@
 
 package com.deathmotion.antihealthindicator.data;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class Constants {
     public static final String GITHUB_API_URL = "https://api.github.com/repos/Bram1903/AntiHealthIndicator/releases/latest";
     public static final String GITHUB_URL = "https://github.com/Bram1903/AntiHealthIndicator";
-    public static final String DISCORD_URL = "https://ahi.deathmotion.com";
     public static final String SPIGOT_URL = "https://www.spigotmc.org/resources/antihealthindicator.114851/";
-
-    public static final List<SubCommand> SUB_COMMANDS = Arrays.asList(
-            new SubCommand("help", "Shows all available commands"),
-            new SubCommand("discord", "Shows the Discord invite link")
-    );
 }
 
