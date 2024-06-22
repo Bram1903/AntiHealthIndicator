@@ -156,7 +156,7 @@ public class AHIVersion implements Comparable<AHIVersion> {
         int patchCompare = Integer.compare(this.patch, other.patch);
         if (patchCompare != 0) return patchCompare;
 
-        return Boolean.compare(this.snapshot, other.snapshot);
+        return Boolean.compare(other.snapshot, this.snapshot);
     }
 
     /**
