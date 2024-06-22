@@ -62,7 +62,7 @@ tasks {
 
     runServer {
         minecraftVersion(version)
-        runDirectory = file("run/paper/$version")
+        runDirectory = rootDir.resolve("run/paper/$version")
 
         javaLauncher = project.javaToolchains.launcherFor {
             languageVersion = javaVersion
@@ -79,7 +79,7 @@ tasks {
 
     runPaper.folia.registerTask {
         minecraftVersion(version)
-        runDirectory = file("run/folia/$version")
+        runDirectory = rootDir.resolve("run/folia/$version")
 
         javaLauncher = project.javaToolchains.launcherFor {
             languageVersion = javaVersion
@@ -94,7 +94,7 @@ tasks {
 
     runVelocity {
         velocityVersion("3.3.0-SNAPSHOT")
-        runDirectory = file("run/velocity/")
+        runDirectory = rootDir.resolve("run/velocity/")
 
         javaLauncher = project.javaToolchains.launcherFor {
             languageVersion = javaVersion
