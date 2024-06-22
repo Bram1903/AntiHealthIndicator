@@ -23,12 +23,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 /**
  * Represents an AntiHealthIndicator version using Semantic Versioning.
  * Supports version comparison, cloning, and provides a string representation.
+ * Snapshots will always resolve to a newer version than the non-snapshot version if major, minor, and patch are the same.
  */
 public class AHIVersion implements Comparable<AHIVersion> {
+
+    public static final AHIVersion UNKNOWN = new AHIVersion(0, 0, 0);
 
     private final int major;
     private final int minor;
@@ -67,18 +71,20 @@ public class AHIVersion implements Comparable<AHIVersion> {
      * @param version the version string (e.g., "1.8.9-SNAPSHOT").
      * @throws IllegalArgumentException if the version string format is incorrect.
      */
-    public AHIVersion(@NotNull final String version) {
-        this.snapshot = version.endsWith("-SNAPSHOT");
+    public static AHIVersion fromString(@NotNull final String version) {
         String versionWithoutSnapshot = version.replace("-SNAPSHOT", "");
         String[] parts = versionWithoutSnapshot.split("\\.");
 
-        if (parts.length != 3) {
-            throw new IllegalArgumentException("Version string must be in the format 'major.minor.patch[-SNAPSHOT]'");
+        if (parts.length < 2 || parts.length > 3) {
+            throw new IllegalArgumentException("Version string must be in the format 'major.minor[.patch][-SNAPSHOT]' found '" + version + "' instead.");
         }
 
-        this.major = Integer.parseInt(parts[0]);
-        this.minor = Integer.parseInt(parts[1]);
-        this.patch = Integer.parseInt(parts[2]);
+        int major = Integer.parseInt(parts[0]);
+        int minor = Integer.parseInt(parts[1]);
+        int patch = parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
+        boolean snapshot = version.contains("-SNAPSHOT");
+
+        return new AHIVersion(major, minor, patch, snapshot);
     }
 
     /**
@@ -87,8 +93,13 @@ public class AHIVersion implements Comparable<AHIVersion> {
      * @return a {@link AHIVersion} instance.
      */
     public static AHIVersion createFromPackageVersion() {
-        String version = Optional.ofNullable(AHIPlatform.class.getPackage().getImplementationVersion()).orElse("0.0.0");
-        return new AHIVersion(version);
+        Optional<AHIVersion> version = Optional.ofNullable(AHIPlatform.class.getPackage().getImplementationVersion()).map(AHIVersion::fromString);
+        if (!version.isPresent()) {
+            Logger logger = Logger.getLogger(AHIPlatform.class.getName());
+            logger.warning("[antihealthindicator-version] Failed to retrieve the AntiHealthIndicator version from the package implementation version. Are you using a using a custom build?");
+        }
+
+        return version.orElse(UNKNOWN);
     }
 
     /**
@@ -145,7 +156,7 @@ public class AHIVersion implements Comparable<AHIVersion> {
         int patchCompare = Integer.compare(this.patch, other.patch);
         if (patchCompare != 0) return patchCompare;
 
-        return Boolean.compare(other.snapshot, this.snapshot);
+        return Boolean.compare(this.snapshot, other.snapshot);
     }
 
     /**

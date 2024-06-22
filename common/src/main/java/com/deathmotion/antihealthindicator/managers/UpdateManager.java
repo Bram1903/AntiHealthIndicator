@@ -58,7 +58,7 @@ public class UpdateManager<P> {
         platform.getScheduler().runAsyncTask((o) -> {
             try {
                 AHIVersion localVersion = platform.getVersion();
-                AHIVersion newVersion = new AHIVersion(getLatestGitHubVersion());
+                AHIVersion newVersion = AHIVersion.fromString(getLatestGitHubVersion());
 
                 compareVersions(localVersion, newVersion);
             } catch (Exception ex) {
