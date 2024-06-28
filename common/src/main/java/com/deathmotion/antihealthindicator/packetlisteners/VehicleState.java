@@ -122,7 +122,7 @@ public class VehicleState<P> extends PacketListenerAbstract {
                 if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
             }
 
-            List<EntityData> metadata = Collections.singletonList(new EntityData(MetadataIndex.HEALTH, EntityDataTypes.FLOAT, healthValue));
+            List<EntityData> metadata = Collections.singletonList(new EntityData(new MetadataIndex(user.getClientVersion()).HEALTH, EntityDataTypes.FLOAT, healthValue));
             user.sendPacketSilently(new WrapperPlayServerEntityMetadata(vehicleId, metadata));
         });
     }

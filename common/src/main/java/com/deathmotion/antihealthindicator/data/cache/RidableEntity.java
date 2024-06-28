@@ -32,7 +32,7 @@ public class RidableEntity extends CachedEntity {
 
     @Override
     public void processMetaData(EntityData metaData, User user) {
-        if (metaData.getIndex() == MetadataIndex.HEALTH) {
+        if (metaData.getIndex() == new MetadataIndex(user.getClientVersion()).HEALTH) {
             setHealth((float) metaData.getValue());
         }
     }

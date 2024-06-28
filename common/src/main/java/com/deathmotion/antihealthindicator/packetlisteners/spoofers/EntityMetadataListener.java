@@ -84,7 +84,9 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         EntityType entityType = cachedEntity.getEntityType();
         if (shouldIgnoreEntity(entityType, user, entityId, cachedEntity)) return;
 
-        packet.getEntityMetadata().forEach(entityData -> handleEntityMetadata(entityType, entityData));
+        MetadataIndex metadataIndex = new MetadataIndex(user.getClientVersion());
+        packet.getEntityMetadata().forEach(entityData -> handleEntityMetadata(entityType, entityData, metadataIndex));
+
         event.markForReEncode(true);
     }
 
@@ -108,47 +110,47 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
                 (settings.getEntityData().getWolves().isOwner() && wolfEntityData.isOwnerPresent() && wolfEntityData.getOwnerUUID().equals(user.getUUID()));
     }
 
-    private void handleEntityMetadata(EntityType entityType, EntityData entityData) {
+    private void handleEntityMetadata(EntityType entityType, EntityData entityData, MetadataIndex metadataIndex) {
         if (entityType == EntityTypes.IRON_GOLEM && settings.getEntityData().getIronGolems().isEnabled()) {
             if (!settings.getEntityData().getIronGolems().isGradual() || !healthTexturesSupported) {
-                spoofEntityMetadata(entityData);
+                spoofEntityMetadata(entityData, metadataIndex);
             } else {
-                spoofIronGolemMetadata(entityData);
+                spoofIronGolemMetadata(entityData, metadataIndex);
             }
         } else {
-            spoofEntityMetadata(entityData);
+            spoofEntityMetadata(entityData, metadataIndex);
             if (entityType == EntityTypes.PLAYER) {
-                spoofPlayerMetadata(entityData);
+                spoofPlayerMetadata(entityData, metadataIndex);
             }
         }
     }
 
-    private void spoofIronGolemMetadata(EntityData entityData) {
-        if (entityData.getIndex() == MetadataIndex.AIR_TICKS && settings.getEntityData().isAirTicks()) {
+    private void spoofIronGolemMetadata(EntityData entityData, MetadataIndex metadataIndex) {
+        if (entityData.getIndex() == metadataIndex.AIR_TICKS && settings.getEntityData().isAirTicks()) {
             setDynamicValue(entityData, 1);
         }
-        if (entityData.getIndex() == MetadataIndex.HEALTH && settings.getEntityData().isHealth()) {
+        if (entityData.getIndex() == metadataIndex.HEALTH && settings.getEntityData().isHealth()) {
             float health = (float) entityData.getValue();
             entityData.setValue(health > 74 ? 100f : health > 49 ? 74f : health > 24 ? 49f : 24f);
         }
     }
 
-    private void spoofEntityMetadata(EntityData entityData) {
-        if (entityData.getIndex() == MetadataIndex.AIR_TICKS && settings.getEntityData().isAirTicks()) {
+    private void spoofEntityMetadata(EntityData entityData, MetadataIndex metadataIndex) {
+        if (entityData.getIndex() == metadataIndex.AIR_TICKS && settings.getEntityData().isAirTicks()) {
             setDynamicValue(entityData, 1);
         }
-        if (entityData.getIndex() == MetadataIndex.HEALTH && settings.getEntityData().isHealth()) {
+        if (entityData.getIndex() == metadataIndex.HEALTH && settings.getEntityData().isHealth()) {
             if (((Float) entityData.getValue()) > 0) {
                 entityData.setValue(0.5f);
             }
         }
     }
 
-    private void spoofPlayerMetadata(EntityData entityData) {
-        if (entityData.getIndex() == MetadataIndex.ABSORPTION && settings.getEntityData().isAbsorption()) {
+    private void spoofPlayerMetadata(EntityData entityData, MetadataIndex metadataIndex) {
+        if (entityData.getIndex() == metadataIndex.ABSORPTION && settings.getEntityData().isAbsorption()) {
             setDynamicValue(entityData, 0);
         }
-        if (entityData.getIndex() == MetadataIndex.XP && settings.getEntityData().isXp()) {
+        if (entityData.getIndex() == metadataIndex.XP && settings.getEntityData().isXp()) {
             setDynamicValue(entityData, 0);
         }
     }

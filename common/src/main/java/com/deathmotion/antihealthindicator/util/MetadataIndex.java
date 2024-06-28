@@ -18,85 +18,32 @@
 
 package com.deathmotion.antihealthindicator.util;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 
-/**
- * This class holds the indexes of different entity metadata elements like health, absorption and air ticks,
- * the values of which might vary based on the server version.
- */
 public class MetadataIndex {
 
-    public static final int AIR_TICKS;
+    public final int AIR_TICKS;
+    public final int HEALTH;
+    public final int ABSORPTION;
+    public final int XP;
+    public final int TAMABLE_TAMED;
+    public final int TAMABLE_OWNER;
 
-    public static final int HEALTH;
-
-    public static final int ABSORPTION;
-
-    public static final int XP;
-
-    public static final int TAMABLE_TAMED;
-
-    public static final int TAMABLE_OWNER;
-
-    static {
-        ServerVersion serverVersion = PacketEvents.getAPI().getServerManager().getVersion();
-
+    public MetadataIndex(ClientVersion version) {
         AIR_TICKS = 1;
+        HEALTH = getIndex(version, new int[]{6, 7, 8, 9}, ClientVersion.V_1_17, ClientVersion.V_1_14, ClientVersion.V_1_10);
+        ABSORPTION = getIndex(version, new int[]{17, 10, 11, 13, 14, 15}, ClientVersion.V_1_17, ClientVersion.V_1_15, ClientVersion.V_1_14, ClientVersion.V_1_10, ClientVersion.V_1_9);
+        XP = getIndex(version, new int[]{18, 11, 12, 14, 15, 16}, ClientVersion.V_1_17, ClientVersion.V_1_15, ClientVersion.V_1_14, ClientVersion.V_1_10, ClientVersion.V_1_9);
+        TAMABLE_TAMED = getIndex(version, new int[]{16, 13, 15, 16, 17}, ClientVersion.V_1_17, ClientVersion.V_1_15, ClientVersion.V_1_14, ClientVersion.V_1_12);
+        TAMABLE_OWNER = getIndex(version, new int[]{17, 14, 16, 17, 18}, ClientVersion.V_1_17, ClientVersion.V_1_15, ClientVersion.V_1_14, ClientVersion.V_1_12);
+    }
 
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            HEALTH = 9;
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            HEALTH = 8;
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
-            HEALTH = 7;
-        } else {
-            HEALTH = 6;
+    private int getIndex(ClientVersion version, int[] indices, ClientVersion... versions) {
+        for (int i = 0; i < versions.length; i++) {
+            if (version.isNewerThanOrEquals(versions[i])) {
+                return indices[i];
+            }
         }
-
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            ABSORPTION = 15;
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
-            ABSORPTION = 14;
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            ABSORPTION = 13;
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
-            ABSORPTION = 11;
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            ABSORPTION = 10;
-        } else {
-            ABSORPTION = 17;
-        }
-
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            XP = 16;
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
-            XP = 15;
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            XP = 14;
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_10)) {
-            XP = 12;
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_9)) {
-            XP = 11;
-        } else {
-            XP = 18;
-        }
-
-        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_17)) {
-            TAMABLE_TAMED = 17;
-            TAMABLE_OWNER = 18;
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_15)) {
-            TAMABLE_TAMED = 16;
-            TAMABLE_OWNER = 17;
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_14)) {
-            TAMABLE_TAMED = 15;
-            TAMABLE_OWNER = 16;
-        } else if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_12)) {
-            TAMABLE_TAMED = 13;
-            TAMABLE_OWNER = 14;
-        } else {
-            TAMABLE_TAMED = 16;
-            TAMABLE_OWNER = 17;
-        }
+        return indices[0];
     }
 }

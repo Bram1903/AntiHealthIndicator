@@ -47,10 +47,11 @@ public class WolfEntity extends CachedEntity {
     @Override
     public void processMetaData(EntityData metaData, User user) {
         int index = metaData.getIndex();
+        MetadataIndex metadataIndex = new MetadataIndex(user.getClientVersion());
 
-        if (index == MetadataIndex.TAMABLE_TAMED) {
+        if (index == metadataIndex.TAMABLE_TAMED) {
             setTamed(((Byte) metaData.getValue() & 0x04) != 0);
-        } else if (index == MetadataIndex.TAMABLE_OWNER) {
+        } else if (index == metadataIndex.TAMABLE_OWNER) {
             Object value = metaData.getValue();
 
             UUID ownerUUID = value instanceof String
