@@ -14,5 +14,5 @@ permissions:
   AntiHealthIndicator.Debug:
     description: "This permission allows players to see debug messages."
     default: op
-depend:
+depends:
   - packetevents
