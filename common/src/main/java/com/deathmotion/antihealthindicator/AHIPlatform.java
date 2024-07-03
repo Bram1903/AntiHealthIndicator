@@ -88,6 +88,8 @@ public abstract class AHIPlatform<P> {
      */
     public abstract boolean hasPermission(UUID sender, String permission);
 
+    public abstract void sendConsoleMessage(Component message);
+
     /**
      * Gets the plugin directory.
      *

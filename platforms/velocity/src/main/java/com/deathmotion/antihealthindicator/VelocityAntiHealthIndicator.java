@@ -23,6 +23,7 @@ import com.google.inject.Inject;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import net.kyori.adventure.text.Component;
 
 import java.nio.file.Path;
 import java.util.UUID;
@@ -58,6 +59,11 @@ public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
         if (player == null) return false;
 
         return player.hasPermission(permission);
+    }
+
+    @Override
+    public void sendConsoleMessage(Component message) {
+        proxy.sendMessage(message);
     }
 
     @Override

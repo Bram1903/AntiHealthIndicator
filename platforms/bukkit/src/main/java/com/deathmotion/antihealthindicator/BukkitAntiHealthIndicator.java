@@ -21,8 +21,10 @@ package com.deathmotion.antihealthindicator;
 import com.deathmotion.antihealthindicator.commands.BukkitAHICommand;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.deathmotion.antihealthindicator.managers.LogManager;
+import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -33,9 +35,30 @@ import java.util.UUID;
 public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
 
     private final JavaPlugin plugin;
+    private final boolean useAdventure;
 
     public BukkitAntiHealthIndicator(JavaPlugin plugin) {
         this.plugin = plugin;
+
+        useAdventure = checkAdventureCompatibility();
+    }
+
+    private static boolean checkAdventureCompatibility() {
+        try {
+            Class.forName("io.papermc.paper.adventure.PaperAdventure");
+            return true;
+        } catch (ClassNotFoundException e) {
+            // ignored exception
+        }
+
+        try {
+            Class.forName("net.kyori.adventure.platform.bukkit.BukkitAudience");
+            return true;
+        } catch (ClassNotFoundException e) {
+            // ignored exception
+        }
+
+        return false;
     }
 
     @Override
@@ -62,6 +85,15 @@ public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
         if (commandSender == null) return false;
 
         return commandSender.hasPermission(permission);
+    }
+
+    @Override
+    public void sendConsoleMessage(Component message) {
+        if (useAdventure) {
+            Bukkit.getConsoleSender().sendMessage(message);
+        } else {
+            Bukkit.getConsoleSender().sendMessage(LegacyComponentSerializer.legacySection().serialize(message));
+        }
     }
 
     @Override

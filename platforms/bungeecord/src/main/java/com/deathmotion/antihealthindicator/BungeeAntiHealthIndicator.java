@@ -20,8 +20,10 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.commands.BungeeAHICommand;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
+import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -57,6 +59,11 @@ public class BungeeAntiHealthIndicator extends AHIPlatform<Plugin> {
         if (player == null) return false;
 
         return player.hasPermission(permission);
+    }
+
+    @Override
+    public void sendConsoleMessage(Component message) {
+        ProxyServer.getInstance().getConsole().sendMessage(LegacyComponentSerializer.legacySection().serialize(message));
     }
 
     @Override

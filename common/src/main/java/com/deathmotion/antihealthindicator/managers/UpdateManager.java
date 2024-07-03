@@ -24,9 +24,9 @@ import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.packetlisteners.UpdateNotifier;
 import com.deathmotion.antihealthindicator.util.AHIVersion;
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.util.ColorUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.io.BufferedReader;
@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.concurrent.CompletableFuture;
 
 public class UpdateManager<P> {
     private final AHIPlatform<P> platform;
@@ -45,29 +46,29 @@ public class UpdateManager<P> {
         this.settings = platform.getConfigManager().getSettings();
         this.logManager = platform.getLogManager();
 
-        initializeUpdateCheck();
-    }
-
-    private void initializeUpdateCheck() {
-        if (!settings.getUpdateChecker().isEnabled()) return;
-
-        checkForUpdate();
+        if (settings.getUpdateChecker().isEnabled()) {
+            checkForUpdate();
+        }
     }
 
     public void checkForUpdate() {
-        platform.getScheduler().runAsyncTask((o) -> {
+        CompletableFuture.runAsync(() -> {
             try {
                 AHIVersion localVersion = platform.getVersion();
-                AHIVersion newVersion = AHIVersion.fromString(getLatestGitHubVersion());
+                AHIVersion latestVersion = fetchLatestGitHubVersion();
 
-                compareVersions(localVersion, newVersion);
+                if (latestVersion != null) {
+                    handleVersionComparison(localVersion, latestVersion);
+                } else {
+                    logManager.warn("Unable to fetch the latest version from GitHub.");
+                }
             } catch (Exception ex) {
-                logManager.warn("Failed to check for updates. " + (ex.getCause() != null ? ex.getCause().getClass().getName() + ": " + ex.getCause().getMessage() : ex.getMessage()));
+                logManager.warn("Failed to check for updates: " + ex.getMessage());
             }
         });
     }
 
-    private String getLatestGitHubVersion() {
+    private AHIVersion fetchLatestGitHubVersion() {
         try {
             URLConnection connection = new URL(Constants.GITHUB_API_URL).openConnection();
             connection.addRequestProperty("User-Agent", "Mozilla/4.0");
@@ -75,39 +76,43 @@ public class UpdateManager<P> {
             String jsonResponse = reader.readLine();
             reader.close();
             JsonObject jsonObject = new Gson().fromJson(jsonResponse, JsonObject.class);
-
-            return jsonObject.get("tag_name").getAsString().replaceFirst("^[vV]", "");
+            return AHIVersion.fromString(jsonObject.get("tag_name").getAsString().replaceFirst("^[vV]", ""));
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to parse AntiHealthIndicator version!", e);
+            logManager.warn("Failed to parse AntiHealthIndicator version! Version API: " + e.getMessage());
+            return null;
         }
     }
 
-    private void compareVersions(AHIVersion localVersion, AHIVersion newVersion) {
-        if (localVersion.isOlderThan(newVersion)) {
-            if (settings.getUpdateChecker().isPrintToConsole()) {
-                logManager.warn("There is an update available for AntiHealthIndicator! Your build: ("
-                        + ColorUtil.toString(NamedTextColor.YELLOW) + localVersion
-                        + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest released build: ("
-                        + ColorUtil.toString(NamedTextColor.GREEN) + newVersion
-                        + ColorUtil.toString(NamedTextColor.WHITE) + ")");
-            }
-            if (settings.getUpdateChecker().isNotifyInGame()) {
-                PacketEvents.getAPI().getEventManager().registerListener(new UpdateNotifier<>(platform, newVersion));
-            }
-        } else if (localVersion.isNewerThan(newVersion)) {
-            if (settings.getUpdateChecker().isPrintToConsole()) {
-                logManager.info("You are on a dev or pre released build of AntiHealthIndicator. Your build: ("
-                        + ColorUtil.toString(NamedTextColor.AQUA) + localVersion
-                        + ColorUtil.toString(NamedTextColor.WHITE) + ") | Latest released build: ("
-                        + ColorUtil.toString(NamedTextColor.DARK_AQUA) + newVersion
-                        + ColorUtil.toString(NamedTextColor.WHITE) + ")");
-            }
-        } else if (localVersion.equals(newVersion)) {
-            return;
-        } else {
-            if (settings.getUpdateChecker().isPrintToConsole()) {
-                logManager.warn("Failed to check for updates. Your build: (" + localVersion + ")");
-            }
+    private void handleVersionComparison(AHIVersion localVersion, AHIVersion latestVersion) {
+        if (localVersion.isOlderThan(latestVersion)) {
+            notifyUpdateAvailable(localVersion, latestVersion);
+        } else if (localVersion.isNewerThan(latestVersion)) {
+            notifyOnDevBuild(localVersion, latestVersion);
+        }
+    }
+
+    private void notifyUpdateAvailable(AHIVersion currentVersion, AHIVersion newVersion) {
+        if (settings.getUpdateChecker().isPrintToConsole()) {
+            platform.sendConsoleMessage(Component.text("[AntiHealthIndicator] ", NamedTextColor.BLUE)
+                    .append(Component.text("Update available! ", NamedTextColor.BLUE))
+                    .append(Component.text("Current version: ", NamedTextColor.WHITE))
+                    .append(Component.text(currentVersion.toString(), NamedTextColor.GOLD))
+                    .append(Component.text(" | New version: ", NamedTextColor.WHITE))
+                    .append(Component.text(newVersion.toString(), NamedTextColor.DARK_PURPLE)));
+        }
+        if (settings.getUpdateChecker().isNotifyInGame()) {
+            PacketEvents.getAPI().getEventManager().registerListener(new UpdateNotifier<>(platform, newVersion));
+        }
+    }
+
+    private void notifyOnDevBuild(AHIVersion currentVersion, AHIVersion newVersion) {
+        if (settings.getUpdateChecker().isPrintToConsole()) {
+            platform.sendConsoleMessage(Component.text("[AntiHealthIndicator] ", NamedTextColor.BLUE)
+                    .append(Component.text("Development build detected. ", NamedTextColor.WHITE))
+                    .append(Component.text("Current version: ", NamedTextColor.WHITE))
+                    .append(Component.text(currentVersion.toString(), NamedTextColor.AQUA))
+                    .append(Component.text(" | Latest stable version: ", NamedTextColor.WHITE))
+                    .append(Component.text(newVersion.toString(), NamedTextColor.DARK_AQUA)));
         }
     }
 }
