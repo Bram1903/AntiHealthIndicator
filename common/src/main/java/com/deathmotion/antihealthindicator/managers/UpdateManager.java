@@ -93,7 +93,7 @@ public class UpdateManager<P> {
 
     private void notifyUpdateAvailable(AHIVersion currentVersion, AHIVersion newVersion) {
         if (settings.getUpdateChecker().isPrintToConsole()) {
-            platform.sendConsoleMessage(Component.text("[AntiHealthIndicator] ", NamedTextColor.BLUE)
+            platform.sendConsoleMessage(Component.text("[AntiHealthIndicator] ", NamedTextColor.DARK_GREEN)
                     .append(Component.text("Update available! ", NamedTextColor.BLUE))
                     .append(Component.text("Current version: ", NamedTextColor.WHITE))
                     .append(Component.text(currentVersion.toString(), NamedTextColor.GOLD))
@@ -107,7 +107,7 @@ public class UpdateManager<P> {
 
     private void notifyOnDevBuild(AHIVersion currentVersion, AHIVersion newVersion) {
         if (settings.getUpdateChecker().isPrintToConsole()) {
-            platform.sendConsoleMessage(Component.text("[AntiHealthIndicator] ", NamedTextColor.BLUE)
+            platform.sendConsoleMessage(Component.text("[AntiHealthIndicator] ", NamedTextColor.DARK_GREEN)
                     .append(Component.text("Development build detected. ", NamedTextColor.WHITE))
                     .append(Component.text("Current version: ", NamedTextColor.WHITE))
                     .append(Component.text(currentVersion.toString(), NamedTextColor.AQUA))
