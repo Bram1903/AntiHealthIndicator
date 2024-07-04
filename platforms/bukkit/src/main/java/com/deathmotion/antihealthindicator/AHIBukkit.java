@@ -20,7 +20,6 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.schedulers.BukkitScheduler;
 import com.deathmotion.antihealthindicator.schedulers.FoliaScheduler;
-import com.deathmotion.antihealthindicator.util.BukkitLogManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class AHIBukkit extends JavaPlugin {
@@ -44,8 +43,6 @@ public class AHIBukkit extends JavaPlugin {
         ahi.commonOnInitialize();
 
         ahi.setScheduler(isFolia() ? new FoliaScheduler(this) : new BukkitScheduler(this));
-
-        ahi.setLogManager(new BukkitLogManager(this));
 
         ahi.commonOnEnable();
         ahi.registerCommands();
