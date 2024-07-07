@@ -19,20 +19,10 @@
 package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.schedulers.BukkitScheduler;
-import com.deathmotion.antihealthindicator.schedulers.FoliaScheduler;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class AHIBukkit extends JavaPlugin {
     private final BukkitAntiHealthIndicator ahi = new BukkitAntiHealthIndicator(this);
-
-    private static boolean isFolia() {
-        try {
-            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
 
     public BukkitAntiHealthIndicator getAhi() {
         return this.ahi;
@@ -42,7 +32,7 @@ public class AHIBukkit extends JavaPlugin {
     public void onEnable() {
         ahi.commonOnInitialize();
 
-        ahi.setScheduler(isFolia() ? new FoliaScheduler(this) : new BukkitScheduler(this));
+        ahi.setScheduler(new BukkitScheduler(this));
 
         ahi.commonOnEnable();
         ahi.registerCommands();
