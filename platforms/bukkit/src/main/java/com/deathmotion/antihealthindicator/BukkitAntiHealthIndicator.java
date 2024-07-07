@@ -20,7 +20,6 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.commands.BukkitAHICommand;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
-import com.deathmotion.antihealthindicator.managers.LogManager;
 import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import io.github.retrooper.packetevents.bstats.Metrics;
 import lombok.Getter;
@@ -73,10 +72,6 @@ public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
 
     protected void setScheduler(Scheduler scheduler) {
         this.scheduler = scheduler;
-    }
-
-    protected void setLogManager(LogManager<JavaPlugin> logManager) {
-        this.logManager = logManager;
     }
 
     @Override
