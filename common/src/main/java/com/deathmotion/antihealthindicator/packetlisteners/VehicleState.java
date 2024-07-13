@@ -19,13 +19,16 @@
 package com.deathmotion.antihealthindicator.packetlisteners;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.deathmotion.antihealthindicator.data.RidableEntities;
 import com.deathmotion.antihealthindicator.data.Settings;
+import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -35,6 +38,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSe
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Listens for VehicleState events and manages the caching of various entity state details.
@@ -79,6 +83,7 @@ public class VehicleState<P> extends PacketListenerAbstract {
     private void handleSetPassengers(WrapperPlayServerSetPassengers packet, User user) {
         int entityId = packet.getEntityId();
         if (entityId == user.getEntityId()) return;
+        if (!validVehicle(user.getUUID(), entityId)) return;
 
         int[] passengers = packet.getPassengers();
 
@@ -98,6 +103,7 @@ public class VehicleState<P> extends PacketListenerAbstract {
     private void handleAttachEntity(WrapperPlayServerAttachEntity packet, User user) {
         int entityId = packet.getHoldingId();
         if (entityId == user.getEntityId()) return;
+        if (!validVehicle(user.getUUID(), entityId)) return;
 
         int passengerId = packet.getAttachedId();
 
@@ -114,6 +120,14 @@ public class VehicleState<P> extends PacketListenerAbstract {
                 handlePassengerEvent(user, reversedEntityId, 0.5F, false);
             }
         }
+    }
+
+    private boolean validVehicle(UUID user, int entityId) {
+        CachedEntity cachedEntity = cacheManager.getCachedEntity(user, entityId).orElse(null);
+        if (cachedEntity == null) return false;
+
+        EntityType entityType = cachedEntity.getEntityType();
+        return RidableEntities.isRideable(entityType);
     }
 
     private void handlePassengerEvent(User user, int vehicleId, float healthValue, boolean entering) {
