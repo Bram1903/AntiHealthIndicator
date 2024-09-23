@@ -22,7 +22,6 @@ import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
-import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import lombok.Getter;
 import lombok.NonNull;
 import net.kyori.adventure.text.Component;
@@ -41,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  * @param <P> The platform type.
  */
 @Getter
-public class CacheManager<P> extends SimplePacketListenerAbstract {
+public class CacheManager<P> {
     private final ConcurrentHashMap<UUID, ConcurrentHashMap<Integer, CachedEntity>> cache;
 
     private final AHIPlatform<P> platform;

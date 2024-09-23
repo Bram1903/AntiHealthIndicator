@@ -88,6 +88,11 @@ public abstract class AHIPlatform<P> {
      */
     public abstract boolean hasPermission(UUID sender, String permission);
 
+    /**
+     * Sends a console message.
+     *
+     * @param message The message to send.
+     */
     public abstract void sendConsoleMessage(Component message);
 
     /**
