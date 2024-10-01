@@ -31,22 +31,41 @@ public class ScoreboardListener<P> extends PacketListenerAbstract {
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType().equals(PacketType.Play.Server.SCOREBOARD_OBJECTIVE)) {
-            WrapperPlayServerScoreboardObjective packet = new WrapperPlayServerScoreboardObjective(event);
-            WrapperPlayServerScoreboardObjective.RenderType renderType = packet.getRenderType();
-
-            if (renderType == WrapperPlayServerScoreboardObjective.RenderType.HEARTS) {
-                healthObjectives.add(packet.getName());
-            }
+            handleScoreboardObjective(event);
         }
 
         if (event.getPacketType().equals(PacketType.Play.Server.UPDATE_SCORE)) {
-            WrapperPlayServerUpdateScore packet = new WrapperPlayServerUpdateScore(event);
+            handleUpdateScore(event);
+        }
+    }
 
-            // Check if the value is present and then compare
-            if (healthObjectives.contains(packet.getObjectiveName()) && packet.getValue().isPresent()) {
-                packet.setValue(Optional.of(-1));
-                event.markForReEncode(true);
+    private void handleScoreboardObjective(PacketSendEvent event) {
+        WrapperPlayServerScoreboardObjective packet = new WrapperPlayServerScoreboardObjective(event);
+        WrapperPlayServerScoreboardObjective.ObjectiveMode mode = packet.getMode();
+        String objectiveName = packet.getName();
+
+        if (mode == WrapperPlayServerScoreboardObjective.ObjectiveMode.REMOVE) {
+            healthObjectives.remove(objectiveName);
+            return;
+        }
+
+        boolean isHeartsRenderType = packet.getRenderType() == WrapperPlayServerScoreboardObjective.RenderType.HEARTS;
+
+        if (mode == WrapperPlayServerScoreboardObjective.ObjectiveMode.UPDATE || isHeartsRenderType) {
+            if (isHeartsRenderType) {
+                healthObjectives.add(objectiveName);
+            } else {
+                healthObjectives.remove(objectiveName);
             }
+        }
+    }
+
+    private void handleUpdateScore(PacketSendEvent event) {
+        WrapperPlayServerUpdateScore packet = new WrapperPlayServerUpdateScore(event);
+
+        if (healthObjectives.contains(packet.getObjectiveName()) && packet.getValue().isPresent()) {
+            packet.setValue(Optional.of(-1));
+            event.markForReEncode(true);
         }
     }
 }
