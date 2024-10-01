@@ -22,10 +22,7 @@ import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.packetlisteners.EntityTracker;
 import com.deathmotion.antihealthindicator.packetlisteners.VehicleState;
-import com.deathmotion.antihealthindicator.packetlisteners.spoofers.EntityEquipmentListener;
-import com.deathmotion.antihealthindicator.packetlisteners.spoofers.EntityMetadataListener;
-import com.deathmotion.antihealthindicator.packetlisteners.spoofers.PlayerUpdateHealthListener;
-import com.deathmotion.antihealthindicator.packetlisteners.spoofers.WorldSeedListener;
+import com.deathmotion.antihealthindicator.packetlisteners.spoofers.*;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 
@@ -66,6 +63,7 @@ public class PacketManager<P> {
         if (settings.getEntityData().isEnabled()) {
             PacketEvents.getAPI().getEventManager().registerListener(new EntityTracker<>(platform), PacketListenerPriority.LOW);
             PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener<>(platform));
+            PacketEvents.getAPI().getEventManager().registerListener(new ScoreboardListener<>(platform));
 
             if (!settings.getEntityData().isPlayersOnly()) {
                 PacketEvents.getAPI().getEventManager().registerListener(new VehicleState<>(platform));

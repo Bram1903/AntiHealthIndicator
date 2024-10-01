@@ -1,6 +1,6 @@
 [versions]
 adventure = "4.16.0"
-packetevents = "2.4.1-SNAPSHOT"
+packetevents = "2.5.1-SNAPSHOT"
 paper = "1.21-R0.1-SNAPSHOT"
 velocity = "3.3.0-SNAPSHOT"
 bungeecord = "1.21-R0.1-SNAPSHOT"

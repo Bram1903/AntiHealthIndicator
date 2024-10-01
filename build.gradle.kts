@@ -47,7 +47,7 @@ tasks {
     // 1.17           = Java 16
     // 1.18 - 1.20.4  = Java 17
     // 1-20.5+        = Java 21
-    val version = "1.21"
+    val version = "1.21.1"
     val javaVersion = JavaLanguageVersion.of(21)
 
     val jvmArgsExternal = listOf(
@@ -55,9 +55,9 @@ tasks {
     )
 
     val sharedBukkitPlugins = runPaper.downloadPluginsSpec {
-        url("https://ci.codemc.io/job/retrooper/job/packetevents/lastSuccessfulBuild/artifact/spigot/build/libs/packetevents-spigot-2.4.1-SNAPSHOT.jar")
-        url("https://github.com/ViaVersion/ViaVersion/releases/download/5.0.1/ViaVersion-5.0.1.jar")
-        url("https://github.com/ViaVersion/ViaBackwards/releases/download/5.0.1/ViaBackwards-5.0.1.jar")
+        url("https://ci.codemc.io/job/retrooper/job/packetevents/lastSuccessfulBuild/artifact/spigot/build/libs/packetevents-spigot-2.5.1-SNAPSHOT.jar")
+        url("https://github.com/ViaVersion/ViaVersion/releases/download/5.0.3/ViaVersion-5.0.3.jar")
+        url("https://github.com/ViaVersion/ViaBackwards/releases/download/5.0.3/ViaBackwards-5.0.3.jar")
     }
 
     runServer {
@@ -70,8 +70,8 @@ tasks {
 
         downloadPlugins {
             from(sharedBukkitPlugins)
-            url("https://ci.lucko.me/job/spark/418/artifact/spark-bukkit/build/libs/spark-1.10.73-bukkit.jar")
-            url("https://download.luckperms.net/1549/bukkit/loader/LuckPerms-Bukkit-5.4.134.jar")
+            url("https://ci.lucko.me/job/spark/456/artifact/spark-bukkit/build/libs/spark-1.10.110-bukkit.jar")
+            url("https://download.luckperms.net/1556/bukkit/loader/LuckPerms-Bukkit-5.4.141.jar")
         }
 
         jvmArgs = jvmArgsExternal
