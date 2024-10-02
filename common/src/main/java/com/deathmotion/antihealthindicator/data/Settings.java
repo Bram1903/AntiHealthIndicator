@@ -30,6 +30,7 @@ public class Settings {
     private boolean AllowBypass = false;
     private boolean WorldSeed = false;
     private boolean FoodSaturation = true;
+    private boolean TeamScoreboard = true;
     private EntityData EntityData = new EntityData();
     private Items Items = new Items();
 

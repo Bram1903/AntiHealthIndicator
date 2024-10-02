@@ -36,6 +36,12 @@ spoof:
   food-saturation:
     enabled: true
 
+  # Prevents the health of team members from being sent to the players due to being on the same team.
+  # Some bad plugins use minecraft teams to color names, etc. and this can be used to determine health.
+  # If this causes issues with other plugins that use teams, you can disable this.
+  team-scoreboard:
+    enabled: true
+
   # These options determine what entity data should be spoofed.
   entity-data:
     # If disabled, none of the following settings will have any effect.

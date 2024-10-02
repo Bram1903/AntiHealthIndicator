@@ -63,7 +63,6 @@ public class PacketManager<P> {
         if (settings.getEntityData().isEnabled()) {
             PacketEvents.getAPI().getEventManager().registerListener(new EntityTracker<>(platform), PacketListenerPriority.LOW);
             PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener<>(platform));
-            PacketEvents.getAPI().getEventManager().registerListener(new ScoreboardListener<>(platform));
 
             if (!settings.getEntityData().isPlayersOnly()) {
                 PacketEvents.getAPI().getEventManager().registerListener(new VehicleState<>(platform));
@@ -83,6 +82,9 @@ public class PacketManager<P> {
         }
         if (settings.isWorldSeed()) {
             PacketEvents.getAPI().getEventManager().registerListener(new WorldSeedListener<>(platform));
+        }
+        if (settings.isTeamScoreboard()) {
+            PacketEvents.getAPI().getEventManager().registerListener(new ScoreboardListener<>(platform));
         }
     }
 }

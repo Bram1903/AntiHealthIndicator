@@ -83,7 +83,6 @@ public class ConfigManager<P> {
         }
     }
 
-
     private void setConfigOptions(Map<String, Object> yamlData, Settings settings) {
         settings.setDebug(getBoolean(yamlData, "debug.enabled", false));
         settings.getUpdateChecker().setEnabled(getBoolean(yamlData, "update-checker.enabled", true));
@@ -92,6 +91,7 @@ public class ConfigManager<P> {
         settings.setAllowBypass(getBoolean(yamlData, "allow-bypass.enabled", false));
         settings.setWorldSeed(getBoolean(yamlData, "spoof.world-seed.enabled", false));
         settings.setFoodSaturation(getBoolean(yamlData, "spoof.food-saturation.enabled", true));
+        settings.setTeamScoreboard(getBoolean(yamlData, "spoof.team-scoreboard.enabled", true));
 
         setEntityDataOptions(yamlData, settings);
         setItemOptions(yamlData, settings);
