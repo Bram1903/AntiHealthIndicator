@@ -65,7 +65,7 @@ The plugin includes various spoofing features:
 
 ## Commands
 
-- `/antihealthindicator` or `/ahi` - Displays the plugin version.
+- `/antihealthindicator` or `/ahi` - Main plugin command.
 
 ## Permission Nodes
 
@@ -73,6 +73,7 @@ Operators (OPs) have these permissions by default:
 
 - `AntiHealthIndicator.Notify` - Notifies player of updates.
 - `AntiHealthIndicator.Bypass` - Prevents receiving spoofed data (if enabled in config).
+- `AntiHealthIndicator.Reload` - Grants access to the `/antihealthindicator reload` command.
 - `AntiHealthIndicator.Debug` - Receives debug messages if debugging is enabled.
 
 ## Installation
