@@ -83,6 +83,10 @@ public class ConfigManager<P> {
         }
     }
 
+    public void reloadConfig() {
+        loadConfig();
+    }
+
     private void setConfigOptions(Map<String, Object> yamlData, Settings settings) {
         settings.setDebug(getBoolean(yamlData, "debug.enabled", false));
         settings.getUpdateChecker().setEnabled(getBoolean(yamlData, "update-checker.enabled", true));

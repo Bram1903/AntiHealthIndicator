@@ -20,6 +20,7 @@ package com.deathmotion.antihealthindicator.commands;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.commands.antihealthindicator.InfoCommand;
+import com.deathmotion.antihealthindicator.commands.antihealthindicator.ReloadCommand;
 import com.deathmotion.antihealthindicator.data.CommonUser;
 import com.deathmotion.antihealthindicator.util.CommandComponentCreator;
 import net.kyori.adventure.text.Component;
@@ -40,6 +41,8 @@ public class AntiHealthIndicatorCommand<P> implements IGlobalCommand<P> {
 
     public AntiHealthIndicatorCommand(AHIPlatform<P> platform) {
         subCommands.put("info", new InfoCommand<>());
+        subCommands.put("reload", new ReloadCommand<>(platform));
+
         versionComponent = CommandComponentCreator.createAHICommandComponent();
     }
 
@@ -91,7 +94,7 @@ public class AntiHealthIndicatorCommand<P> implements IGlobalCommand<P> {
             case "info":
                 return true;
             case "reload":
-                return sender.hasPermission("TotemGuard.Reload");
+                return sender.hasPermission("AntiHealthIndicator.Reload");
             default:
                 return false;
         }
@@ -114,7 +117,7 @@ public class AntiHealthIndicatorCommand<P> implements IGlobalCommand<P> {
         for (String command : subCommands.keySet()) {
             if (hasPermissionForSubCommand(sender, command)) {
                 componentBuilder.append(Component.text("- ", NamedTextColor.DARK_GRAY))
-                        .append(Component.text("/antihealthindicator " + command, NamedTextColor.GOLD, TextDecoration.BOLD))
+                        .append(Component.text("/ahi " + command, NamedTextColor.GOLD, TextDecoration.BOLD))
                         .append(Component.text(" - ", NamedTextColor.GRAY))
                         .append(Component.text(commandDescriptions.get(command), NamedTextColor.GRAY))
                         .append(Component.newline());
