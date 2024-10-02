@@ -24,3 +24,5 @@ permissions:
     default: op
 depend:
   - packetevents
+softdepend:
+  - BetterReload
