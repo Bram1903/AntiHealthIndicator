@@ -16,32 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.deathmotion.antihealthindicator;
+package com.deathmotion.antihealthindicator.commands;
 
-import com.deathmotion.antihealthindicator.commands.BungeeAHICommand;
-import com.deathmotion.antihealthindicator.schedulers.BungeeScheduler;
-import net.md_5.bungee.api.plugin.Plugin;
+import com.deathmotion.antihealthindicator.data.CommonUser;
 
-public final class AHIBungee extends Plugin {
-    private final BungeeAntiHealthIndicator ahi = new BungeeAntiHealthIndicator(this);
+import java.util.List;
 
-    public BungeeAntiHealthIndicator getAhi() {
-        return this.ahi;
-    }
+public interface SubCommand<P> {
+    void execute(CommonUser<P> sender, String[] args);
 
-    @Override
-    public void onEnable() {
-        ahi.commonOnInitialize();
-
-        ahi.setScheduler(new BungeeScheduler(this));
-        ahi.commonOnEnable();
-
-        new BungeeAHICommand(this);
-        ahi.enableBStats();
-    }
-
-    @Override
-    public void onDisable() {
-        ahi.commonOnDisable();
-    }
+    List<String> onTabComplete(CommonUser<P> sender, String[] args);
 }

@@ -18,6 +18,7 @@
 
 package com.deathmotion.antihealthindicator;
 
+import com.deathmotion.antihealthindicator.commands.BukkitAHICommand;
 import com.deathmotion.antihealthindicator.schedulers.BukkitScheduler;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -35,7 +36,7 @@ public class AHIBukkit extends JavaPlugin {
         ahi.setScheduler(new BukkitScheduler(this));
 
         ahi.commonOnEnable();
-        ahi.registerCommands();
+        new BukkitAHICommand(this);
         ahi.enableBStats();
     }
 

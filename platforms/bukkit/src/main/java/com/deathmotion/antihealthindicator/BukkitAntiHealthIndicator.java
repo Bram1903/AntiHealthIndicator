@@ -18,7 +18,6 @@
 
 package com.deathmotion.antihealthindicator;
 
-import com.deathmotion.antihealthindicator.commands.BukkitAHICommand;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import io.github.retrooper.packetevents.bstats.Metrics;
@@ -104,9 +103,5 @@ public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
         } catch (Exception e) {
             this.plugin.getLogger().warning("Something went wrong while enabling bStats.\n" + e.getMessage());
         }
-    }
-
-    protected void registerCommands() {
-        new BukkitAHICommand(this.plugin);
     }
 }

@@ -18,32 +18,43 @@
 
 package com.deathmotion.antihealthindicator.commands;
 
-import com.deathmotion.antihealthindicator.util.CommandComponentCreator;
+import com.deathmotion.antihealthindicator.AHIBungee;
+import com.deathmotion.antihealthindicator.data.CommonUser;
 import com.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.Component;
+import com.github.retrooper.packetevents.protocol.player.User;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.plugin.TabExecutor;
 
-public class BungeeAHICommand extends Command {
+public class BungeeAHICommand extends Command implements TabExecutor {
 
-    public BungeeAHICommand(Plugin plugin) {
+    private final AHIBungee plugin;
+
+    public BungeeAHICommand(AHIBungee plugin) {
         super("AntiHealthIndicator", null, "ahi");
+        this.plugin = plugin;
+
         plugin.getProxy().getPluginManager().registerCommand(plugin, this);
     }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        sendMessage(sender, CommandComponentCreator.createAHICommandComponent());
+        plugin.getAhi().getCommand().onCommand(createCommonUser(sender), args);
     }
 
-    private void sendMessage(CommandSender sender, Component message) {
+    @Override
+    public Iterable<String> onTabComplete(CommandSender commandSender, String[] strings) {
+        return plugin.getAhi().getCommand().onTabComplete(createCommonUser(commandSender), strings);
+    }
+
+    private CommonUser<Plugin> createCommonUser(CommandSender sender) {
         if (sender instanceof ProxiedPlayer) {
-            PacketEvents.getAPI().getPlayerManager().getUser(sender).sendMessage(message);
+            User user = PacketEvents.getAPI().getPlayerManager().getUser(sender);
+            return new CommonUser<>(plugin.getAhi(), user);
         } else {
-            sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(message));
+            return new CommonUser<>(plugin.getAhi(), null);
         }
     }
 }

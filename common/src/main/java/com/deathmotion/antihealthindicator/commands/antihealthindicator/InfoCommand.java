@@ -16,32 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.deathmotion.antihealthindicator;
+package com.deathmotion.antihealthindicator.commands.antihealthindicator;
 
-import com.deathmotion.antihealthindicator.commands.BungeeAHICommand;
-import com.deathmotion.antihealthindicator.schedulers.BungeeScheduler;
-import net.md_5.bungee.api.plugin.Plugin;
+import com.deathmotion.antihealthindicator.commands.SubCommand;
+import com.deathmotion.antihealthindicator.data.CommonUser;
+import com.deathmotion.antihealthindicator.util.CommandComponentCreator;
+import net.kyori.adventure.text.Component;
 
-public final class AHIBungee extends Plugin {
-    private final BungeeAntiHealthIndicator ahi = new BungeeAntiHealthIndicator(this);
+import java.util.Collections;
+import java.util.List;
 
-    public BungeeAntiHealthIndicator getAhi() {
-        return this.ahi;
+public class InfoCommand<P> implements SubCommand<P> {
+    private final Component infoComponent;
+
+    public InfoCommand() {
+        this.infoComponent = CommandComponentCreator.createAHICommandComponent();
     }
 
     @Override
-    public void onEnable() {
-        ahi.commonOnInitialize();
-
-        ahi.setScheduler(new BungeeScheduler(this));
-        ahi.commonOnEnable();
-
-        new BungeeAHICommand(this);
-        ahi.enableBStats();
+    public void execute(CommonUser<P> sender, String[] args) {
+        sender.sendMessage(infoComponent);
     }
 
     @Override
-    public void onDisable() {
-        ahi.commonOnDisable();
+    public List<String> onTabComplete(CommonUser<P> sender, String[] args) {
+        return Collections.emptyList();
     }
 }

@@ -18,34 +18,46 @@
 
 package com.deathmotion.antihealthindicator.commands;
 
-import com.deathmotion.antihealthindicator.util.CommandComponentCreator;
+import com.deathmotion.antihealthindicator.AHIBukkit;
+import com.deathmotion.antihealthindicator.data.CommonUser;
 import com.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.Component;
+import com.github.retrooper.packetevents.protocol.player.User;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-public class BukkitAHICommand implements CommandExecutor {
+import java.util.List;
 
-    public BukkitAHICommand(JavaPlugin plugin) {
+public class BukkitAHICommand implements CommandExecutor, TabExecutor {
+
+    private final AHIBukkit plugin;
+
+    public BukkitAHICommand(AHIBukkit plugin) {
+        this.plugin = plugin;
         plugin.getCommand("antihealthindicator").setExecutor(this);
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        sendMessage(sender, CommandComponentCreator.createAHICommandComponent());
+        plugin.getAhi().getCommand().onCommand(createCommonUser(sender), args);
         return true;
     }
 
-    private void sendMessage(CommandSender sender, Component message) {
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        return plugin.getAhi().getCommand().onTabComplete(createCommonUser(sender), args);
+    }
+
+    private CommonUser<JavaPlugin> createCommonUser(CommandSender sender) {
         if (sender instanceof Player) {
-            PacketEvents.getAPI().getPlayerManager().getUser(sender).sendMessage(message);
+            User user = PacketEvents.getAPI().getPlayerManager().getUser(sender);
+            return new CommonUser<>(plugin.getAhi(), user);
         } else {
-            sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(message));
+            return new CommonUser<>(plugin.getAhi(), null);
         }
     }
 }

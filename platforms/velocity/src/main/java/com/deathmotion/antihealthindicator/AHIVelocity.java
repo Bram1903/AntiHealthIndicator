@@ -45,6 +45,10 @@ public class AHIVelocity {
         this.ahi = new VelocityAntiHealthIndicator(server, dataDirectory);
     }
 
+    public VelocityAntiHealthIndicator getAhi() {
+        return this.ahi;
+    }
+
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent ignoredEvent) {
         ahi.commonOnInitialize();
@@ -73,6 +77,6 @@ public class AHIVelocity {
     }
 
     private void registerCommands() {
-        new VelocityAHICommand(server);
+        new VelocityAHICommand(this, server);
     }
 }

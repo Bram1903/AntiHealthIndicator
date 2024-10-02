@@ -18,26 +18,47 @@
 
 package com.deathmotion.antihealthindicator.commands;
 
-import com.deathmotion.antihealthindicator.util.CommandComponentCreator;
+import com.deathmotion.antihealthindicator.AHIVelocity;
+import com.deathmotion.antihealthindicator.data.CommonUser;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+
+import java.util.List;
 
 public class VelocityAHICommand implements SimpleCommand {
 
-    public VelocityAHICommand(ProxyServer proxyServer) {
-        CommandMeta commandMeta = proxyServer.getCommandManager().metaBuilder("antihealthindicator")
+    private final AHIVelocity plugin;
+
+    public VelocityAHICommand(AHIVelocity plugin, ProxyServer server) {
+        this.plugin = plugin;
+
+        CommandMeta commandMeta = server.getCommandManager().metaBuilder("antihealthindicator")
                 .aliases("ahi")
                 .build();
-        proxyServer.getCommandManager().register(commandMeta, this);
+        server.getCommandManager().register(commandMeta, this);
     }
 
     @Override
     public void execute(Invocation invocation) {
-        String[] args = invocation.arguments();
-        CommandSource source = invocation.source();
+        plugin.getAhi().getCommand().onCommand(createCommonUser(invocation.source()), invocation.arguments());
+    }
 
-        source.sendMessage(CommandComponentCreator.createAHICommandComponent());
+    @Override
+    public List<String> suggest(Invocation invocation) {
+        return plugin.getAhi().getCommand().onTabComplete(createCommonUser(invocation.source()), invocation.arguments());
+    }
+
+    private CommonUser<ProxyServer> createCommonUser(CommandSource sender) {
+        if (sender instanceof Player) {
+            User user = PacketEvents.getAPI().getPlayerManager().getUser(sender);
+            return new CommonUser<>(plugin.getAhi(), user);
+        } else {
+            return new CommonUser<>(plugin.getAhi(), null);
+        }
     }
 }

@@ -18,7 +18,6 @@
 
 package com.deathmotion.antihealthindicator;
 
-import com.deathmotion.antihealthindicator.commands.BungeeAHICommand;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import io.github.retrooper.packetevents.bstats.Metrics;
@@ -79,9 +78,5 @@ public class BungeeAntiHealthIndicator extends AHIPlatform<Plugin> {
         } catch (Exception e) {
             this.plugin.getLogger().warning("Something went wrong while enabling bStats.\n" + e.getMessage());
         }
-    }
-
-    protected void registerCommands() {
-        new BungeeAHICommand(this.plugin);
     }
 }

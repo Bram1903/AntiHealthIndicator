@@ -18,6 +18,7 @@
 
 package com.deathmotion.antihealthindicator;
 
+import com.deathmotion.antihealthindicator.commands.AntiHealthIndicatorCommand;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.deathmotion.antihealthindicator.managers.*;
 import com.deathmotion.antihealthindicator.util.AHIVersion;
@@ -36,6 +37,7 @@ public abstract class AHIPlatform<P> {
     protected LogManager<P> logManager;
 
     protected Scheduler scheduler;
+    protected AntiHealthIndicatorCommand<P> command;
     private CacheManager<P> cacheManager;
 
     public void commonOnInitialize() {
@@ -48,6 +50,7 @@ public abstract class AHIPlatform<P> {
      */
     public void commonOnEnable() {
         cacheManager = new CacheManager<>(this);
+        command = new AntiHealthIndicatorCommand<>(this);
 
         new UpdateManager<>(this);
         new PacketManager<>(this);
