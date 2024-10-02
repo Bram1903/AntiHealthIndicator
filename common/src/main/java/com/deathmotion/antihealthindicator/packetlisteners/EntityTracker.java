@@ -25,6 +25,7 @@ import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
 import com.deathmotion.antihealthindicator.data.cache.WolfEntity;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
+import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
@@ -44,7 +45,7 @@ import java.util.UUID;
  */
 public class EntityTracker<P> implements PacketListener {
     private final CacheManager<P> cacheManager;
-    private final Settings settings;
+    private final ConfigManager<P> configManager;
 
     /**
      * Constructs a new EntityState with the specified {@link AHIPlatform}.
@@ -53,7 +54,7 @@ public class EntityTracker<P> implements PacketListener {
      */
     public EntityTracker(AHIPlatform<P> platform) {
         this.cacheManager = platform.getCacheManager();
-        this.settings = platform.getConfigManager().getSettings();
+        this.configManager = platform.getConfigManager();
 
         platform.getLogManager().debug("Entity State listener has been set up.");
     }
@@ -66,16 +67,19 @@ public class EntityTracker<P> implements PacketListener {
      */
     @Override
     public void onPacketSend(PacketSendEvent event) {
+        final Settings settings = configManager.getSettings();
+        if (!settings.getEntityData().isEnabled()) return;
+
         final PacketTypeCommon type = event.getPacketType();
 
         if (PacketType.Play.Server.SPAWN_LIVING_ENTITY == type) {
-            handleSpawnLivingEntity(new WrapperPlayServerSpawnLivingEntity(event), event.getUser());
+            handleSpawnLivingEntity(new WrapperPlayServerSpawnLivingEntity(event), event.getUser(), settings);
         } else if (PacketType.Play.Server.SPAWN_ENTITY == type) {
-            handleSpawnEntity(new WrapperPlayServerSpawnEntity(event), event.getUser());
+            handleSpawnEntity(new WrapperPlayServerSpawnEntity(event), event.getUser(), settings);
         } else if (PacketType.Play.Server.SPAWN_PLAYER == type) {
             handleSpawnPlayer(new WrapperPlayServerSpawnPlayer(event), event.getUser());
         } else if (PacketType.Play.Server.ENTITY_METADATA == type) {
-            handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), event.getUser());
+            handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), event.getUser(), settings);
         } else if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
             handleDestroyEntities(new WrapperPlayServerDestroyEntities(event), event.getUser());
         } else if (PacketType.Play.Server.RESPAWN == type) {
@@ -95,7 +99,7 @@ public class EntityTracker<P> implements PacketListener {
         cacheManager.removeUserCache(userUUID);
     }
 
-    private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet, User user) {
+    private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet, User user, Settings settings) {
         EntityType entityType = packet.getEntityType();
 
         if (settings.getEntityData().isPlayersOnly()) {
@@ -108,7 +112,7 @@ public class EntityTracker<P> implements PacketListener {
         cacheManager.addLivingEntity(user.getUUID(), entityId, entityData);
     }
 
-    private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet, User user) {
+    private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet, User user, Settings settings) {
         EntityType entityType = packet.getEntityType();
 
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.LIVINGENTITY)) {
@@ -130,7 +134,7 @@ public class EntityTracker<P> implements PacketListener {
         cacheManager.addLivingEntity(user.getUUID(), packet.getEntityId(), livingEntityData);
     }
 
-    private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, User user) {
+    private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, User user, Settings settings) {
         if (settings.getEntityData().isPlayersOnly()) return;
 
         int entityId = packet.getEntityId();

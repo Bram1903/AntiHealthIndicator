@@ -44,7 +44,7 @@ public class CacheManager<P> {
     private final ConcurrentHashMap<UUID, ConcurrentHashMap<Integer, CachedEntity>> cache;
 
     private final AHIPlatform<P> platform;
-    private final Settings settings;
+    private final ConfigManager<P> configManager;
     private final LogManager<P> logManager;
 
     public CacheManager(AHIPlatform<P> platform) {
@@ -52,11 +52,9 @@ public class CacheManager<P> {
 
         this.platform = platform;
         this.logManager = platform.getLogManager();
-        this.settings = platform.getConfigManager().getSettings();
+        this.configManager = platform.getConfigManager();
 
-        if (settings.isDebug()) {
-            LogCacheStats();
-        }
+        LogCacheStats();
 
         this.platform.getLogManager().debug("CacheManager initialized.");
     }
@@ -118,6 +116,8 @@ public class CacheManager<P> {
 
     private void LogCacheStats() {
         platform.getScheduler().runAsyncTaskAtFixedRate((o) -> {
+            if (!configManager.getSettings().isDebug()) return;
+
             ConcurrentHashMap<UUID, ConcurrentHashMap<Integer, CachedEntity>> cacheMap = cache;
 
             int underlyingSize = cacheMap.values().stream().mapToInt(Map::size).sum();

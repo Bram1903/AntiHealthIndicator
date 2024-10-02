@@ -20,6 +20,7 @@ package com.deathmotion.antihealthindicator.packetlisteners;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.Constants;
+import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.util.AHIVersion;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
@@ -72,6 +73,9 @@ public class UpdateNotifier<P> extends PacketListenerAbstract {
      */
     @Override
     public void onUserLogin(UserLoginEvent event) {
+        final Settings settings = platform.getConfigManager().getSettings();
+        if (!settings.getUpdateChecker().isNotifyInGame()) return;
+
         User user = event.getUser();
 
         platform.getScheduler().runAsyncTaskDelayed((o) -> {

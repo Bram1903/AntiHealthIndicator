@@ -20,6 +20,7 @@ package com.deathmotion.antihealthindicator.packetlisteners.spoofers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.Settings;
+import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -32,7 +33,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUp
  */
 public class PlayerUpdateHealthListener<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
-    private final Settings settings;
+    private final ConfigManager<P> configManager;
 
     /**
      * Constructs a new PlayerUpdateHealthListener with the specified {@link AHIPlatform}.
@@ -41,7 +42,7 @@ public class PlayerUpdateHealthListener<P> extends PacketListenerAbstract {
      */
     public PlayerUpdateHealthListener(AHIPlatform<P> platform) {
         this.platform = platform;
-        this.settings = platform.getConfigManager().getSettings();
+        this.configManager = platform.getConfigManager();
 
         platform.getLogManager().debug("Player Update Health listener has been set up.");
     }
@@ -54,17 +55,20 @@ public class PlayerUpdateHealthListener<P> extends PacketListenerAbstract {
      */
     @Override
     public void onPacketSend(PacketSendEvent event) {
-        if (event.getPacketType() == PacketType.Play.Server.UPDATE_HEALTH) {
-            if (settings.isAllowBypass()) {
-                if (platform.hasPermission(event.getUser().getUUID(), "AntiHealthIndicator.Bypass")) return;
-            }
+        if (event.getPacketType() != PacketType.Play.Server.UPDATE_HEALTH) return;
 
-            WrapperPlayServerUpdateHealth packet = new WrapperPlayServerUpdateHealth(event);
+        final Settings settings = configManager.getSettings();
+        if (!settings.isFoodSaturation()) return;
 
-            if (packet.getFoodSaturation() > 0) {
-                packet.setFoodSaturation(Float.NaN);
-                event.markForReEncode(true);
-            }
+        if (settings.isAllowBypass()) {
+            if (platform.hasPermission(event.getUser().getUUID(), "AntiHealthIndicator.Bypass")) return;
+        }
+
+        WrapperPlayServerUpdateHealth packet = new WrapperPlayServerUpdateHealth(event);
+
+        if (packet.getFoodSaturation() > 0) {
+            packet.setFoodSaturation(Float.NaN);
+            event.markForReEncode(true);
         }
     }
 }

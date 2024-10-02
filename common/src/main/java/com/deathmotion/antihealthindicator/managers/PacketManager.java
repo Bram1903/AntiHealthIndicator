@@ -33,7 +33,6 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
  */
 public class PacketManager<P> {
     private final AHIPlatform<P> platform;
-    private final Settings settings;
 
     /**
      * Constructs a new PacketManager with the specified {@link AHIPlatform}.
@@ -42,7 +41,6 @@ public class PacketManager<P> {
      */
     public PacketManager(AHIPlatform<P> platform) {
         this.platform = platform;
-        this.settings = platform.getConfigManager().getSettings();
 
         setupPacketListeners();
         platform.getLogManager().debug("Packet listeners have been set up.");
@@ -52,39 +50,12 @@ public class PacketManager<P> {
      * Sets up packet listeners
      */
     public void setupPacketListeners() {
-        setupEntityListeners();
-        setupAdditionalListeners();
-    }
-
-    /**
-     * Sets up entity listeners
-     */
-    private void setupEntityListeners() {
-        if (settings.getEntityData().isEnabled()) {
-            PacketEvents.getAPI().getEventManager().registerListener(new EntityTracker<>(platform), PacketListenerPriority.LOW);
-            PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener<>(platform));
-
-            if (!settings.getEntityData().isPlayersOnly()) {
-                PacketEvents.getAPI().getEventManager().registerListener(new VehicleState<>(platform));
-            }
-        }
-    }
-
-    /**
-     * Sets up additional listeners
-     */
-    private void setupAdditionalListeners() {
-        if (settings.getItems().isEnabled()) {
-            PacketEvents.getAPI().getEventManager().registerListener(new EntityEquipmentListener<>(platform));
-        }
-        if (settings.isFoodSaturation()) {
-            PacketEvents.getAPI().getEventManager().registerListener(new PlayerUpdateHealthListener<>(platform));
-        }
-        if (settings.isWorldSeed()) {
-            PacketEvents.getAPI().getEventManager().registerListener(new WorldSeedListener<>(platform));
-        }
-        if (settings.isTeamScoreboard()) {
-            PacketEvents.getAPI().getEventManager().registerListener(new ScoreboardListener<>(platform));
-        }
+        PacketEvents.getAPI().getEventManager().registerListener(new EntityTracker<>(platform), PacketListenerPriority.LOW);
+        PacketEvents.getAPI().getEventManager().registerListener(new EntityMetadataListener<>(platform));
+        PacketEvents.getAPI().getEventManager().registerListener(new VehicleState<>(platform));
+        PacketEvents.getAPI().getEventManager().registerListener(new EntityEquipmentListener<>(platform));
+        PacketEvents.getAPI().getEventManager().registerListener(new PlayerUpdateHealthListener<>(platform));
+        PacketEvents.getAPI().getEventManager().registerListener(new WorldSeedListener<>(platform));
+        PacketEvents.getAPI().getEventManager().registerListener(new ScoreboardListener<>(platform));
     }
 }

@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class AntiHealthIndicatorCommand<P> implements IGlobalCommand<P> {
+public class AntiHealthIndicatorCommand<P> {
     private final Component versionComponent;
     private final Map<String, SubCommand<P>> subCommands = new HashMap<>();
 
@@ -46,7 +46,6 @@ public class AntiHealthIndicatorCommand<P> implements IGlobalCommand<P> {
         versionComponent = CommandComponentCreator.createAHICommandComponent();
     }
 
-    @Override
     public void onCommand(@NotNull CommonUser<P> sender, @NotNull String[] args) {
         if (!hasAnyPermission(sender)) {
             sender.sendMessage(versionComponent);
@@ -68,7 +67,6 @@ public class AntiHealthIndicatorCommand<P> implements IGlobalCommand<P> {
         }
     }
 
-    @Override
     public List<String> onTabComplete(@NotNull CommonUser<P> sender, @NotNull String[] args) {
         if (args.length == 1) {
             return subCommands.keySet().stream()

@@ -20,6 +20,7 @@ package com.deathmotion.antihealthindicator.packetlisteners.spoofers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.Settings;
+import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -34,7 +35,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRe
 public class WorldSeedListener<P> extends PacketListenerAbstract {
 
     private final AHIPlatform<P> platform;
-    private final Settings settings;
+    private final ConfigManager<P> settings;
 
     /**
      * Constructs a new WorldSeedListener with the specified {@link AHIPlatform}.
@@ -43,7 +44,7 @@ public class WorldSeedListener<P> extends PacketListenerAbstract {
      */
     public WorldSeedListener(AHIPlatform<P> platform) {
         this.platform = platform;
-        this.settings = platform.getConfigManager().getSettings();
+        this.settings = platform.getConfigManager();
 
         platform.getLogManager().debug("World Seed listener has been set up.");
     }
@@ -57,6 +58,9 @@ public class WorldSeedListener<P> extends PacketListenerAbstract {
      */
     @Override
     public void onPacketSend(PacketSendEvent event) {
+        final Settings settings = this.settings.getSettings();
+        if (!settings.isWorldSeed()) return;
+
         if (event.getPacketType().equals(PacketType.Play.Server.JOIN_GAME)) {
             if (settings.isAllowBypass()) {
                 if (platform.hasPermission(event.getUser().getUUID(), "AntiHealthIndicator.Bypass")) return;

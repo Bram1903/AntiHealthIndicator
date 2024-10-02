@@ -20,6 +20,7 @@ package com.deathmotion.antihealthindicator.packetlisteners.spoofers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.Settings;
+import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
@@ -42,7 +43,7 @@ import java.util.List;
  */
 public class EntityEquipmentListener<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
-    private final Settings settings;
+    private final ConfigManager<P> configManager;
 
     private final boolean useDamageableInterface;
 
@@ -61,7 +62,7 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
      */
     public EntityEquipmentListener(AHIPlatform<P> platform) {
         this.platform = platform;
-        this.settings = platform.getConfigManager().getSettings();
+        this.configManager = platform.getConfigManager();
 
         this.useDamageableInterface = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13);
 
@@ -75,23 +76,26 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
      */
     @Override
     public void onPacketSend(PacketSendEvent event) {
-        if (event.getPacketType() == PacketType.Play.Server.ENTITY_EQUIPMENT) {
-            WrapperPlayServerEntityEquipment packet = new WrapperPlayServerEntityEquipment(event);
+        if (event.getPacketType() != PacketType.Play.Server.ENTITY_EQUIPMENT) return;
 
-            if (settings.isAllowBypass()) {
-                if (platform.hasPermission(event.getUser().getUUID(), "AntiHealthIndicator.Bypass")) return;
-            }
+        final Settings settings = configManager.getSettings();
+        if (!settings.getItems().isEnabled()) return;
 
-            List<Equipment> equipmentList = packet.getEquipment();
-            if (equipmentList.isEmpty()) {
-                return;
-            }
+        WrapperPlayServerEntityEquipment packet = new WrapperPlayServerEntityEquipment(event);
 
-            equipmentList.forEach(equipment -> handleEquipment(equipment, packet.getClientVersion()));
-
-            packet.setEquipment(equipmentList);
-            event.markForReEncode(true);
+        if (settings.isAllowBypass()) {
+            if (platform.hasPermission(event.getUser().getUUID(), "AntiHealthIndicator.Bypass")) return;
         }
+
+        List<Equipment> equipmentList = packet.getEquipment();
+        if (equipmentList.isEmpty()) {
+            return;
+        }
+
+        equipmentList.forEach(equipment -> handleEquipment(equipment, packet.getClientVersion(), settings));
+
+        packet.setEquipment(equipmentList);
+        event.markForReEncode(true);
     }
 
     /**
@@ -106,7 +110,7 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
      * @param equipment     a single piece of equipment
      * @param clientVersion the player's client version
      */
-    private void handleEquipment(Equipment equipment, ClientVersion clientVersion) {
+    private void handleEquipment(Equipment equipment, ClientVersion clientVersion, Settings settings) {
         ItemStack itemStack = equipment.getItem();
         if (itemStack == null) return;
 

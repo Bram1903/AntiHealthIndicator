@@ -23,12 +23,12 @@ import com.deathmotion.antihealthindicator.data.RidableEntities;
 import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
+import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
-import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -47,96 +47,87 @@ import java.util.UUID;
  */
 public class VehicleState<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
-    private final Settings settings;
+    private final ConfigManager<P> configManager;
     private final CacheManager<P> cacheManager;
 
-    /**
-     * Constructs a new VehicleState with the specified {@link AHIPlatform}.
-     *
-     * @param platform The platform to use.
-     */
     public VehicleState(AHIPlatform<P> platform) {
         this.platform = platform;
-        this.settings = platform.getConfigManager().getSettings();
+        this.configManager = platform.getConfigManager();
         this.cacheManager = platform.getCacheManager();
 
         platform.getLogManager().debug("Vehicle State listener has been set up.");
     }
 
-    /**
-     * This function is called when an {@link PacketSendEvent} is triggered.
-     * Manages the state of various entities based on the event triggered.
-     *
-     * @param event The event that has been triggered.
-     */
     @Override
     public void onPacketSend(PacketSendEvent event) {
+        final Settings settings = configManager.getSettings();
+        if (!settings.getEntityData().isEnabled()) return;
+        if (!settings.getEntityData().isPlayersOnly()) return;
+
         final PacketTypeCommon type = event.getPacketType();
 
         if (PacketType.Play.Server.SET_PASSENGERS == type) {
-            handleSetPassengers(new WrapperPlayServerSetPassengers(event), event.getUser());
+            handlePassengers(new WrapperPlayServerSetPassengers(event), event.getUser(), settings);
         } else if (PacketType.Play.Server.ATTACH_ENTITY == type) {
-            handleAttachEntity(new WrapperPlayServerAttachEntity(event), event.getUser());
+            handleAttachEntity(new WrapperPlayServerAttachEntity(event), event.getUser(), settings);
         }
     }
 
-    private void handleSetPassengers(WrapperPlayServerSetPassengers packet, User user) {
+    private void handlePassengers(WrapperPlayServerSetPassengers packet, User user, Settings settings) {
         int entityId = packet.getEntityId();
-        if (entityId == user.getEntityId()) return;
-        if (!validVehicle(user.getUUID(), entityId)) return;
+        if (entityId == user.getEntityId() || !isValidVehicle(user.getUUID(), entityId)) return;
 
         int[] passengers = packet.getPassengers();
-
         if (passengers.length > 0) {
-            cacheManager.updateVehiclePassenger(user.getUUID(), entityId, passengers[0]);
-            handlePassengerEvent(user, entityId, cacheManager.getVehicleHealth(user.getUUID(), entityId), true);
+            updatePassengerState(user, entityId, passengers[0], true, settings);
         } else {
             int passengerId = cacheManager.getPassengerId(user.getUUID(), entityId);
-            cacheManager.updateVehiclePassenger(user.getUUID(), entityId, -1);
-
-            if (user.getEntityId() == passengerId) {
-                handlePassengerEvent(user, entityId, 0.5F, false);
-            }
+            updatePassengerState(user, entityId, passengerId, false, settings);
         }
     }
 
-    private void handleAttachEntity(WrapperPlayServerAttachEntity packet, User user) {
+    private void handleAttachEntity(WrapperPlayServerAttachEntity packet, User user, Settings settings) {
         int entityId = packet.getHoldingId();
-        if (entityId == user.getEntityId()) return;
-        if (!validVehicle(user.getUUID(), entityId)) return;
+        if (entityId == user.getEntityId() || !isValidVehicle(user.getUUID(), entityId)) return;
 
         int passengerId = packet.getAttachedId();
-
         if (entityId > 0) {
-            cacheManager.updateVehiclePassenger(user.getUUID(), entityId, passengerId);
-            handlePassengerEvent(user, entityId, cacheManager.getVehicleHealth(user.getUUID(), entityId), true);
+            updatePassengerState(user, entityId, passengerId, true, settings);
         } else {
-            // With the Entity Attach packet, the entity ID is set to -1 when the entity is detached;
-            // Thus we need to retrieve the vehicle we stepped of by using a reverse lookup by passenger ID
             int reversedEntityId = cacheManager.getEntityIdByPassengerId(user.getUUID(), passengerId);
-            cacheManager.updateVehiclePassenger(user.getUUID(), reversedEntityId, -1);
-
-            if (user.getEntityId() == passengerId) {
-                handlePassengerEvent(user, reversedEntityId, 0.5F, false);
-            }
+            updatePassengerState(user, reversedEntityId, passengerId, false, settings);
         }
     }
 
-    private boolean validVehicle(UUID user, int entityId) {
-        CachedEntity cachedEntity = cacheManager.getCachedEntity(user, entityId).orElse(null);
-        if (cachedEntity == null) return false;
-
-        EntityType entityType = cachedEntity.getEntityType();
-        return RidableEntities.isRideable(entityType);
+    private void updatePassengerState(User user, int vehicleId, int passengerId, boolean entering, Settings settings) {
+        cacheManager.updateVehiclePassenger(user.getUUID(), vehicleId, entering ? passengerId : -1);
+        if (entering || user.getEntityId() == passengerId) {
+            float healthValue = entering ? cacheManager.getVehicleHealth(user.getUUID(), vehicleId) : 0.5F;
+            sendVehicleHealthUpdate(user, vehicleId, healthValue, entering, settings);
+        }
     }
 
-    private void handlePassengerEvent(User user, int vehicleId, float healthValue, boolean entering) {
+    private boolean isValidVehicle(UUID userUUID, int entityId) {
+        return cacheManager.getCachedEntity(userUUID, entityId)
+                .map(CachedEntity::getEntityType)
+                .map(RidableEntities::isRideable)
+                .orElse(false);
+    }
+
+    private void sendVehicleHealthUpdate(User user, int vehicleId, float healthValue, boolean entering, Settings settings) {
         platform.getScheduler().runAsyncTask((o) -> {
-            if (!entering && settings.isAllowBypass()) {
-                if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) return;
+            if (!entering && settings.isAllowBypass() && platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass")) {
+                return;
             }
 
-            List<EntityData> metadata = Collections.singletonList(new EntityData(new MetadataIndex(user.getClientVersion()).HEALTH, EntityDataTypes.FLOAT, healthValue));
+            List<EntityData> metadata = Collections.singletonList(
+                    new EntityData(
+                            new MetadataIndex(user.getClientVersion()).HEALTH,
+                            EntityDataTypes.FLOAT,
+                            healthValue
+                    )
+            );
+
             user.sendPacketSilently(new WrapperPlayServerEntityMetadata(vehicleId, metadata));
         });
     }

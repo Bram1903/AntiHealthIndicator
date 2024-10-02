@@ -19,6 +19,8 @@
 package com.deathmotion.antihealthindicator.packetlisteners.spoofers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.deathmotion.antihealthindicator.data.Settings;
+import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -30,7 +32,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ScoreboardListener<P> extends PacketListenerAbstract {
-    private final AHIPlatform<P> platform;
+    private final ConfigManager<P> configManager;
 
     // Use ConcurrentHashMap's KeySet for a thread-safe Set
     private final Set<String> healthObjectives = ConcurrentHashMap.newKeySet();
@@ -41,13 +43,16 @@ public class ScoreboardListener<P> extends PacketListenerAbstract {
      * @param platform The platform to use.
      */
     public ScoreboardListener(AHIPlatform<P> platform) {
-        this.platform = platform;
+        this.configManager = platform.getConfigManager();
 
         platform.getLogManager().debug("Update Objective Listener initialized.");
     }
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
+        final Settings settings = configManager.getSettings();
+        if (!settings.isTeamScoreboard()) return;
+
         if (event.getPacketType().equals(PacketType.Play.Server.SCOREBOARD_OBJECTIVE)) {
             handleScoreboardObjective(event);
         }

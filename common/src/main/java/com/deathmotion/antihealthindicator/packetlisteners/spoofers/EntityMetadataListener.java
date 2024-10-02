@@ -23,6 +23,7 @@ import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
 import com.deathmotion.antihealthindicator.data.cache.WolfEntity;
 import com.deathmotion.antihealthindicator.managers.CacheManager;
+import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
@@ -42,7 +43,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
  */
 public class EntityMetadataListener<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
-    private final Settings settings;
+    private final ConfigManager<P> configManager;
     private final CacheManager<P> cacheManager;
 
     private final boolean healthTexturesSupported;
@@ -54,7 +55,7 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
      */
     public EntityMetadataListener(AHIPlatform<P> platform) {
         this.platform = platform;
-        this.settings = platform.getConfigManager().getSettings();
+        this.configManager = platform.getConfigManager();
         this.cacheManager = platform.getCacheManager();
 
         this.healthTexturesSupported = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_15);
@@ -71,38 +72,41 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
     public void onPacketSend(PacketSendEvent event) {
         if (!event.getPacketType().equals(PacketType.Play.Server.ENTITY_METADATA)) return;
 
+        final Settings settings = configManager.getSettings();
+        if (!settings.getEntityData().isEnabled()) return;
+
         WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata(event);
         int entityId = packet.getEntityId();
         User user = event.getUser();
 
         if (entityId == user.getEntityId()) return;
-        if (shouldBypass(user)) return;
+        if (shouldBypass(user, settings)) return;
 
         CachedEntity cachedEntity = cacheManager.getCachedEntity(user.getUUID(), entityId).orElse(null);
         if (cachedEntity == null) return;
 
         EntityType entityType = cachedEntity.getEntityType();
-        if (shouldIgnoreEntity(entityType, user, entityId, cachedEntity)) return;
+        if (shouldIgnoreEntity(entityType, user, entityId, cachedEntity, settings)) return;
 
         MetadataIndex metadataIndex = new MetadataIndex(user.getClientVersion());
-        packet.getEntityMetadata().forEach(entityData -> handleEntityMetadata(entityType, entityData, metadataIndex));
+        packet.getEntityMetadata().forEach(entityData -> handleEntityMetadata(entityType, entityData, metadataIndex, settings));
 
         event.markForReEncode(true);
     }
 
-    private boolean shouldBypass(User user) {
+    private boolean shouldBypass(User user, Settings settings) {
         return settings.isAllowBypass() && platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass");
     }
 
-    private boolean shouldIgnoreEntity(EntityType entityType, User user, int entityId, CachedEntity cachedEntity) {
+    private boolean shouldIgnoreEntity(EntityType entityType, User user, int entityId, CachedEntity cachedEntity, Settings settings) {
         if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) return true;
         if (settings.getEntityData().isPlayersOnly() && entityType != EntityTypes.PLAYER) return true;
         if (!settings.getEntityData().isPlayersOnly() && settings.getEntityData().isIgnoreVehicles() && cacheManager.isUserPassenger(user.getUUID(), entityId, user.getEntityId()))
             return true;
-        return entityType == EntityTypes.WOLF && settings.getEntityData().getWolves().isEnabled() && shouldIgnoreWolf(user, cachedEntity);
+        return entityType == EntityTypes.WOLF && settings.getEntityData().getWolves().isEnabled() && shouldIgnoreWolf(user, cachedEntity, settings);
     }
 
-    private boolean shouldIgnoreWolf(User user, CachedEntity cachedEntity) {
+    private boolean shouldIgnoreWolf(User user, CachedEntity cachedEntity, Settings settings) {
         WolfEntity wolfEntityData = (WolfEntity) cachedEntity;
 
         return (!settings.getEntityData().getWolves().isTamed() && !settings.getEntityData().getWolves().isOwner()) ||
@@ -110,22 +114,22 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
                 (settings.getEntityData().getWolves().isOwner() && wolfEntityData.isOwnerPresent() && wolfEntityData.getOwnerUUID().equals(user.getUUID()));
     }
 
-    private void handleEntityMetadata(EntityType entityType, EntityData entityData, MetadataIndex metadataIndex) {
+    private void handleEntityMetadata(EntityType entityType, EntityData entityData, MetadataIndex metadataIndex, Settings settings) {
         if (entityType == EntityTypes.IRON_GOLEM && settings.getEntityData().getIronGolems().isEnabled()) {
             if (!settings.getEntityData().getIronGolems().isGradual() || !healthTexturesSupported) {
-                spoofEntityMetadata(entityData, metadataIndex);
+                spoofEntityMetadata(entityData, metadataIndex, settings);
             } else {
-                spoofIronGolemMetadata(entityData, metadataIndex);
+                spoofIronGolemMetadata(entityData, metadataIndex, settings);
             }
         } else {
-            spoofEntityMetadata(entityData, metadataIndex);
+            spoofEntityMetadata(entityData, metadataIndex, settings);
             if (entityType == EntityTypes.PLAYER) {
-                spoofPlayerMetadata(entityData, metadataIndex);
+                spoofPlayerMetadata(entityData, metadataIndex, settings);
             }
         }
     }
 
-    private void spoofIronGolemMetadata(EntityData entityData, MetadataIndex metadataIndex) {
+    private void spoofIronGolemMetadata(EntityData entityData, MetadataIndex metadataIndex, Settings settings) {
         if (entityData.getIndex() == metadataIndex.AIR_TICKS && settings.getEntityData().isAirTicks()) {
             setDynamicValue(entityData, 1);
         }
@@ -135,7 +139,7 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         }
     }
 
-    private void spoofEntityMetadata(EntityData entityData, MetadataIndex metadataIndex) {
+    private void spoofEntityMetadata(EntityData entityData, MetadataIndex metadataIndex, Settings settings) {
         if (entityData.getIndex() == metadataIndex.AIR_TICKS && settings.getEntityData().isAirTicks()) {
             setDynamicValue(entityData, 1);
         }
@@ -146,7 +150,7 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
         }
     }
 
-    private void spoofPlayerMetadata(EntityData entityData, MetadataIndex metadataIndex) {
+    private void spoofPlayerMetadata(EntityData entityData, MetadataIndex metadataIndex, Settings settings) {
         if (entityData.getIndex() == metadataIndex.ABSORPTION && settings.getEntityData().isAbsorption()) {
             setDynamicValue(entityData, 0);
         }
