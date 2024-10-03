@@ -33,13 +33,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class AntiHealthIndicatorCommand<P> {
+    private final AHIPlatform<P> platform;
+
     private final Component versionComponent;
     private final Map<String, SubCommand<P>> subCommands = new HashMap<>();
 
     public AntiHealthIndicatorCommand(AHIPlatform<P> platform) {
+        this.platform = platform;
+
         subCommands.put("info", new InfoCommand<>());
         subCommands.put("reload", new ReloadCommand<>(platform));
 
@@ -47,39 +52,48 @@ public class AntiHealthIndicatorCommand<P> {
     }
 
     public void onCommand(@NotNull CommonUser<P> sender, @NotNull String[] args) {
-        if (!hasAnyPermission(sender)) {
-            sender.sendMessage(versionComponent);
-            return;
-        }
+        platform.getScheduler().runAsyncTask((o) -> {
+            if (!hasAnyPermission(sender)) {
+                sender.sendMessage(versionComponent);
+                return;
+            }
 
-        if (args.length == 0) {
-            sender.sendMessage(getAvailableCommandsComponent(sender));
-            return;
-        }
+            if (args.length == 0) {
+                sender.sendMessage(getAvailableCommandsComponent(sender));
+                return;
+            }
 
-        String subCommandName = args[0].toLowerCase();
-        SubCommand<P> subCommand = subCommands.get(subCommandName);
+            String subCommandName = args[0].toLowerCase();
+            SubCommand<P> subCommand = subCommands.get(subCommandName);
 
-        if (subCommand != null && hasPermissionForSubCommand(sender, subCommandName)) {
-            subCommand.execute(sender, args);
-        } else {
-            sender.sendMessage(getAvailableCommandsComponent(sender));
-        }
+            if (subCommand != null && hasPermissionForSubCommand(sender, subCommandName)) {
+                subCommand.execute(sender, args);
+            } else {
+                sender.sendMessage(getAvailableCommandsComponent(sender));
+            }
+        });
     }
 
+    @SuppressWarnings("unchecked")
     public List<String> onTabComplete(@NotNull CommonUser<P> sender, @NotNull String[] args) {
-        if (args.length == 1) {
-            return subCommands.keySet().stream()
-                    .filter(name -> name.startsWith(args[0].toLowerCase()))
-                    .filter(name -> hasPermissionForSubCommand(sender, name))
-                    .collect(Collectors.toList());
-        } else if (args.length > 1) {
-            SubCommand<P> subCommand = subCommands.get(args[0].toLowerCase());
-            if (subCommand != null && hasPermissionForSubCommand(sender, args[0].toLowerCase())) {
-                return subCommand.onTabComplete(sender, args);
-            }
+        try {
+            return (List<String>) CompletableFuture.supplyAsync(() -> {
+                if (args.length == 1) {
+                    return subCommands.keySet().stream()
+                            .filter(name -> name.startsWith(args[0].toLowerCase()))
+                            .filter(name -> hasPermissionForSubCommand(sender, name))
+                            .collect(Collectors.toList());
+                } else if (args.length > 1) {
+                    SubCommand<P> subCommand = subCommands.get(args[0].toLowerCase());
+                    if (subCommand != null && hasPermissionForSubCommand(sender, args[0].toLowerCase())) {
+                        return subCommand.onTabComplete(sender, args);
+                    }
+                }
+                return Collections.emptyList();
+            }).get();
+        } catch (Exception e) {
+            return Collections.emptyList();
         }
-        return Collections.emptyList();
     }
 
     private boolean hasAnyPermission(CommonUser<P> sender) {
