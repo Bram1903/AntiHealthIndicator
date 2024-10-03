@@ -19,7 +19,6 @@
 package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
 import lombok.Getter;

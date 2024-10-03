@@ -19,7 +19,6 @@
 package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.packetlisteners.EntityTracker;
 import com.deathmotion.antihealthindicator.packetlisteners.VehicleState;
 import com.deathmotion.antihealthindicator.packetlisteners.spoofers.*;
