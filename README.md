@@ -48,6 +48,7 @@ Ensure the [PacketEvents](https://modrinth.com/plugin/packetevents) library is i
 | Bukkit (Spigot, Paper, Folia etc.) | 1.8.8 - 1.21.1     |
 | Velocity                           | Latest Major       |
 | BungeeCord (or any forks)          | Latest Major       |
+| Sponge                             | Latest Major       |
 
 ## Spoofers
 
