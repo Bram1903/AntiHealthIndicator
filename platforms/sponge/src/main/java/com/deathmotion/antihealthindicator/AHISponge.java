@@ -20,7 +20,6 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.schedulers.SpongeScheduler;
 import com.google.inject.Inject;
-import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
