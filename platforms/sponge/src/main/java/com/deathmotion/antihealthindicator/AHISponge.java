@@ -18,22 +18,56 @@
 
 package com.deathmotion.antihealthindicator;
 
+import com.deathmotion.antihealthindicator.schedulers.SpongeScheduler;
 import com.google.inject.Inject;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Server;
+import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
+import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
+
+import java.nio.file.Path;
 
 @Plugin("antihealthindicator")
 public class AHISponge {
 
+    private final PluginContainer pluginContainer;
+    private final SpongeAntiHealthIndicator ahi;
+
     @Inject
-    private Logger logger;
+    public AHISponge(PluginContainer pluginContainer, @ConfigDir(sharedRoot = false) Path configDirectory) {
+        this.pluginContainer = pluginContainer;
+        this.ahi = new SpongeAntiHealthIndicator(configDirectory);
+    }
+
+    public SpongeAntiHealthIndicator getAhi() {
+        return this.ahi;
+    }
 
     @Listener
     public void onServerStart(final StartedEngineEvent<Server> event) {
-        logger.info("AntiHealthIndicator has been enabled!");
+        ahi.commonOnInitialize();
+
+        ahi.setScheduler(new SpongeScheduler(this.pluginContainer));
+
+        ahi.commonOnEnable();
+
+        registerCommands();
+        enableBStats();
     }
 
+    @Listener
+    public void onServerStop(final StoppingEngineEvent<Server> event) {
+        ahi.commonOnDisable();
+    }
+
+    private void enableBStats() {
+    }
+
+    private void registerCommands() {
+        //new VelocityAHICommand(this, server);
+    }
 }
