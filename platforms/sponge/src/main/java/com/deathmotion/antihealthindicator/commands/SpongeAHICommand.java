@@ -23,8 +23,10 @@ import com.deathmotion.antihealthindicator.data.CommonUser;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
 import net.kyori.adventure.text.Component;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Platform;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.CommandCompletion;
@@ -32,28 +34,37 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.parameter.ArgumentReader;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class SpongeAHICommand implements Command.Raw {
     private final AHISponge plugin;
+    private final Logger logger;
 
-    public SpongeAHICommand(AHISponge plugin) {
+    public SpongeAHICommand(AHISponge plugin, Logger logger) {
         this.plugin = plugin;
+        this.logger = logger;
     }
 
     @Override
     @NotNull
     public CommandResult process(@NotNull CommandCause cause, @NotNull ArgumentReader.Mutable arguments) {
-        plugin.getAhi().getCommand().onCommand(createCommonUser(cause), assimilateArguments(arguments));
+        //plugin.getAhi().getCommand().onCommand(createCommonUser(cause), assimilateArguments(arguments));
+        plugin.getAhi().getScheduler().runAsyncTask((o) -> {
+            logger.info("Command executed by " + cause.root().toString());
+        });
+
         return CommandResult.success();
     }
 
     @Override
     @NotNull
     public List<CommandCompletion> complete(@NotNull CommandCause cause, @NotNull ArgumentReader.Mutable arguments) {
-        List<String> completions = plugin.getAhi().getCommand().onTabComplete(createCommonUser(cause), assimilateArguments(arguments));
+        //List<String> completions = plugin.getAhi().getCommand().onTabComplete(createCommonUser(cause), assimilateArguments(arguments));
+        List<String> completions = new ArrayList<>();
+        completions.add("test");
 
         // Convert List<String> to List<CommandCompletion>
         return completions.stream()

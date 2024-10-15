@@ -21,6 +21,7 @@ package com.deathmotion.antihealthindicator;
 import com.deathmotion.antihealthindicator.commands.SpongeAHICommand;
 import com.deathmotion.antihealthindicator.schedulers.SpongeScheduler;
 import com.google.inject.Inject;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.config.ConfigDir;
@@ -37,11 +38,13 @@ import java.nio.file.Path;
 public class AHISponge {
 
     private final PluginContainer pluginContainer;
+    private final Logger logger;
     private final SpongeAntiHealthIndicator ahi;
 
     @Inject
-    public AHISponge(PluginContainer pluginContainer, @ConfigDir(sharedRoot = false) Path configDirectory) {
+    public AHISponge(PluginContainer pluginContainer, @ConfigDir(sharedRoot = false) Path configDirectory, Logger logger) {
         this.pluginContainer = pluginContainer;
+        this.logger = logger;
         this.ahi = new SpongeAntiHealthIndicator(configDirectory);
     }
 
@@ -52,10 +55,9 @@ public class AHISponge {
     @Listener
     public void onServerStart(final StartedEngineEvent<Server> event) {
         ahi.commonOnInitialize();
-
         ahi.setScheduler(new SpongeScheduler(this.pluginContainer));
-
         ahi.commonOnEnable();
+
         enableBStats();
     }
 
@@ -63,7 +65,7 @@ public class AHISponge {
     public void onRegisterCommands(final RegisterCommandEvent<Command.Raw> event) {
         event.register(
                 this.pluginContainer,
-                new SpongeAHICommand(this),
+                new SpongeAHICommand(this, logger),
                 "antihealthindicator",
                 "ahi"
         );
