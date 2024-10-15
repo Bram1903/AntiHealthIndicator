@@ -65,7 +65,7 @@ public class AHISponge {
     public void onRegisterCommands(final RegisterCommandEvent<Command.Raw> event) {
         event.register(
                 this.pluginContainer,
-                new SpongeAHICommand(this, logger),
+                new SpongeAHICommand(this),
                 "antihealthindicator",
                 "ahi"
         );

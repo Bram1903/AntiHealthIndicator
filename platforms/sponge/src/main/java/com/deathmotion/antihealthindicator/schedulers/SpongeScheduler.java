@@ -28,19 +28,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public final class SpongeScheduler implements Scheduler {
-    private final Task.Builder taskBuilder;
     private final PluginContainer pluginContainer;
     private final org.spongepowered.api.scheduler.Scheduler asyncScheduler;
 
     public SpongeScheduler(PluginContainer pluginContainer) {
-        this.taskBuilder = Task.builder();
         this.pluginContainer = pluginContainer;
         this.asyncScheduler = Sponge.asyncScheduler();
     }
 
     @Override
     public void runAsyncTask(Consumer<Object> task) {
-        Task runTask = taskBuilder
+        Task runTask = Task.builder()
                 .execute(task::accept)
                 .plugin(pluginContainer)
                 .build();
@@ -50,7 +48,7 @@ public final class SpongeScheduler implements Scheduler {
 
     @Override
     public void runAsyncTaskDelayed(Consumer<Object> task, long delay, TimeUnit timeUnit) {
-        Task runDelayedTask = taskBuilder
+        Task runDelayedTask = Task.builder()
                 .execute(task::accept)
                 .plugin(pluginContainer)
                 .delay(delay, timeUnit)
@@ -61,7 +59,7 @@ public final class SpongeScheduler implements Scheduler {
 
     @Override
     public void runAsyncTaskAtFixedRate(@NotNull Consumer<Object> task, long delay, long period, @NotNull TimeUnit timeUnit) {
-        Task internalTask = taskBuilder
+        Task internalTask = Task.builder()
                 .execute(task::accept)
                 .plugin(pluginContainer)
                 .interval(period, timeUnit)
