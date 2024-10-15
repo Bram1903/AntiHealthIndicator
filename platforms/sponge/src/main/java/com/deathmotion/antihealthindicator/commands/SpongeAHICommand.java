@@ -100,10 +100,8 @@ public class SpongeAHICommand implements Command.Raw {
     private CommonUser<Platform> createCommonUser(CommandCause sender) {
         if (sender.root() instanceof ServerPlayer) {
             User user = PacketEvents.getAPI().getPlayerManager().getUser(sender.root());
-            plugin.getAhi().getLogManager().info("User: " + user.getName());
             return new CommonUser<>(plugin.getAhi(), user);
         } else {
-            plugin.getAhi().getLogManager().info("Console");
             return new CommonUser<>(plugin.getAhi(), null);
         }
     }
