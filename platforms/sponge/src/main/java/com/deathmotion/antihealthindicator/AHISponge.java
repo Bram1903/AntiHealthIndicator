@@ -18,11 +18,14 @@
 
 package com.deathmotion.antihealthindicator;
 
+import com.deathmotion.antihealthindicator.commands.SpongeAHICommand;
 import com.deathmotion.antihealthindicator.schedulers.SpongeScheduler;
 import com.google.inject.Inject;
 import org.spongepowered.api.Server;
+import org.spongepowered.api.command.Command;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 import org.spongepowered.plugin.PluginContainer;
@@ -53,9 +56,17 @@ public class AHISponge {
         ahi.setScheduler(new SpongeScheduler(this.pluginContainer));
 
         ahi.commonOnEnable();
-
-        registerCommands();
         enableBStats();
+    }
+
+    @Listener
+    public void onRegisterCommands(final RegisterCommandEvent<Command.Raw> event) {
+        event.register(
+                this.pluginContainer,
+                new SpongeAHICommand(this),
+                "antihealthindicator",
+                "ahi"
+        );
     }
 
     @Listener
@@ -64,9 +75,5 @@ public class AHISponge {
     }
 
     private void enableBStats() {
-    }
-
-    private void registerCommands() {
-        //new VelocityAHICommand(this, server);
     }
 }

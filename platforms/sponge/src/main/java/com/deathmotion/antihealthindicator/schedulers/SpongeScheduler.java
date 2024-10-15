@@ -40,23 +40,23 @@ public final class SpongeScheduler implements Scheduler {
 
     @Override
     public void runAsyncTask(Consumer<Object> task) {
-        Task internalTask = taskBuilder
+        Task runTask = taskBuilder
                 .execute(task::accept)
                 .plugin(pluginContainer)
                 .build();
 
-        this.asyncScheduler.submit(internalTask);
+        this.asyncScheduler.submit(runTask);
     }
 
     @Override
     public void runAsyncTaskDelayed(Consumer<Object> task, long delay, TimeUnit timeUnit) {
-        Task internalTask = taskBuilder
+        Task runDelayedTask = taskBuilder
                 .execute(task::accept)
                 .plugin(pluginContainer)
                 .delay(delay, timeUnit)
                 .build();
 
-        this.asyncScheduler.submit(internalTask);
+        this.asyncScheduler.submit(runDelayedTask);
     }
 
     @Override
