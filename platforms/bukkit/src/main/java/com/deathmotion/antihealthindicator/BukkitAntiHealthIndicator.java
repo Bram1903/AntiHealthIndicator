@@ -20,9 +20,10 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
-import io.github.retrooper.packetevents.bstats.Metrics;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -98,8 +99,8 @@ public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
     protected void enableBStats() {
         try {
             Metrics metrics = new Metrics(this.plugin, 20803);
-            metrics.addCustomChart(new Metrics.SimplePie("antihealthindicator_version", () -> AHIPlatform.class.getPackage().getImplementationVersion()));
-            metrics.addCustomChart(new Metrics.SimplePie("antihealthindicator_platform", () -> "Bukkit"));
+            metrics.addCustomChart(new SimplePie("antihealthindicator_version", () -> AHIPlatform.class.getPackage().getImplementationVersion()));
+            metrics.addCustomChart(new SimplePie("antihealthindicator_platform", () -> "Bukkit"));
         } catch (Exception e) {
             this.plugin.getLogger().warning("Something went wrong while enabling bStats.\n" + e.getMessage());
         }

@@ -20,12 +20,13 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
-import io.github.retrooper.packetevents.bstats.Metrics;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
+import org.bstats.bungeecord.Metrics;
+import org.bstats.charts.SimplePie;
 
 import java.util.UUID;
 
@@ -73,8 +74,8 @@ public class BungeeAntiHealthIndicator extends AHIPlatform<Plugin> {
     protected void enableBStats() {
         try {
             Metrics metrics = new Metrics(this.plugin, 20803);
-            metrics.addCustomChart(new Metrics.SimplePie("antihealthindicator_version", () -> AHIPlatform.class.getPackage().getImplementationVersion()));
-            metrics.addCustomChart(new Metrics.SimplePie("antihealthindicator_platform", () -> "BungeeCord"));
+            metrics.addCustomChart(new SimplePie("antihealthindicator_version", () -> AHIPlatform.class.getPackage().getImplementationVersion()));
+            metrics.addCustomChart(new SimplePie("antihealthindicator_platform", () -> "BungeeCord"));
         } catch (Exception e) {
             this.plugin.getLogger().warning("Something went wrong while enabling bStats.\n" + e.getMessage());
         }

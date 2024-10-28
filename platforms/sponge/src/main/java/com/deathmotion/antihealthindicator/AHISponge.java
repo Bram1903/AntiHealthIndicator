@@ -21,7 +21,8 @@ package com.deathmotion.antihealthindicator;
 import com.deathmotion.antihealthindicator.commands.SpongeAHICommand;
 import com.deathmotion.antihealthindicator.schedulers.SpongeScheduler;
 import com.google.inject.Inject;
-import org.apache.logging.log4j.Logger;
+import org.bstats.charts.SimplePie;
+import org.bstats.sponge.Metrics;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.config.ConfigDir;
@@ -38,13 +39,13 @@ import java.nio.file.Path;
 public class AHISponge {
 
     private final PluginContainer pluginContainer;
-    private final Logger logger;
+    private final Metrics metrics;
     private final SpongeAntiHealthIndicator ahi;
 
     @Inject
-    public AHISponge(PluginContainer pluginContainer, @ConfigDir(sharedRoot = false) Path configDirectory, Logger logger) {
+    public AHISponge(PluginContainer pluginContainer, @ConfigDir(sharedRoot = false) Path configDirectory, Metrics.Factory metricsFactory) {
         this.pluginContainer = pluginContainer;
-        this.logger = logger;
+        this.metrics = metricsFactory.make(20803);
         this.ahi = new SpongeAntiHealthIndicator(configDirectory);
     }
 
@@ -77,5 +78,7 @@ public class AHISponge {
     }
 
     private void enableBStats() {
+        metrics.addCustomChart(new SimplePie("antihealthindicator_version", () -> AHIPlatform.class.getPackage().getImplementationVersion()));
+        metrics.addCustomChart(new SimplePie("antihealthindicator_platform", () -> "Sponge"));
     }
 }

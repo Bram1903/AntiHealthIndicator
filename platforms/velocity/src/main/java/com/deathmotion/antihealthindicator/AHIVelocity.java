@@ -26,22 +26,20 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import io.github.retrooper.packetevents.bstats.Metrics;
-import org.slf4j.Logger;
+import org.bstats.charts.SimplePie;
+import org.bstats.velocity.Metrics;
 
 import java.nio.file.Path;
 
 public class AHIVelocity {
     private final ProxyServer server;
-    private final Path dataDirectory;
-    private final Logger logger;
+    private final Metrics.Factory metricsFactory;
     private final VelocityAntiHealthIndicator ahi;
 
     @Inject
-    public AHIVelocity(ProxyServer server, @DataDirectory Path dataDirectory, Logger logger) {
+    public AHIVelocity(ProxyServer server, @DataDirectory Path dataDirectory, Metrics.Factory metricsFactory) {
         this.server = server;
-        this.dataDirectory = dataDirectory;
-        this.logger = logger;
+        this.metricsFactory = metricsFactory;
         this.ahi = new VelocityAntiHealthIndicator(server, dataDirectory);
     }
 
@@ -67,13 +65,9 @@ public class AHIVelocity {
     }
 
     private void enableBStats() {
-        try {
-            Metrics metrics = Metrics.createInstance(this, this.ahi.getPlatform(), logger, dataDirectory, 20803);
-            metrics.addCustomChart(new Metrics.SimplePie("antihealthindicator_version", () -> AHIPlatform.class.getPackage().getImplementationVersion()));
-            metrics.addCustomChart(new Metrics.SimplePie("antihealthindicator_platform", () -> "Velocity"));
-        } catch (Exception e) {
-            this.logger.warn("Something went wrong while enabling bStats.\n{}", e.getMessage());
-        }
+        Metrics metrics = metricsFactory.make(this, 20803);
+        metrics.addCustomChart(new SimplePie("antihealthindicator_version", () -> AHIPlatform.class.getPackage().getImplementationVersion()));
+        metrics.addCustomChart(new SimplePie("antihealthindicator_platform", () -> "Velocity"));
     }
 
     private void registerCommands() {
