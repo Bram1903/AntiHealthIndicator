@@ -28,7 +28,6 @@ tasks {
 
         relocate("net.kyori.adventure.text.serializer.gson", "io.github.retrooper.packetevents.adventure.serializer.gson")
         relocate("net.kyori.adventure.text.serializer.legacy", "io.github.retrooper.packetevents.adventure.serializer.legacy")
-        relocate("org.bstats", "io.github.retrooper.packetevents.bstats")
 
         manifest {
             attributes["Implementation-Version"] = rootProject.version

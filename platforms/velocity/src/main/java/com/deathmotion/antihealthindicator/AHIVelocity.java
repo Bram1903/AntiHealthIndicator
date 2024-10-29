@@ -26,8 +26,8 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import org.bstats.charts.SimplePie;
-import org.bstats.velocity.Metrics;
+import io.github.retrooper.packetevents.bstats.charts.SimplePie;
+import io.github.retrooper.packetevents.bstats.velocity.Metrics;
 
 import java.nio.file.Path;
 

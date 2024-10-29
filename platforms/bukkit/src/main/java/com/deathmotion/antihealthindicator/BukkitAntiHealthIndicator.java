@@ -20,10 +20,10 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
+import io.github.retrooper.packetevents.bstats.bukkit.Metrics;
+import io.github.retrooper.packetevents.bstats.charts.SimplePie;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import org.bstats.bukkit.Metrics;
-import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
