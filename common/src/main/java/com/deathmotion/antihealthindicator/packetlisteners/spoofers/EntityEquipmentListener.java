@@ -121,6 +121,7 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
         }
 
         if (settings.getItems().isDurability() && itemStack.isDamageableItem()) {
+            // Prevent a broken elytra from being spoofed
             if (!settings.getItems().isBrokenElytra() || itemStack.getType() != ItemTypes.ELYTRA || itemStack.getDamageValue() < itemStack.getMaxDamage() - 1) {
                 if (useDamageableInterface) {
                     itemStack.setDamageValue(0);
