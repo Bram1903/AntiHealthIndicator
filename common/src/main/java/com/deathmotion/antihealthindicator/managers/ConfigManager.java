@@ -120,6 +120,7 @@ public class ConfigManager<P> {
         settings.getItems().setEnabled(getBoolean(yamlData, "spoof.entity-data.items.enabled", true));
         settings.getItems().setStackAmount(getBoolean(yamlData, "spoof.entity-data.items.stack-amount.enabled", true));
         settings.getItems().setDurability(getBoolean(yamlData, "spoof.entity-data.items.durability.enabled", true));
+        settings.getItems().setBrokenElytra(getBoolean(yamlData, "spoof.entity-data.items.durability.broken-elytra.enabled", true));
         settings.getItems().setEnchantments(getBoolean(yamlData, "spoof.entity-data.items.enchantments.enabled", true));
     }
 

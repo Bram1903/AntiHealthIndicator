@@ -26,6 +26,7 @@ import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.item.enchantment.Enchantment;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -120,12 +121,15 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
         }
 
         if (settings.getItems().isDurability() && itemStack.isDamageableItem()) {
-            if (useDamageableInterface) {
-                itemStack.setDamageValue(0);
-            } else {
-                itemStack.setLegacyData((short) 0);
+            // Prevent a broken elytra from being spoofed
+            if (!settings.getItems().isBrokenElytra() || itemStack.getType() != ItemTypes.ELYTRA || itemStack.getDamageValue() < itemStack.getMaxDamage() - 1) {
+                if (useDamageableInterface) {
+                    itemStack.setDamageValue(0);
+                } else {
+                    itemStack.setLegacyData((short) 0);
+                }
+                equipment.setItem(itemStack);
             }
-            equipment.setItem(itemStack);
         }
 
         if (settings.getItems().isEnchantments() && itemStack.isEnchanted(clientVersion)) {
