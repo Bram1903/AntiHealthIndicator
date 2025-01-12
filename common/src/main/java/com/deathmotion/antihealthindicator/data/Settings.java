@@ -78,7 +78,10 @@ public class Settings {
     public static class Items {
         private boolean Enabled = true;
         private boolean StackAmount = true;
+
         private boolean Durability = true;
+        private boolean BrokenElytra = true;
+
         private boolean Enchantments = true;
     }
 }

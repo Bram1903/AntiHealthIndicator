@@ -119,6 +119,10 @@ spoof:
       durability:
         enabled: true
 
+        # If enabled, elytra durability spoofing will be disabled when the elytra's durability is 1 or less.
+        broken-elytra:
+          enabled: true
+
       # If enabled, hides the enchantments of other players items (e.g., tools, armor).
       # For example, if a player holds a sword with sharpness 5, it won't show the sharpness enchantment.
       # But rather Luck of the Sea I, which is not true, but we need to apply at least one enchantment
