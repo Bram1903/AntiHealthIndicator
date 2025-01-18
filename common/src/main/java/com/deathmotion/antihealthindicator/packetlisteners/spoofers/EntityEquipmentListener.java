@@ -32,6 +32,7 @@ import com.github.retrooper.packetevents.protocol.item.enchantment.type.Enchantm
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
+import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
 
 import java.util.Collections;
@@ -120,9 +121,11 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
             equipment.setItem(itemStack);
         }
 
-        if (settings.getItems().isDurability() && itemStack.isDamageableItem()) {
+        if (settings.getItems().isDurability() && itemStack.isDamageableItem() && itemStack.getDamageValue() > 0) {
             // Prevent a broken elytra from being spoofed
-            if (!settings.getItems().isBrokenElytra() || itemStack.getType() != ItemTypes.ELYTRA || itemStack.getDamageValue() < itemStack.getMaxDamage() - 1) {
+            if (!settings.getItems().isBrokenElytra() || itemStack.getType() != ItemTypes.ELYTRA ||
+                (equipment.getSlot() != EquipmentSlot.MAIN_HAND && equipment.getSlot() != EquipmentSlot.OFF_HAND && equipment.getSlot() != EquipmentSlot.HELMET) ||
+                itemStack.getDamageValue() < itemStack.getMaxDamage() - 1) {
                 if (useDamageableInterface) {
                     itemStack.setDamageValue(0);
                 } else {
