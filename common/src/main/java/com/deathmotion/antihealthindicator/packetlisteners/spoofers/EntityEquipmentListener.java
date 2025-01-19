@@ -26,9 +26,9 @@ import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
-import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.item.enchantment.Enchantment;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
@@ -114,7 +114,9 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
      */
     private void handleEquipment(Equipment equipment, ClientVersion clientVersion, Settings settings) {
         ItemStack itemStack = equipment.getItem();
-        if (itemStack == null) return;
+        if (itemStack == null) {
+            return;
+        }
 
         if (settings.getItems().isStackAmount() && itemStack.getAmount() > 1) {
             itemStack.setAmount(1);
@@ -122,15 +124,21 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
         }
 
         if (settings.getItems().isDurability() && itemStack.isDamageableItem() && itemStack.getDamageValue() > 0) {
-            // Prevent a broken elytra from being spoofed
-            if (!settings.getItems().isBrokenElytra() || itemStack.getType() != ItemTypes.ELYTRA ||
-                (equipment.getSlot() != EquipmentSlot.MAIN_HAND && equipment.getSlot() != EquipmentSlot.OFF_HAND && equipment.getSlot() != EquipmentSlot.HELMET) ||
-                itemStack.getDamageValue() < itemStack.getMaxDamage() - 1) {
-                if (useDamageableInterface) {
-                    itemStack.setDamageValue(0);
-                } else {
-                    itemStack.setLegacyData((short) 0);
+            boolean isElytra = (itemStack.getType() == ItemTypes.ELYTRA);
+
+            // Additional checks if the item is Elytra
+            if (isElytra) {
+                boolean isInAllowedElytraSlot = (equipment.getSlot() == EquipmentSlot.MAIN_HAND || equipment.getSlot() == EquipmentSlot.OFF_HAND || equipment.getSlot() == EquipmentSlot.HELMET);
+                boolean isReallyBroken = (itemStack.getDamageValue() >= itemStack.getMaxDamage() - 1);
+
+                // Prevent resetting Elytra durability unless allowed by settings
+                if (!settings.getItems().isBrokenElytra() || !isInAllowedElytraSlot || !isReallyBroken) {
+                    resetItemDamage(itemStack);
+                    equipment.setItem(itemStack);
                 }
+            } else {
+                // For non-Elytra items, reset damage unconditionally when durability is disabled
+                resetItemDamage(itemStack);
                 equipment.setItem(itemStack);
             }
         }
@@ -138,6 +146,14 @@ public class EntityEquipmentListener<P> extends PacketListenerAbstract {
         if (settings.getItems().isEnchantments() && itemStack.isEnchanted(clientVersion)) {
             itemStack.setEnchantments(enchantmentList, clientVersion);
             equipment.setItem(itemStack);
+        }
+    }
+
+    private void resetItemDamage(ItemStack itemStack) {
+        if (useDamageableInterface) {
+            itemStack.setDamageValue(0);
+        } else {
+            itemStack.setLegacyData((short) 0);
         }
     }
 }
