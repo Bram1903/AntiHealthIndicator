@@ -62,7 +62,7 @@ public class VehicleState<P> extends PacketListenerAbstract {
     public void onPacketSend(PacketSendEvent event) {
         final Settings settings = configManager.getSettings();
         if (!settings.getEntityData().isEnabled()) return;
-        if (!settings.getEntityData().isPlayersOnly()) return;
+        if (settings.getEntityData().isPlayersOnly()) return;
 
         final PacketTypeCommon type = event.getPacketType();
 

@@ -45,7 +45,7 @@ Ensure the [PacketEvents](https://modrinth.com/plugin/packetevents) library is i
 
 | Platform                           | Supported Versions |
 |------------------------------------|--------------------|
-| Bukkit (Spigot, Paper, Folia etc.) | 1.8.8 - 1.21.1     |
+| Bukkit (Spigot, Paper, Folia etc.) | 1.8.8 - 1.21.4     |
 | Velocity                           | Latest Major       |
 | BungeeCord (or any forks)          | Latest Major       |
 | Sponge                             | Latest Major       |
