@@ -1,15 +1,15 @@
 [versions]
-adventure = "4.16.0"
-packetevents = "2.6.0"
+adventure = "4.18.0"
+packetevents = "2.7.0"
 betterreload = "v1.0.0"
-paper = "1.21-R0.1-SNAPSHOT"
-velocity = "3.3.0-SNAPSHOT"
+paper = "1.21.4-R0.1-SNAPSHOT"
+velocity = "3.4.0-SNAPSHOT"
 bungeecord = "1.21-R0.1-SNAPSHOT"
 sponge = "8.0.0"
 snakeyaml = "2.2"
-run-paper = "2.3.0"
-lombok = "1.18.30"
-shadow = "8.3.0"
+run-paper = "2.3.1"
+lombok = "1.18.36"
+shadow = "8.3.5"
 spongeGradle = "2.2.0"
 
 [libraries]
