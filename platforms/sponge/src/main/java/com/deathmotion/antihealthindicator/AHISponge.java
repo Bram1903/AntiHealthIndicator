@@ -20,6 +20,7 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.commands.SpongeAHICommand;
 import com.deathmotion.antihealthindicator.schedulers.SpongeScheduler;
+import com.deathmotion.antihealthindicator.util.AHIVersions;
 import com.google.inject.Inject;
 import io.github.retrooper.packetevents.bstats.charts.SimplePie;
 import io.github.retrooper.packetevents.bstats.sponge.Metrics;
@@ -78,7 +79,7 @@ public class AHISponge {
     }
 
     private void enableBStats() {
-        metrics.addCustomChart(new SimplePie("antihealthindicator_version", () -> AHIPlatform.class.getPackage().getImplementationVersion()));
+        metrics.addCustomChart(new SimplePie("antihealthindicator_version", AHIVersions.CURRENT::toStringWithoutSnapshot));
         metrics.addCustomChart(new SimplePie("antihealthindicator_platform", () -> "Sponge"));
     }
 }

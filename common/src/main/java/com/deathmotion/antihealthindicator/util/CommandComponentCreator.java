@@ -18,9 +18,7 @@
 
 package com.deathmotion.antihealthindicator.util;
 
-import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.Constants;
-import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -29,25 +27,25 @@ import net.kyori.adventure.text.format.TextDecoration;
 
 public class CommandComponentCreator {
 
-    private static String pluginVersion;
-
-    private static String getPluginVersion() {
-        if (pluginVersion == null) {
-            pluginVersion = AHIPlatform.class.getPackage().getImplementationVersion();
-        }
-        return pluginVersion;
-    }
-
     private static Component createColoredText(String text, NamedTextColor color, boolean bold) {
         return Component.text(text, color).decoration(TextDecoration.BOLD, bold);
     }
 
     public static Component createAHICommandComponent() {
+        AHIVersion currentVersion = AHIVersions.CURRENT;
+        boolean isSnapshot = currentVersion.snapshot();
+        String versionString = currentVersion.toStringWithoutSnapshot();
+
+        // Include snapshot commit if applicable
+        if (isSnapshot && currentVersion.snapshotCommit() != null) {
+            versionString += " (git: " + currentVersion.snapshotCommit() + ")";
+        }
+
         return Component.text()
                 .append(createColoredText("\u25cf", NamedTextColor.GREEN, true))
                 .append(createColoredText(" Running ", NamedTextColor.GRAY, false))
                 .append(createColoredText("AntiHealthIndicator", NamedTextColor.GREEN, true))
-                .append(createColoredText(" v" + getPluginVersion(), NamedTextColor.GREEN, true))
+                .append(createColoredText(" v" + versionString, NamedTextColor.GREEN, true))
                 .append(createColoredText(" by ", NamedTextColor.GRAY, false))
                 .append(createColoredText("Bram", NamedTextColor.GREEN, true))
                 .hoverEvent(HoverEvent.showText(createColoredText("Open Github Page!", NamedTextColor.GREEN, true)
@@ -56,8 +54,5 @@ public class CommandComponentCreator {
                 .build();
     }
 
-    public static String createLegacyMessage(Component message) {
-        return LegacyComponentSerializer.legacySection().serialize(message);
-    }
 }
 

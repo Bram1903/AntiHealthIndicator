@@ -1,3 +1,5 @@
+import java.io.ByteArrayOutputStream
+
 plugins {
     antihealthindicator.`java-conventions`
     alias(libs.plugins.shadow)
@@ -7,7 +9,26 @@ plugins {
 
 group = "com.deathmotion.antihealthindicator"
 description = "A plugin that prevents hackers and modders from seeing the health of other players."
-version = "2.3.1-SNAPSHOT"
+val fullVersion = "2.3.1"
+val snapshot = true
+
+fun getVersionMeta(includeHash: Boolean): String {
+    if (!snapshot) {
+        return ""
+    }
+    var commitHash = ""
+    if (includeHash && file(".git").isDirectory) {
+        val stdout = ByteArrayOutputStream()
+        exec {
+            commandLine("git", "rev-parse", "--short", "HEAD")
+            standardOutput = stdout
+        }
+        commitHash = "+${stdout.toString().trim()}"
+    }
+    return "$commitHash-SNAPSHOT"
+}
+version = "$fullVersion${getVersionMeta(true)}"
+ext["versionNoHash"] = "$fullVersion${getVersionMeta(false)}"
 
 dependencies {
     implementation(project(":common"))
@@ -23,15 +44,11 @@ tasks {
     }
 
     shadowJar {
-        archiveFileName = "${rootProject.name}-${project.version}.jar"
+        archiveFileName = "${rootProject.name}-${ext["versionNoHash"]}.jar"
         archiveClassifier = null
 
         relocate("net.kyori.adventure.text.serializer.gson", "io.github.retrooper.packetevents.adventure.serializer.gson")
         relocate("net.kyori.adventure.text.serializer.legacy", "io.github.retrooper.packetevents.adventure.serializer.legacy")
-
-        manifest {
-            attributes["Implementation-Version"] = rootProject.version
-        }
     }
 
     assemble {
@@ -42,7 +59,7 @@ tasks {
     // 1.17           = Java 16
     // 1.18 - 1.20.4  = Java 17
     // 1-20.5+        = Java 21
-    val version = "1.21.3"
+    val version = "1.21.4"
     val javaVersion = JavaLanguageVersion.of(21)
 
     val jvmArgsExternal = listOf(
@@ -50,9 +67,9 @@ tasks {
     )
 
     val sharedBukkitPlugins = runPaper.downloadPluginsSpec {
-        url("https://ci.codemc.io/job/retrooper/job/packetevents/lastSuccessfulBuild/artifact/spigot/build/libs/packetevents-spigot-2.6.1-SNAPSHOT.jar")
-        url("https://github.com/ViaVersion/ViaVersion/releases/download/5.1.1/ViaVersion-5.1.1.jar")
-        url("https://github.com/ViaVersion/ViaBackwards/releases/download/5.1.1/ViaBackwards-5.1.1.jar")
+        url("https://github.com/retrooper/packetevents/releases/download/v2.7.0/packetevents-spigot-2.7.0.jar")
+        url("https://github.com/ViaVersion/ViaVersion/releases/download/5.2.1/ViaVersion-5.2.1.jar")
+        url("https://github.com/ViaVersion/ViaBackwards/releases/download/5.2.1/ViaBackwards-5.2.1.jar")
     }
 
     runServer {
@@ -65,8 +82,8 @@ tasks {
 
         downloadPlugins {
             from(sharedBukkitPlugins)
-            url("https://ci.lucko.me/job/spark/462/artifact/spark-bukkit/build/libs/spark-1.10.116-bukkit.jar")
-            url("https://download.luckperms.net/1560/bukkit/loader/LuckPerms-Bukkit-5.4.145.jar")
+            url("https://ci.lucko.me/job/spark/472/artifact/spark-bukkit/build/libs/spark-1.10.124-bukkit.jar")
+            url("https://download.luckperms.net/1569/bukkit/loader/LuckPerms-Bukkit-5.4.152.jar")
         }
 
         jvmArgs = jvmArgsExternal

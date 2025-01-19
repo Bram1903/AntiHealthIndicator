@@ -54,7 +54,7 @@ public class UpdateNotifier<P> extends PacketListenerAbstract {
         this.updateComponent = Component.text()
                 .append(Component.text("[AntiHealthIndicator] ", NamedTextColor.RED)
                         .decoration(TextDecoration.BOLD, true))
-                .append(Component.text("Version " + latestVersion.toString() + " is ", NamedTextColor.GREEN))
+                .append(Component.text("Version " + latestVersion.toStringWithoutSnapshot() + " is ", NamedTextColor.GREEN))
                 .append(Component.text("now available", NamedTextColor.GREEN)
                         .decorate(TextDecoration.UNDERLINED)
                         .hoverEvent(HoverEvent.showText(Component.text("Click to download", NamedTextColor.GREEN)))

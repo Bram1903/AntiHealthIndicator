@@ -20,6 +20,7 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.commands.VelocityAHICommand;
 import com.deathmotion.antihealthindicator.schedulers.VelocityScheduler;
+import com.deathmotion.antihealthindicator.util.AHIVersions;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -66,7 +67,7 @@ public class AHIVelocity {
 
     private void enableBStats() {
         Metrics metrics = metricsFactory.make(this, 20803);
-        metrics.addCustomChart(new SimplePie("antihealthindicator_version", () -> AHIPlatform.class.getPackage().getImplementationVersion()));
+        metrics.addCustomChart(new SimplePie("antihealthindicator_version", AHIVersions.CURRENT::toStringWithoutSnapshot));
         metrics.addCustomChart(new SimplePie("antihealthindicator_platform", () -> "Velocity"));
     }
 
