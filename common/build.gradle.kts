@@ -1,5 +1,6 @@
 plugins {
     antihealthindicator.`java-conventions`
+    `ahi-version`
     `java-library`
 }
 
@@ -14,4 +15,14 @@ dependencies {
 // So that SNAPSHOT is always the latest SNAPSHOT
 configurations.all {
     resolutionStrategy.cacheDynamicVersionsFor(0, TimeUnit.SECONDS)
+}
+
+tasks {
+    withType<JavaCompile> {
+        dependsOn(generateVersionsFile)
+    }
+
+    generateVersionsFile {
+        packageName = "com.deathmotion.antihealthindicator.util"
+    }
 }

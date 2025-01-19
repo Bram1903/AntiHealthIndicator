@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":common"))
     compileOnly(libs.sponge)
     compileOnly(libs.packetevents.sponge)
+    annotationProcessor(libs.lombok)
 }
 
 sponge {

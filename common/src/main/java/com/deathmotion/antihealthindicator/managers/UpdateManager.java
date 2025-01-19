@@ -23,6 +23,7 @@ import com.deathmotion.antihealthindicator.data.Constants;
 import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.packetlisteners.UpdateNotifier;
 import com.deathmotion.antihealthindicator.util.AHIVersion;
+import com.deathmotion.antihealthindicator.util.AHIVersions;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -54,7 +55,7 @@ public class UpdateManager<P> {
     public void checkForUpdate() {
         CompletableFuture.runAsync(() -> {
             try {
-                AHIVersion localVersion = platform.getVersion();
+                AHIVersion localVersion = AHIVersions.CURRENT;
                 AHIVersion latestVersion = fetchLatestGitHubVersion();
 
                 if (latestVersion != null) {
@@ -96,9 +97,9 @@ public class UpdateManager<P> {
             platform.sendConsoleMessage(Component.text("[AntiHealthIndicator] ", NamedTextColor.DARK_GREEN)
                     .append(Component.text("Update available! ", NamedTextColor.BLUE))
                     .append(Component.text("Current version: ", NamedTextColor.WHITE))
-                    .append(Component.text(currentVersion.toString(), NamedTextColor.GOLD))
+                    .append(Component.text(currentVersion.toStringWithoutSnapshot(), NamedTextColor.GOLD))
                     .append(Component.text(" | New version: ", NamedTextColor.WHITE))
-                    .append(Component.text(newVersion.toString(), NamedTextColor.DARK_PURPLE)));
+                    .append(Component.text(newVersion.toStringWithoutSnapshot(), NamedTextColor.DARK_PURPLE)));
         }
         if (settings.getUpdateChecker().isNotifyInGame()) {
             PacketEvents.getAPI().getEventManager().registerListener(new UpdateNotifier<>(platform, newVersion));
@@ -110,9 +111,9 @@ public class UpdateManager<P> {
             platform.sendConsoleMessage(Component.text("[AntiHealthIndicator] ", NamedTextColor.DARK_GREEN)
                     .append(Component.text("Development build detected. ", NamedTextColor.WHITE))
                     .append(Component.text("Current version: ", NamedTextColor.WHITE))
-                    .append(Component.text(currentVersion.toString(), NamedTextColor.AQUA))
+                    .append(Component.text(currentVersion.toStringWithoutSnapshot(), NamedTextColor.AQUA))
                     .append(Component.text(" | Latest stable version: ", NamedTextColor.WHITE))
-                    .append(Component.text(newVersion.toString(), NamedTextColor.DARK_AQUA)));
+                    .append(Component.text(newVersion.toStringWithoutSnapshot(), NamedTextColor.DARK_AQUA)));
         }
     }
 }

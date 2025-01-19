@@ -21,7 +21,6 @@ package com.deathmotion.antihealthindicator;
 import com.deathmotion.antihealthindicator.commands.AntiHealthIndicatorCommand;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.deathmotion.antihealthindicator.managers.*;
-import com.deathmotion.antihealthindicator.util.AHIVersion;
 import com.github.retrooper.packetevents.PacketEvents;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -31,8 +30,6 @@ import java.util.UUID;
 
 @Getter
 public abstract class AHIPlatform<P> {
-    private final AHIVersion version = AHIVersion.createFromPackageVersion();
-
     protected ConfigManager<P> configManager;
     protected LogManager<P> logManager;
 

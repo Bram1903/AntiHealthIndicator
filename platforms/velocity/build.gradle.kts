@@ -14,6 +14,7 @@ dependencies {
     compileOnly(libs.velocity)
     compileOnly(libs.packetevents.velocity)
     annotationProcessor(libs.velocity)
+    annotationProcessor(libs.lombok)
 }
 
 tasks.register("generateTemplates") {}

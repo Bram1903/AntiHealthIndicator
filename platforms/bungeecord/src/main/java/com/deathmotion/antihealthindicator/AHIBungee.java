@@ -20,14 +20,12 @@ package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.commands.BungeeAHICommand;
 import com.deathmotion.antihealthindicator.schedulers.BungeeScheduler;
+import lombok.Getter;
 import net.md_5.bungee.api.plugin.Plugin;
 
+@Getter
 public final class AHIBungee extends Plugin {
     private final BungeeAntiHealthIndicator ahi = new BungeeAntiHealthIndicator(this);
-
-    public BungeeAntiHealthIndicator getAhi() {
-        return this.ahi;
-    }
 
     @Override
     public void onEnable() {

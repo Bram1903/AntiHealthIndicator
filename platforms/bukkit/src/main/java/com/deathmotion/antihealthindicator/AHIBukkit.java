@@ -21,15 +21,13 @@ package com.deathmotion.antihealthindicator;
 import com.deathmotion.antihealthindicator.commands.BukkitAHICommand;
 import com.deathmotion.antihealthindicator.listener.ReloadListener;
 import com.deathmotion.antihealthindicator.schedulers.BukkitScheduler;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@Getter
 public class AHIBukkit extends JavaPlugin {
     private final BukkitAntiHealthIndicator ahi = new BukkitAntiHealthIndicator(this);
-
-    public BukkitAntiHealthIndicator getAhi() {
-        return this.ahi;
-    }
 
     @Override
     public void onEnable() {
