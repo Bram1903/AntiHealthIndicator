@@ -29,12 +29,15 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import io.github.retrooper.packetevents.bstats.charts.SimplePie;
 import io.github.retrooper.packetevents.bstats.velocity.Metrics;
+import lombok.Getter;
 
 import java.nio.file.Path;
 
 public class AHIVelocity {
     private final ProxyServer server;
     private final Metrics.Factory metricsFactory;
+
+    @Getter
     private final VelocityAntiHealthIndicator ahi;
 
     @Inject
@@ -42,10 +45,6 @@ public class AHIVelocity {
         this.server = server;
         this.metricsFactory = metricsFactory;
         this.ahi = new VelocityAntiHealthIndicator(server, dataDirectory);
-    }
-
-    public VelocityAntiHealthIndicator getAhi() {
-        return this.ahi;
     }
 
     @Subscribe

@@ -16,4 +16,5 @@ dependencies {
     compileOnly(libs.paper)
     compileOnly(libs.packetevents.spigot)
     compileOnly(libs.betterreload.api)
+    annotationProcessor(libs.lombok)
 }

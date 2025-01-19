@@ -14,4 +14,5 @@ dependencies {
     implementation(project(":common"))
     compileOnly(libs.bungeecord)
     compileOnly(libs.packetevents.bungeecord)
+    annotationProcessor(libs.lombok)
 }
