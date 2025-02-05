@@ -20,21 +20,25 @@ package com.deathmotion.antihealthindicator.testplugin;
 
 import com.deathmotion.antihealthindicator.api.AntiHealthIndicator;
 import com.deathmotion.antihealthindicator.api.AntiHealthIndicatorAPI;
-import lombok.Getter;
-import org.bukkit.plugin.java.JavaPlugin;
+import com.google.inject.Inject;
+import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import org.slf4j.Logger;
 
-@Getter
-public final class ApiTestPlugin extends JavaPlugin {
+public final class ApiTestPlugin {
+
+    private final Logger logger;
 
     private AntiHealthIndicatorAPI api;
 
-    @Override
-    public void onEnable() {
-        api = AntiHealthIndicator.getAPI();
-        getLogger().info("Successfully hooked into the AntiHealthIndicator API running version " + api.getVersion().toStringWithoutSnapshot());
+    @Inject
+    public ApiTestPlugin(Logger logger) {
+        this.logger = logger;
     }
 
-    @Override
-    public void onDisable() {
+    @Subscribe
+    public void onProxyInitialization(ProxyInitializeEvent ignoredEvent) {
+        api = AntiHealthIndicator.getAPI();
+        logger.info("Successfully hooked into the AntiHealthIndicator API running version {}", api.getVersion().toStringWithoutSnapshot());
     }
 }

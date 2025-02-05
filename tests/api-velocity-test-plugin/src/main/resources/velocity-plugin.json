@@ -1,0 +1,17 @@
+{
+  "id": "apitestplugin",
+  "name": "APITestPlugin",
+  "version": "${version}",
+  "description": "A simple test plugin for the AntiHealthIndicator API.",
+  "url": "https://github.com/Bram1903/AntiHealthIndicator",
+  "authors": [
+    "Bram"
+  ],
+  "dependencies": [
+    {
+      "id": "antihealthindicator",
+      "optional": false
+    }
+  ],
+  "main": "com.deathmotion.antihealthindicator.testplugin.ApiTestPlugin"
+}

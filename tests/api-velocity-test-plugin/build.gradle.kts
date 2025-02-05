@@ -5,14 +5,18 @@ plugins {
 }
 
 repositories {
-    maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
+    maven {
+        name = "papermc"
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
 }
 
 dependencies {
     compileOnly(project(":api"))
 
-    compileOnly(libs.paper)
-    compileOnly(libs.lombok)
+    compileOnly(libs.velocity)
+    compileOnly(libs.packetevents.velocity)
+    annotationProcessor(libs.velocity)
     annotationProcessor(libs.lombok)
 }
 
@@ -25,7 +29,7 @@ tasks {
     }
 
     shadowJar {
-        archiveFileName = "AntiHealthIndicatorAPI-Bukkit-Test.jar"
+        archiveFileName = "AntiHealthIndicatorAPI-Velocity-Test.jar"
         archiveClassifier = null
     }
 
@@ -36,7 +40,7 @@ tasks {
     processResources {
         inputs.property("version", project.version)
 
-        filesMatching(listOf("plugin.yml", "paper-plugin.yml")) {
+        filesMatching(listOf("velocity-plugin.json", "velocity-plugin.json")) {
             expand(
                 "version" to project.version,
             )
