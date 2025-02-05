@@ -18,6 +18,7 @@
 
 package com.deathmotion.antihealthindicator.util;
 
+import com.deathmotion.antihealthindicator.api.versioning.AHIVersion;
 import com.deathmotion.antihealthindicator.data.Constants;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;

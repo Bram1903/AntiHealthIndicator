@@ -13,6 +13,10 @@ repositories {
     maven("https://repo.codemc.io/repository/maven-snapshots/")
 }
 
+dependencies {
+    compileOnly("org.jetbrains:annotations:23.0.0")
+}
+
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(21)
     disableAutoTargetJvm()

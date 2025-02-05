@@ -19,9 +19,9 @@
 package com.deathmotion.antihealthindicator.packetlisteners;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.deathmotion.antihealthindicator.api.versioning.AHIVersion;
 import com.deathmotion.antihealthindicator.data.Constants;
 import com.deathmotion.antihealthindicator.data.Settings;
-import com.deathmotion.antihealthindicator.util.AHIVersion;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.protocol.player.User;

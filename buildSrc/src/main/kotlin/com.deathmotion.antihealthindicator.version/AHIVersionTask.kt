@@ -42,6 +42,8 @@ abstract class AHIVersionTask : DefaultTask() {
              */
             package $packageName;
             
+            import com.deathmotion.antihealthindicator.api.versioning.AHIVersion;
+            
             import java.time.Instant;
             
             public final class AHIVersions {

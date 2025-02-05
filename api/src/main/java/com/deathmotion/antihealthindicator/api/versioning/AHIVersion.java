@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.deathmotion.antihealthindicator.util;
+package com.deathmotion.antihealthindicator.api.versioning;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 /**
- * Represents a TotemGuard version using Semantic Versioning.
+ * Represents an AntiHealthIndicator version using Semantic Versioning.
  * Supports version comparison, cloning, and provides a string representation.
  * Snapshot versioning is also supported.
  * Generally a snapshot version is published before the release version,
@@ -158,9 +158,9 @@ public class AHIVersion implements Comparable<AHIVersion> {
     }
 
     /**
-     * Gets the snapshot commit hash of the TotemGuard snapshot version. May be of any length.
+     * Gets the snapshot commit hash of the AntiHealthIndicator snapshot version. May be of any length.
      * Availability is not guaranteed since it is contingent on how the program was built.
-     * Generally speaking, the commit hash can only be available if the TotemGuard version is a snapshot version.
+     * Generally speaking, the commit hash can only be available if the AntiHealthIndicator version is a snapshot version.
      *
      * @return the snapshot commit hash, if available.
      */

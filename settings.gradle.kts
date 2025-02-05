@@ -21,6 +21,7 @@ gradleEnterprise {
 }
 
 rootProject.name = "AntiHealthIndicator"
+include(":api")
 include(":common")
 include(":platforms:bukkit")
 include(":platforms:velocity")

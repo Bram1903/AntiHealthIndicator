@@ -19,10 +19,10 @@
 package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.deathmotion.antihealthindicator.api.versioning.AHIVersion;
 import com.deathmotion.antihealthindicator.data.Constants;
 import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.packetlisteners.UpdateNotifier;
-import com.deathmotion.antihealthindicator.util.AHIVersion;
 import com.deathmotion.antihealthindicator.util.AHIVersions;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.google.gson.Gson;
