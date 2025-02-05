@@ -1,0 +1,10 @@
+name: APITestPlugin
+version: ${version}
+main: com.deathmotion.antihealthindicator.testplugin.ApiTestPlugin
+api-version: '1.21'
+dependencies:
+  server:
+    AntiHealthIndicator:
+      load: BEFORE
+      required: true
+      join-classpath: true

@@ -41,7 +41,7 @@ public abstract class AHIPlatform<P> {
     public void commonOnInitialize() {
         logManager = new LogManager<>(this);
         configManager = new ConfigManager<>(this);
-        AntiHealthIndicator.setInstance(new AntiHealthIndicatorAPIImpl<>(this));
+        AntiHealthIndicator.setAPI(new AntiHealthIndicatorAPIImpl<>(this));
     }
 
     /**

@@ -1,0 +1,10 @@
+name: APITestPlugin
+version: ${version}
+main: com.deathmotion.antihealthindicator.testplugin.ApiTestPlugin
+api-version: '1.21'
+folia-supported: true
+author: Bram
+description: A simple test plugin for the AntiHealthIndicator API.
+load: POSTWORLD
+depend:
+  - AntiHealthIndicator

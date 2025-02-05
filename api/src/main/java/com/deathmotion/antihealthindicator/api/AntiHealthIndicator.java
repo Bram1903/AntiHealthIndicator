@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.deathmotion.antihealthindicator.api;
 
 /**
@@ -32,7 +33,7 @@ public final class AntiHealthIndicator {
      * @return The API instance.
      * @throws IllegalStateException if the API has not been initialized.
      */
-    public static AntiHealthIndicatorAPI getInstance() {
+    public static AntiHealthIndicatorAPI getAPI() {
         if (api == null) {
             throw new IllegalStateException("AntiHealthIndicator API is not initialized! Ensure the implementation is set before calling getInstance().");
         }
@@ -46,7 +47,7 @@ public final class AntiHealthIndicator {
      * @param instance The api implementation instance.
      * @throws IllegalStateException if the API has already been initialized.
      */
-    public static void setInstance(AntiHealthIndicatorAPI instance) {
+    public static void setAPI(AntiHealthIndicatorAPI instance) {
         if (api != null) {
             throw new IllegalStateException("AntiHealthIndicator API instance is already set and cannot be modified.");
         }
