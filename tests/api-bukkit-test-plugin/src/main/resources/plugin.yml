@@ -6,5 +6,5 @@ folia-supported: true
 author: Bram
 description: A simple test plugin for the AntiHealthIndicator API.
 load: POSTWORLD
-depend:
+softdepend:
   - AntiHealthIndicator

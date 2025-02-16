@@ -18,10 +18,13 @@
 
 package com.deathmotion.antihealthindicator.api;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Singleton manager for the AntiHealthIndicator API.
  */
 public final class AntiHealthIndicator {
+
     private static AntiHealthIndicatorAPI api;
 
     private AntiHealthIndicator() {
@@ -35,7 +38,7 @@ public final class AntiHealthIndicator {
      */
     public static AntiHealthIndicatorAPI getAPI() {
         if (api == null) {
-            throw new IllegalStateException("AntiHealthIndicator API is not initialized! Ensure the implementation is set before calling getInstance().");
+            throw new IllegalStateException("AntiHealthIndicator API has not been initialized.");
         }
         return api;
     }
@@ -47,7 +50,7 @@ public final class AntiHealthIndicator {
      * @param instance The api implementation instance.
      * @throws IllegalStateException if the API has already been initialized.
      */
-    public static void setAPI(AntiHealthIndicatorAPI instance) {
+    public static void setAPI(@NotNull AntiHealthIndicatorAPI instance) {
         if (api != null) {
             throw new IllegalStateException("AntiHealthIndicator API instance is already set and cannot be modified.");
         }

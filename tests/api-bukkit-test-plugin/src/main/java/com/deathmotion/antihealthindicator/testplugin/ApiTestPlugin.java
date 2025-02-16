@@ -30,6 +30,12 @@ public final class ApiTestPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        if (!(getServer().getPluginManager().isPluginEnabled("AntiHealthIndicator"))) {
+            getLogger().severe("AntiHealthIndicator is not enabled! This plugin will be disabled.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
         api = AntiHealthIndicator.getAPI();
         getLogger().info("Successfully hooked into the AntiHealthIndicator API running version " + api.getVersion().toStringWithoutSnapshot());
     }

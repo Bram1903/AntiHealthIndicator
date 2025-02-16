@@ -6,5 +6,5 @@ dependencies:
   server:
     AntiHealthIndicator:
       load: BEFORE
-      required: true
+      required: false
       join-classpath: true
