@@ -1,9 +1,9 @@
 /*
  * This file is part of AntiHealthIndicator - https://github.com/Bram1903/AntiHealthIndicator
- * Copyright (C) 2024 Bram and contributors
+ * Copyright (C) 2025 Bram and contributors
  *
  * This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
@@ -37,7 +37,8 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 
 /**
- * Listens for EntityMetadata events to modify the display of entity attributes.
+ * Listens for EntityMetadata packets and modifies certain entity attributes
+ * based on configuration settings.
  *
  * @param <P> The platform type.
  */
@@ -45,42 +46,32 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
     private final AHIPlatform<P> platform;
     private final ConfigManager<P> configManager;
     private final CacheManager<P> cacheManager;
-
     private final boolean healthTexturesSupported;
 
-    /**
-     * Constructs a new EntityMetadataListener with the specified {@link AHIPlatform}.
-     *
-     * @param platform The platform to use.
-     */
     public EntityMetadataListener(AHIPlatform<P> platform) {
         this.platform = platform;
         this.configManager = platform.getConfigManager();
         this.cacheManager = platform.getCacheManager();
 
+        // Health textures are supported for server versions 1.15 and above.
         this.healthTexturesSupported = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_15);
 
         platform.getLogManager().debug("Entity Metadata listener initialized.");
     }
 
-    /**
-     * Called when an {@link PacketSendEvent} is triggered to overwrite the {@link EntityData} for certain entities.
-     *
-     * @param event The event that has been triggered.
-     */
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (!event.getPacketType().equals(PacketType.Play.Server.ENTITY_METADATA)) return;
 
-        final Settings settings = configManager.getSettings();
+        Settings settings = configManager.getSettings();
         if (!settings.getEntityData().isEnabled()) return;
 
         WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata(event);
         int entityId = packet.getEntityId();
         User user = event.getUser();
 
-        if (entityId == user.getEntityId()) return;
-        if (shouldBypass(user, settings)) return;
+        // Do not process if the packet refers to the user’s own entity or if the user has bypass permissions.
+        if (entityId == user.getEntityId() || shouldBypass(user, settings)) return;
 
         CachedEntity cachedEntity = cacheManager.getCachedEntity(user.getUUID(), entityId).orElse(null);
         if (cachedEntity == null) return;
@@ -90,7 +81,6 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
 
         MetadataIndex metadataIndex = new MetadataIndex(user.getClientVersion());
         packet.getEntityMetadata().forEach(entityData -> handleEntityMetadata(entityType, entityData, metadataIndex, settings));
-
         event.markForReEncode(true);
     }
 
@@ -99,57 +89,86 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
     }
 
     private boolean shouldIgnoreEntity(EntityType entityType, User user, int entityId, CachedEntity cachedEntity, Settings settings) {
-        if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) return true;
-        if (settings.getEntityData().isPlayersOnly() && entityType != EntityTypes.PLAYER) return true;
-        if (!settings.getEntityData().isPlayersOnly() && settings.getEntityData().isIgnoreVehicles() && cacheManager.isUserPassenger(user.getUUID(), entityId, user.getEntityId()))
+        // Ignore entities with a boss bar (that shows the health already anyway)
+        if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) {
             return true;
+        }
+
+        // If only players should be processed, skip non-player entities.
+        if (settings.getEntityData().isPlayersOnly() && entityType != EntityTypes.PLAYER) {
+            return true;
+        }
+
+        // Optionally ignore vehicles.
+        if (!settings.getEntityData().isPlayersOnly() && settings.getEntityData().isIgnoreVehicles() && cacheManager.isUserPassenger(user.getUUID(), entityId, user.getEntityId())) {
+            return true;
+        }
+
+        // Special handling for wolves.
         return entityType == EntityTypes.WOLF && settings.getEntityData().getWolves().isEnabled() && shouldIgnoreWolf(user, cachedEntity, settings);
     }
 
     private boolean shouldIgnoreWolf(User user, CachedEntity cachedEntity, Settings settings) {
-        WolfEntity wolfEntityData = (WolfEntity) cachedEntity;
-
-        return (!settings.getEntityData().getWolves().isTamed() && !settings.getEntityData().getWolves().isOwner()) ||
-                (settings.getEntityData().getWolves().isTamed() && wolfEntityData.isTamed()) ||
-                (settings.getEntityData().getWolves().isOwner() && wolfEntityData.isOwnerPresent() && wolfEntityData.getOwnerUUID().equals(user.getUUID()));
+        WolfEntity wolfEntity = (WolfEntity) cachedEntity;
+        boolean ignoreBasedOnSettings = !settings.getEntityData().getWolves().isTamed() && !settings.getEntityData().getWolves().isOwner();
+        boolean isTamed = settings.getEntityData().getWolves().isTamed() && wolfEntity.isTamed();
+        boolean isOwnedByUser = settings.getEntityData().getWolves().isOwner() && wolfEntity.isOwnerPresent() && wolfEntity.getOwnerUUID().equals(user.getUUID());
+        return ignoreBasedOnSettings || isTamed || isOwnedByUser;
     }
 
+    /**
+     * Modifies the metadata for the given entity based on its type and settings.
+     */
     private void handleEntityMetadata(EntityType entityType, EntityData entityData, MetadataIndex metadataIndex, Settings settings) {
         if (entityType == EntityTypes.IRON_GOLEM && settings.getEntityData().getIronGolems().isEnabled()) {
             if (!settings.getEntityData().getIronGolems().isGradual() || !healthTexturesSupported) {
-                spoofEntityMetadata(entityData, metadataIndex, settings);
+                applyDefaultSpoofing(entityData, metadataIndex, settings);
             } else {
                 spoofIronGolemMetadata(entityData, metadataIndex, settings);
             }
         } else {
-            spoofEntityMetadata(entityData, metadataIndex, settings);
+            applyDefaultSpoofing(entityData, metadataIndex, settings);
             if (entityType == EntityTypes.PLAYER) {
                 spoofPlayerMetadata(entityData, metadataIndex, settings);
             }
         }
     }
 
-    private void spoofIronGolemMetadata(EntityData entityData, MetadataIndex metadataIndex, Settings settings) {
-        if (entityData.getIndex() == metadataIndex.AIR_TICKS && settings.getEntityData().isAirTicks()) {
-            setDynamicValue(entityData, 1);
-        }
+    /**
+     * Applies default spoofing logic for common entity metadata.
+     */
+    private void applyDefaultSpoofing(EntityData entityData, MetadataIndex metadataIndex, Settings settings) {
+        updateAirTicks(entityData, metadataIndex, settings);
         if (entityData.getIndex() == metadataIndex.HEALTH && settings.getEntityData().isHealth()) {
-            float health = (float) entityData.getValue();
-            entityData.setValue(health > 74 ? 100f : health > 49 ? 74f : health > 24 ? 49f : 24f);
-        }
-    }
-
-    private void spoofEntityMetadata(EntityData entityData, MetadataIndex metadataIndex, Settings settings) {
-        if (entityData.getIndex() == metadataIndex.AIR_TICKS && settings.getEntityData().isAirTicks()) {
-            setDynamicValue(entityData, 1);
-        }
-        if (entityData.getIndex() == metadataIndex.HEALTH && settings.getEntityData().isHealth()) {
-            if (((Float) entityData.getValue()) > 0) {
+            float health = (Float) entityData.getValue();
+            if (health > 0) {
                 entityData.setValue(0.5f);
             }
         }
     }
 
+    /**
+     * Modifies the metadata for iron golems gradually.
+     */
+    private void spoofIronGolemMetadata(EntityData entityData, MetadataIndex metadataIndex, Settings settings) {
+        updateAirTicks(entityData, metadataIndex, settings);
+        if (entityData.getIndex() == metadataIndex.HEALTH && settings.getEntityData().isHealth()) {
+            float health = (Float) entityData.getValue();
+            if (health > 74f) {
+                entityData.setValue(100f);
+            } else if (health > 49f) {
+                entityData.setValue(74f);
+            } else if (health > 24f) {
+                entityData.setValue(49f);
+            } else {
+                entityData.setValue(24f);
+            }
+        }
+    }
+
+    /**
+     * Modifies the metadata for player entities.
+     */
     private void spoofPlayerMetadata(EntityData entityData, MetadataIndex metadataIndex, Settings settings) {
         if (entityData.getIndex() == metadataIndex.ABSORPTION && settings.getEntityData().isAbsorption()) {
             setDynamicValue(entityData, 0);
@@ -160,32 +179,38 @@ public class EntityMetadataListener<P> extends PacketListenerAbstract {
     }
 
     /**
-     * This method is designed to handle and set dynamic values for different types of data objects.
-     * This is necessary because the value of the data object is stored as an Object, and not as a primitive type.
-     * Besides, the value of the data object is not always an integer,
-     * but can be a float, double, long, short or byte, etc.
-     * <p>
-     * The reason why I am not simply using a byte since my value will never be bigger than zero or one is because
-     * legacy versions for some retarded reason don't support upcasting of bytes to integers.
-     *
-     * @param obj        The EntityData containing the value to be set.
-     * @param spoofValue The value to be set in the EntityData object.
+     * Updates the air ticks metadata if enabled.
      */
-    private void setDynamicValue(EntityData obj, int spoofValue) {
-        Object value = obj.getValue();
+    private void updateAirTicks(EntityData entityData, MetadataIndex metadataIndex, Settings settings) {
+        if (entityData.getIndex() == metadataIndex.AIR_TICKS && settings.getEntityData().isAirTicks()) {
+            setDynamicValue(entityData, 1);
+        }
+    }
+
+    /**
+     * Sets a new value for the entity data while preserving its original numeric type.
+     * <p>
+     * This method is necessary because the metadata value is stored as an {@code Object}
+     * and can be of different numeric types (e.g., Integer, Short, Byte, Long, Float, or Double).
+     *
+     * @param entityData The metadata object to modify.
+     * @param spoofValue The new value to set.
+     */
+    private void setDynamicValue(EntityData entityData, int spoofValue) {
+        Object value = entityData.getValue();
 
         if (value instanceof Integer) {
-            obj.setValue(spoofValue);
+            entityData.setValue(spoofValue);
         } else if (value instanceof Short) {
-            obj.setValue((short) spoofValue);
+            entityData.setValue((short) spoofValue);
         } else if (value instanceof Byte) {
-            obj.setValue((byte) spoofValue);
+            entityData.setValue((byte) spoofValue);
         } else if (value instanceof Long) {
-            obj.setValue((long) spoofValue);
+            entityData.setValue((long) spoofValue);
         } else if (value instanceof Float) {
-            obj.setValue((float) spoofValue);
+            entityData.setValue((float) spoofValue);
         } else if (value instanceof Double) {
-            obj.setValue((double) spoofValue);
+            entityData.setValue((double) spoofValue);
         }
     }
 }
