@@ -115,12 +115,9 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
         if (wolfSettings.isTamed() && wolfEntity.isTamed()) {
             return true;
         }
-        // Ignore if the user owns the wolf and owner wolves should be ignored.
-        if (wolfSettings.isOwner() && wolfEntity.isOwnerPresent() && wolfEntity.getOwnerUUID().equals(player.uuid)) {
-            return true;
-        }
 
-        return false;
+        // Ignore if the user owns the wolf and owner wolves should be ignored.
+        return wolfSettings.isOwner() && wolfEntity.isOwnerPresent() && wolfEntity.getOwnerUUID().equals(player.uuid);
     }
 
     /**
@@ -179,10 +176,10 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
      */
     private void spoofPlayerMetadata(EntityData entityData, Settings settings) {
         if (entityData.getIndex() == player.metadataIndex.ABSORPTION && settings.getEntityData().isAbsorption()) {
-            setEntityDataValue(entityData, (byte) 0);
+            setDynamicValue(entityData, 0);
         }
         if (entityData.getIndex() == player.metadataIndex.XP && settings.getEntityData().isXp()) {
-            setEntityDataValue(entityData, (byte) 0);
+            setDynamicValue(entityData, 0);
         }
     }
 
@@ -191,18 +188,34 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
      */
     private void updateAirTicks(EntityData entityData, Settings settings) {
         if (entityData.getIndex() == player.metadataIndex.AIR_TICKS && settings.getEntityData().isAirTicks()) {
-            setEntityDataValue(entityData, (byte) 1);
+            setDynamicValue(entityData, 1);
         }
     }
 
     /**
-     * Sets a new value for the entity metadata while preserving the original data type.
-     * This ensures that numeric types are cast safely and helps prevent ClassCastException issues.
+     * Sets a new value for the entity data while preserving its original numeric type.
+     * <p>
+     * This method is necessary because the metadata value is stored as an {@code Object}
+     * and can be of different numeric types (e.g., Integer, Short, Byte, Long, Float, or Double).
      *
-     * @param entityData The entity metadata object to modify.
-     * @param value      The new value to set.
+     * @param entityData The metadata object to modify.
+     * @param spoofValue The new value to set.
      */
-    private void setEntityDataValue(EntityData entityData, byte value) {
-        entityData.setValue(entityData.getValue().getClass().cast(value));
+    private void setDynamicValue(EntityData entityData, int spoofValue) {
+        Object value = entityData.getValue();
+
+        if (value instanceof Integer) {
+            entityData.setValue(spoofValue);
+        } else if (value instanceof Short) {
+            entityData.setValue((short) spoofValue);
+        } else if (value instanceof Byte) {
+            entityData.setValue((byte) spoofValue);
+        } else if (value instanceof Long) {
+            entityData.setValue((long) spoofValue);
+        } else if (value instanceof Float) {
+            entityData.setValue((float) spoofValue);
+        } else if (value instanceof Double) {
+            entityData.setValue((double) spoofValue);
+        }
     }
 }
