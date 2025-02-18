@@ -36,12 +36,17 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 
 public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
 
+    // Constants for Iron Golem health thresholds
+    private static final float IRON_GOLEM_HEALTH_MAX = 100f;
+    private static final float IRON_GOLEM_THRESHOLD_1 = 74f;
+    private static final float IRON_GOLEM_THRESHOLD_2 = 49f;
+    private static final float IRON_GOLEM_THRESHOLD_3 = 24f;
+
     private final EntityCache entityCache;
     private final boolean healthTexturesSupported;
 
     public MetadataSpoofer(AHIPlayer player) {
         super(player);
-
         this.entityCache = player.entityCache;
         this.healthTexturesSupported = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_15);
     }
@@ -56,7 +61,7 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
         WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata(event);
         int entityId = packet.getEntityId();
 
-        // Do not process if the packet refers to the user’s own entity or if the user has bypass permissions.
+        // Skip processing if the packet refers to the user's own entity.
         if (entityId == player.user.getEntityId()) return;
 
         CachedEntity cachedEntity = entityCache.getCachedEntity(entityId).orElse(null);
@@ -65,12 +70,14 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
         EntityType entityType = cachedEntity.getEntityType();
         if (shouldIgnoreEntity(entityType, entityId, cachedEntity, settings)) return;
 
+        // Process each metadata entry for spoofing.
         packet.getEntityMetadata().forEach(entityData -> handleEntityMetadata(entityType, entityData, settings));
+
         event.markForReEncode(true);
     }
 
     private boolean shouldIgnoreEntity(EntityType entityType, int entityId, CachedEntity cachedEntity, Settings settings) {
-        // Ignore entities with a boss bar (that shows the health already anyway)
+        // Ignore entities with built-in health displays (e.g., bosses).
         if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) {
             return true;
         }
@@ -86,19 +93,38 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
         }
 
         // Special handling for wolves.
-        return entityType == EntityTypes.WOLF && settings.getEntityData().getWolves().isEnabled() && shouldIgnoreWolf(cachedEntity, settings);
-    }
+        if (entityType == EntityTypes.WOLF && settings.getEntityData().getWolves().isEnabled()) {
+            return shouldIgnoreWolf(cachedEntity, settings);
+        }
 
-    private boolean shouldIgnoreWolf(CachedEntity cachedEntity, Settings settings) {
-        WolfEntity wolfEntity = (WolfEntity) cachedEntity;
-        boolean ignoreBasedOnSettings = !settings.getEntityData().getWolves().isTamed() && !settings.getEntityData().getWolves().isOwner();
-        boolean isTamed = settings.getEntityData().getWolves().isTamed() && wolfEntity.isTamed();
-        boolean isOwnedByUser = settings.getEntityData().getWolves().isOwner() && wolfEntity.isOwnerPresent() && wolfEntity.getOwnerUUID().equals(player.uuid);
-        return ignoreBasedOnSettings || isTamed || isOwnedByUser;
+        return false;
     }
 
     /**
-     * Modifies the metadata for the given entity based on its type and settings.
+     * Determines whether a wolf entity should be ignored based on its tamed/owner state and the settings.
+     */
+    private boolean shouldIgnoreWolf(CachedEntity cachedEntity, Settings settings) {
+        WolfEntity wolfEntity = (WolfEntity) cachedEntity;
+        Settings.EntityData.Wolves wolfSettings = settings.getEntityData().getWolves();
+
+        // If neither tamed nor owner conditions are enabled, ignore the wolf.
+        if (!wolfSettings.isTamed() && !wolfSettings.isOwner()) {
+            return true;
+        }
+        // Ignore if the wolf is tamed and tamed wolves should be ignored.
+        if (wolfSettings.isTamed() && wolfEntity.isTamed()) {
+            return true;
+        }
+        // Ignore if the user owns the wolf and owner wolves should be ignored.
+        if (wolfSettings.isOwner() && wolfEntity.isOwnerPresent() && wolfEntity.getOwnerUUID().equals(player.uuid)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Modifies the metadata for the given entity based on its type and the configured settings.
      */
     private void handleEntityMetadata(EntityType entityType, EntityData entityData, Settings settings) {
         if (entityType == EntityTypes.IRON_GOLEM && settings.getEntityData().getIronGolems().isEnabled()) {
@@ -116,39 +142,40 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
     }
 
     /**
-     * Applies default spoofing logic for common entity metadata.
+     * Applies default spoofing logic to common metadata.
      */
     private void applyDefaultSpoofing(EntityData entityData, Settings settings) {
         updateAirTicks(entityData, settings);
         if (entityData.getIndex() == player.metadataIndex.HEALTH && settings.getEntityData().isHealth()) {
             float health = (Float) entityData.getValue();
             if (health > 0) {
+                // Spoof health value to a fixed, low value.
                 entityData.setValue(0.5f);
             }
         }
     }
 
     /**
-     * Modifies the metadata for iron golems gradually.
+     * Applies gradual spoofing for iron golem health based on thresholds.
      */
     private void spoofIronGolemMetadata(EntityData entityData, Settings settings) {
         updateAirTicks(entityData, settings);
         if (entityData.getIndex() == player.metadataIndex.HEALTH && settings.getEntityData().isHealth()) {
             float health = (Float) entityData.getValue();
-            if (health > 74f) {
-                entityData.setValue(100f);
-            } else if (health > 49f) {
-                entityData.setValue(74f);
-            } else if (health > 24f) {
-                entityData.setValue(49f);
+            if (health > IRON_GOLEM_THRESHOLD_1) {
+                entityData.setValue(IRON_GOLEM_HEALTH_MAX);
+            } else if (health > IRON_GOLEM_THRESHOLD_2) {
+                entityData.setValue(IRON_GOLEM_THRESHOLD_1);
+            } else if (health > IRON_GOLEM_THRESHOLD_3) {
+                entityData.setValue(IRON_GOLEM_THRESHOLD_2);
             } else {
-                entityData.setValue(24f);
+                entityData.setValue(IRON_GOLEM_THRESHOLD_3);
             }
         }
     }
 
     /**
-     * Modifies the metadata for player entities.
+     * Spoofs player-specific metadata such as absorption and experience.
      */
     private void spoofPlayerMetadata(EntityData entityData, Settings settings) {
         if (entityData.getIndex() == player.metadataIndex.ABSORPTION && settings.getEntityData().isAbsorption()) {
@@ -160,7 +187,7 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
     }
 
     /**
-     * Updates the air ticks metadata if enabled.
+     * Updates the air ticks metadata if enabled in the settings.
      */
     private void updateAirTicks(EntityData entityData, Settings settings) {
         if (entityData.getIndex() == player.metadataIndex.AIR_TICKS && settings.getEntityData().isAirTicks()) {
@@ -169,21 +196,13 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
     }
 
     /**
-     * Sets a new value for the entity data while preserving its original type.
-     * <p>
-     * This method ensures that the provided value is cast correctly to match
-     * the original type of the metadata value.
-     * Since entity metadata values
-     * can be stored as different numeric types (e.g., Byte, Short, Integer),
-     * this method uses the class of the current value to perform a safe cast.
-     * <p>
-     * This prevents potential `ClassCastException` issues when modifying metadata.
+     * Sets a new value for the entity metadata while preserving the original data type.
+     * This ensures that numeric types are cast safely and helps prevent ClassCastException issues.
      *
      * @param entityData The entity metadata object to modify.
-     * @param value      The new value to set, which will be cast to the original metadata type.
+     * @param value      The new value to set.
      */
     private void setEntityDataValue(EntityData entityData, byte value) {
         entityData.setValue(entityData.getValue().getClass().cast(value));
     }
-
 }
