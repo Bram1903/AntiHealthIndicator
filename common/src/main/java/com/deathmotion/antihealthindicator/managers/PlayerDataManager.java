@@ -54,8 +54,7 @@ public class PlayerDataManager<P> {
 
     public void addUser(final User user) {
         if (shouldCheck(user)) {
-            AHIPlayer player = new AHIPlayer(user);
-            playerDataMap.put(user, player);
+            playerDataMap.put(user, new AHIPlayer(user));
         }
     }
 
