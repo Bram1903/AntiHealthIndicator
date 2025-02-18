@@ -21,6 +21,6 @@ package com.deathmotion.antihealthindicator.data;
 public class Constants {
     public static final String GITHUB_API_URL = "https://api.github.com/repos/Bram1903/AntiHealthIndicator/releases/latest";
     public static final String GITHUB_URL = "https://github.com/Bram1903/AntiHealthIndicator";
-    public static final String SPIGOT_URL = "https://www.spigotmc.org/resources/antihealthindicator.114851/";
+    public static final String MODRINTH_URL = "https://modrinth.com/plugin/antihealthindicator";
 }
 

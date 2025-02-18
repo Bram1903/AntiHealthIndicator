@@ -131,7 +131,7 @@ public class UpdateChecker<P> {
                 .append(Component.text("now available", NamedTextColor.GREEN)
                         .decorate(TextDecoration.UNDERLINED)
                         .hoverEvent(HoverEvent.showText(Component.text("Click to download", NamedTextColor.GREEN)))
-                        .clickEvent(ClickEvent.openUrl(Constants.SPIGOT_URL)))
+                        .clickEvent(ClickEvent.openUrl(Constants.MODRINTH_URL)))
                 .append(Component.text("!", NamedTextColor.GREEN))
                 .build();
     }
