@@ -16,9 +16,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.deathmotion.antihealthindicator.data;
+package com.deathmotion.antihealthindicator.cache.entities;
 
-import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
+import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import lombok.Getter;
 import lombok.Setter;
