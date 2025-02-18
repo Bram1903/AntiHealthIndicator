@@ -24,7 +24,7 @@ import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.deathmotion.antihealthindicator.managers.LogManager;
 import com.deathmotion.antihealthindicator.managers.PlayerDataManager;
-import com.deathmotion.antihealthindicator.managers.UpdateManager;
+import com.deathmotion.antihealthindicator.util.UpdateChecker;
 import com.deathmotion.antihealthindicator.packets.PacketPlayerJoinQuit;
 import com.deathmotion.antihealthindicator.packets.SpoofManagerPacketListener;
 import com.github.retrooper.packetevents.PacketEvents;
@@ -47,7 +47,7 @@ public abstract class AHIPlatform<P> {
     protected AntiHealthIndicatorCommand<P> command;
     protected PlayerDataManager<P> playerDataManager;
 
-    private UpdateManager<P> updateManager;
+    private UpdateChecker<P> updateChecker;
 
     public void commonOnInitialize() {
         instance = this;
@@ -67,7 +67,7 @@ public abstract class AHIPlatform<P> {
         PacketEvents.getAPI().getEventManager().registerListener(new PacketPlayerJoinQuit<>(this));
         PacketEvents.getAPI().getEventManager().registerListener(new SpoofManagerPacketListener<>(this));
 
-        this.updateManager = new UpdateManager<>(this);
+        this.updateChecker = new UpdateChecker<>(this);
     }
 
     /**

@@ -46,11 +46,11 @@ public class PacketPlayerJoinQuit<P> extends PacketListenerAbstract {
 
     @Override
     public void onUserLogin(UserLoginEvent event) {
-        if (platform.getConfigManager().getSettings().getUpdateChecker().isNotifyInGame() && platform.getUpdateManager().isUpdateAvailable()) {
+        if (platform.getConfigManager().getSettings().getUpdateChecker().isNotifyInGame() && platform.getUpdateChecker().isUpdateAvailable()) {
             User user = event.getUser();
 
             if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Update")) {
-                platform.getScheduler().runAsyncTaskDelayed((o) -> user.sendMessage(platform.getUpdateManager().getUpdateComponent()), 2, TimeUnit.SECONDS);
+                platform.getScheduler().runAsyncTaskDelayed((o) -> user.sendMessage(platform.getUpdateChecker().getUpdateComponent()), 2, TimeUnit.SECONDS);
             }
         }
     }

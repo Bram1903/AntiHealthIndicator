@@ -1,28 +1,28 @@
 /*
- * This file is part of AntiHealthIndicator - https://github.com/Bram1903/AntiHealthIndicator
- * Copyright (C) 2025 Bram and contributors
+ *  This file is part of AntiHealthIndicator - https://github.com/Bram1903/AntiHealthIndicator
+ *  Copyright (C) 2025 Bram and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.deathmotion.antihealthindicator.managers;
+package com.deathmotion.antihealthindicator.util;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.api.versioning.AHIVersion;
 import com.deathmotion.antihealthindicator.data.Constants;
 import com.deathmotion.antihealthindicator.data.Settings;
-import com.deathmotion.antihealthindicator.util.AHIVersions;
+import com.deathmotion.antihealthindicator.managers.LogManager;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.Getter;
@@ -40,7 +40,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.CompletableFuture;
 
-public class UpdateManager<P> {
+public class UpdateChecker<P> {
     private final AHIPlatform<P> platform;
     private final Settings settings;
     private final LogManager<P> logManager;
@@ -49,7 +49,7 @@ public class UpdateManager<P> {
     private boolean updateAvailable = false;
     private @Nullable AHIVersion latestVersion;
 
-    public UpdateManager(AHIPlatform<P> platform) {
+    public UpdateChecker(AHIPlatform<P> platform) {
         this.platform = platform;
         this.settings = platform.getConfigManager().getSettings();
         this.logManager = platform.getLogManager();
