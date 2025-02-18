@@ -39,12 +39,7 @@ public class PlayerDataManager<P> {
         if (!ChannelHelper.isOpen(user.getChannel())) return false;
         if (user.getUUID() == null) return false;
 
-        if (platform.getConfigManager().getSettings().isAllowBypass()) {
-            // Has exempt permission
-            return !platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass");
-        }
-
-        return true;
+        return !platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass");
     }
 
     @Nullable

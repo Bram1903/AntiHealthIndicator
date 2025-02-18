@@ -20,10 +20,6 @@ update-checker:
   # When an update is found, should players with the permission "AntiHealthIndicator.Notify" be notified?
   notify-in-game: true
 
-# If enabled, players with the permission "AntiHealthIndicator.Bypass" will not be affected by the spoofing.
-allow-bypass:
-  enabled: false
-
 # These options determine what information should be spoofed.
 spoof:
   # Sets the seed which is being sent to the client to zero.
