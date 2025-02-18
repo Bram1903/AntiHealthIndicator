@@ -21,6 +21,9 @@ package com.deathmotion.antihealthindicator.managers;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
 import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
+import com.deathmotion.antihealthindicator.packets.trackers.EntityTracker;
+import com.deathmotion.antihealthindicator.packets.trackers.VehicleTracker;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -32,10 +35,19 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CacheManager {
     private final AHIPlayer player;
     private final ConcurrentHashMap<Integer, CachedEntity> cache;
+    private final EntityTracker entityTracker;
+    private final VehicleTracker vehicleTracker;
 
     public CacheManager(AHIPlayer player) {
         this.player = player;
         this.cache = new ConcurrentHashMap<>();
+        this.entityTracker = new EntityTracker(player, this);
+        this.vehicleTracker = new VehicleTracker(player, this);
+    }
+
+    public void onPacketSend(PacketSendEvent event) {
+        entityTracker.onPacketSend(event);
+        vehicleTracker.onPacketSend(event);
     }
 
     public Optional<CachedEntity> getCachedEntity(int entityId) {

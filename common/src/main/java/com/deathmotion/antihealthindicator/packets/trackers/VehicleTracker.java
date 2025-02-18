@@ -45,9 +45,9 @@ public class VehicleTracker {
     private final CacheManager cacheManager;
     private final ConfigManager<?> configManager;
 
-    public VehicleTracker(AHIPlayer player) {
+    public VehicleTracker(AHIPlayer player, CacheManager cacheManager) {
         this.player = player;
-        this.cacheManager = player.cacheManager;
+        this.cacheManager = cacheManager;
         this.configManager = AHIPlatform.getInstance().getConfigManager();
     }
 

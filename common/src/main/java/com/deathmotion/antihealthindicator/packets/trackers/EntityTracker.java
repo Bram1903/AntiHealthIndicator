@@ -44,9 +44,9 @@ public class EntityTracker {
     private final ConfigManager<?> configManager;
 
 
-    public EntityTracker(AHIPlayer player) {
+    public EntityTracker(AHIPlayer player, CacheManager cacheManager) {
         this.player = player;
-        this.cacheManager = player.cacheManager;
+        this.cacheManager = cacheManager;
         this.configManager = AHIPlatform.getInstance().getConfigManager();
     }
 

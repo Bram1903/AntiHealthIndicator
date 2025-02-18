@@ -20,8 +20,6 @@ package com.deathmotion.antihealthindicator.data;
 
 import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.managers.SpoofManager;
-import com.deathmotion.antihealthindicator.packets.trackers.EntityTracker;
-import com.deathmotion.antihealthindicator.packets.trackers.VehicleTracker;
 import com.deathmotion.antihealthindicator.util.MetadataIndex;
 import com.github.retrooper.packetevents.protocol.player.User;
 
@@ -34,8 +32,6 @@ public class AHIPlayer {
     public final MetadataIndex metadataIndex;
     public final CacheManager cacheManager;
 
-    public final EntityTracker entityTracker;
-    public final VehicleTracker vehicleTracker;
     public final SpoofManager spoofManager;
 
     public AHIPlayer(User user) {
@@ -45,8 +41,6 @@ public class AHIPlayer {
         this.metadataIndex = new MetadataIndex(user.getClientVersion());
         this.cacheManager = new CacheManager(this);
 
-        this.entityTracker = new EntityTracker(this);
-        this.vehicleTracker = new VehicleTracker(this);
         this.spoofManager = new SpoofManager(this);
     }
 }
