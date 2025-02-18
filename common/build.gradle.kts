@@ -10,6 +10,7 @@ dependencies {
     compileOnlyApi(libs.bundles.adventure)
     compileOnlyApi(libs.snakeyaml)
     compileOnlyApi(libs.lombok)
+    compileOnly(libs.guava)
     annotationProcessor(libs.lombok)
 }
 

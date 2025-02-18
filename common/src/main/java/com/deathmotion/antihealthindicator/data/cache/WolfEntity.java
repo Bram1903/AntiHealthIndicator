@@ -18,9 +18,8 @@
 
 package com.deathmotion.antihealthindicator.data.cache;
 
-import com.deathmotion.antihealthindicator.util.MetadataIndex;
+import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
-import com.github.retrooper.packetevents.protocol.player.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -45,22 +44,21 @@ public class WolfEntity extends CachedEntity {
     }
 
     @Override
-    public void processMetaData(EntityData metaData, User user) {
+    public void processMetaData(EntityData metaData, AHIPlayer player) {
         int index = metaData.getIndex();
-        MetadataIndex metadataIndex = new MetadataIndex(user.getClientVersion());
 
-        if (index == metadataIndex.TAMABLE_TAMED) {
+        if (index == player.metadataIndex.TAMABLE_TAMED) {
             setTamed(((Byte) metaData.getValue() & 0x04) != 0);
-        } else if (index == metadataIndex.TAMABLE_OWNER) {
+        } else if (index == player.metadataIndex.TAMABLE_OWNER) {
             Object value = metaData.getValue();
 
             UUID ownerUUID = value instanceof String
                     ? Optional.of((String) value)
-                    .filter(user.getUUID().toString()::equals)
+                    .filter(player.uuid.toString()::equals)
                     .map(UUID::fromString)
                     .orElse(null)
                     : ((Optional<UUID>) value)
-                    .filter(user.getUUID()::equals)
+                    .filter(player.uuid::equals)
                     .orElse(null);
 
             setOwnerUUID(ownerUUID);

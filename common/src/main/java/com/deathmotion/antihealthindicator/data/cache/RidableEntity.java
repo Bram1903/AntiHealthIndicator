@@ -18,9 +18,8 @@
 
 package com.deathmotion.antihealthindicator.data.cache;
 
-import com.deathmotion.antihealthindicator.util.MetadataIndex;
+import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
-import com.github.retrooper.packetevents.protocol.player.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,8 +30,8 @@ public class RidableEntity extends CachedEntity {
     private int passengerId;
 
     @Override
-    public void processMetaData(EntityData metaData, User user) {
-        if (metaData.getIndex() == new MetadataIndex(user.getClientVersion()).HEALTH) {
+    public void processMetaData(EntityData metaData, AHIPlayer player) {
+        if (metaData.getIndex() == player.metadataIndex.HEALTH) {
             setHealth((float) metaData.getValue());
         }
     }
