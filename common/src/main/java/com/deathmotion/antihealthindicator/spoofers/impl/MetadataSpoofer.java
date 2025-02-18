@@ -18,11 +18,11 @@
 
 package com.deathmotion.antihealthindicator.spoofers.impl;
 
+import com.deathmotion.antihealthindicator.cache.EntityCache;
+import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
+import com.deathmotion.antihealthindicator.cache.entities.WolfEntity;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.deathmotion.antihealthindicator.data.Settings;
-import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
-import com.deathmotion.antihealthindicator.data.cache.WolfEntity;
-import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.spoofers.Spoofer;
 import com.deathmotion.antihealthindicator.spoofers.type.PacketSpoofer;
 import com.github.retrooper.packetevents.PacketEvents;
@@ -36,13 +36,13 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 
 public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
 
-    private final CacheManager cacheManager;
+    private final EntityCache entityCache;
     private final boolean healthTexturesSupported;
 
     public MetadataSpoofer(AHIPlayer player) {
         super(player);
 
-        this.cacheManager = player.cacheManager;
+        this.entityCache = player.entityCache;
         this.healthTexturesSupported = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_15);
     }
 
@@ -59,7 +59,7 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
         // Do not process if the packet refers to the user’s own entity or if the user has bypass permissions.
         if (entityId == player.user.getEntityId()) return;
 
-        CachedEntity cachedEntity = cacheManager.getCachedEntity(entityId).orElse(null);
+        CachedEntity cachedEntity = entityCache.getCachedEntity(entityId).orElse(null);
         if (cachedEntity == null) return;
 
         EntityType entityType = cachedEntity.getEntityType();
@@ -81,7 +81,7 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
         }
 
         // Optionally ignore vehicles.
-        if (!settings.getEntityData().isPlayersOnly() && settings.getEntityData().isIgnoreVehicles() && cacheManager.isUserPassenger(entityId)) {
+        if (!settings.getEntityData().isPlayersOnly() && settings.getEntityData().isIgnoreVehicles() && entityCache.isUserPassenger(entityId)) {
             return true;
         }
 

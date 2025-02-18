@@ -16,16 +16,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.deathmotion.antihealthindicator.packets.trackers;
+package com.deathmotion.antihealthindicator.cache.trackers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.deathmotion.antihealthindicator.cache.EntityCache;
+import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
+import com.deathmotion.antihealthindicator.cache.entities.RidableEntities;
+import com.deathmotion.antihealthindicator.cache.entities.WolfEntity;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
-import com.deathmotion.antihealthindicator.data.RidableEntities;
+import com.deathmotion.antihealthindicator.data.RidableEntity;
 import com.deathmotion.antihealthindicator.data.Settings;
-import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
-import com.deathmotion.antihealthindicator.data.cache.RidableEntity;
-import com.deathmotion.antihealthindicator.data.cache.WolfEntity;
-import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
@@ -40,13 +40,13 @@ import com.github.retrooper.packetevents.wrapper.play.server.*;
  */
 public class EntityTracker {
     private final AHIPlayer player;
-    private final CacheManager cacheManager;
+    private final EntityCache entityCache;
     private final ConfigManager<?> configManager;
 
 
-    public EntityTracker(AHIPlayer player, CacheManager cacheManager) {
+    public EntityTracker(AHIPlayer player, EntityCache entityCache) {
         this.player = player;
-        this.cacheManager = cacheManager;
+        this.entityCache = entityCache;
         this.configManager = AHIPlatform.getInstance().getConfigManager();
     }
 
@@ -85,7 +85,7 @@ public class EntityTracker {
         int entityId = packet.getEntityId();
 
         CachedEntity entityData = createLivingEntity(entityType);
-        cacheManager.addLivingEntity(entityId, entityData);
+        entityCache.addLivingEntity(entityId, entityData);
     }
 
     private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet, Settings settings) {
@@ -99,7 +99,7 @@ public class EntityTracker {
             int entityId = packet.getEntityId();
 
             CachedEntity entityData = createLivingEntity(entityType);
-            cacheManager.addLivingEntity(entityId, entityData);
+            entityCache.addLivingEntity(entityId, entityData);
         }
     }
 
@@ -107,7 +107,7 @@ public class EntityTracker {
         CachedEntity livingEntityData = new CachedEntity();
         livingEntityData.setEntityType(EntityTypes.PLAYER);
 
-        cacheManager.addLivingEntity(packet.getEntityId(), livingEntityData);
+        entityCache.addLivingEntity(packet.getEntityId(), livingEntityData);
     }
 
     private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, User user, Settings settings) {
@@ -115,7 +115,7 @@ public class EntityTracker {
 
         int entityId = packet.getEntityId();
 
-        CachedEntity entityData = cacheManager.getCachedEntity(entityId).orElse(null);
+        CachedEntity entityData = entityCache.getCachedEntity(entityId).orElse(null);
         if (entityData == null) return;
 
         packet.getEntityMetadata().forEach(metaData -> entityData.processMetaData(metaData, player));
@@ -123,20 +123,20 @@ public class EntityTracker {
 
     private void handleDestroyEntities(WrapperPlayServerDestroyEntities packet) {
         for (int entityId : packet.getEntityIds()) {
-            cacheManager.removeEntity(entityId);
+            entityCache.removeEntity(entityId);
         }
     }
 
     private void handleRespawn() {
-        cacheManager.resetUserCache();
+        entityCache.resetUserCache();
     }
 
     private void handleJoinGame() {
-        cacheManager.resetUserCache();
+        entityCache.resetUserCache();
     }
 
     private void handleConfigurationStart() {
-        cacheManager.resetUserCache();
+        entityCache.resetUserCache();
     }
 
     private CachedEntity createLivingEntity(EntityType entityType) {

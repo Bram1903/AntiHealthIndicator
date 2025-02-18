@@ -16,14 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.deathmotion.antihealthindicator.packets.trackers;
+package com.deathmotion.antihealthindicator.cache.trackers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.deathmotion.antihealthindicator.cache.EntityCache;
+import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
+import com.deathmotion.antihealthindicator.cache.entities.RidableEntities;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
-import com.deathmotion.antihealthindicator.data.RidableEntities;
 import com.deathmotion.antihealthindicator.data.Settings;
-import com.deathmotion.antihealthindicator.data.cache.CachedEntity;
-import com.deathmotion.antihealthindicator.managers.CacheManager;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
@@ -42,12 +42,12 @@ import java.util.List;
  */
 public class VehicleTracker {
     private final AHIPlayer player;
-    private final CacheManager cacheManager;
+    private final EntityCache entityCache;
     private final ConfigManager<?> configManager;
 
-    public VehicleTracker(AHIPlayer player, CacheManager cacheManager) {
+    public VehicleTracker(AHIPlayer player, EntityCache entityCache) {
         this.player = player;
-        this.cacheManager = cacheManager;
+        this.entityCache = entityCache;
         this.configManager = AHIPlatform.getInstance().getConfigManager();
     }
 
@@ -73,7 +73,7 @@ public class VehicleTracker {
         if (passengers.length > 0) {
             updatePassengerState(entityId, passengers[0], true);
         } else {
-            int passengerId = cacheManager.getPassengerId(entityId);
+            int passengerId = entityCache.getPassengerId(entityId);
             updatePassengerState(entityId, passengerId, false);
         }
     }
@@ -86,21 +86,21 @@ public class VehicleTracker {
         if (entityId > 0) {
             updatePassengerState(entityId, passengerId, true);
         } else {
-            int reversedEntityId = cacheManager.getEntityIdByPassengerId(passengerId);
+            int reversedEntityId = entityCache.getEntityIdByPassengerId(passengerId);
             updatePassengerState(reversedEntityId, passengerId, false);
         }
     }
 
     private void updatePassengerState(int vehicleId, int passengerId, boolean entering) {
-        cacheManager.updateVehiclePassenger(vehicleId, entering ? passengerId : -1);
+        entityCache.updateVehiclePassenger(vehicleId, entering ? passengerId : -1);
         if (entering || player.user.getEntityId() == passengerId) {
-            float healthValue = entering ? cacheManager.getVehicleHealth(vehicleId) : 0.5F;
+            float healthValue = entering ? entityCache.getVehicleHealth(vehicleId) : 0.5F;
             sendVehicleHealthUpdate(vehicleId, healthValue);
         }
     }
 
     private boolean isValidVehicle(int entityId) {
-        return cacheManager.getCachedEntity(entityId)
+        return entityCache.getCachedEntity(entityId)
                 .map(CachedEntity::getEntityType)
                 .map(RidableEntities::isRideable)
                 .orElse(false);

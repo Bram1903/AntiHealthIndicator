@@ -18,29 +18,21 @@
 
 package com.deathmotion.antihealthindicator.data;
 
-import com.deathmotion.antihealthindicator.cache.EntityCache;
-import com.deathmotion.antihealthindicator.managers.SpoofManager;
-import com.deathmotion.antihealthindicator.util.MetadataIndex;
-import com.github.retrooper.packetevents.protocol.player.User;
+import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.UUID;
+@Getter
+@Setter
+public class RidableEntity extends CachedEntity {
+    private float health;
+    private int passengerId;
 
-public class AHIPlayer {
-    public final UUID uuid;
-    public final User user;
-
-    public final MetadataIndex metadataIndex;
-    public final EntityCache entityCache;
-
-    public final SpoofManager spoofManager;
-
-    public AHIPlayer(User user) {
-        this.uuid = user.getUUID();
-        this.user = user;
-
-        this.metadataIndex = new MetadataIndex(user.getClientVersion());
-        this.entityCache = new EntityCache(this);
-
-        this.spoofManager = new SpoofManager(this);
+    @Override
+    public void processMetaData(EntityData metaData, AHIPlayer player) {
+        if (metaData.getIndex() == player.metadataIndex.HEALTH) {
+            setHealth((float) metaData.getValue());
+        }
     }
 }

@@ -40,7 +40,7 @@ public class SpoofManagerPacketListener<P> extends PacketListenerAbstract {
         AHIPlayer player = platform.getPlayerDataManager().getPlayer(event.getUser());
         if (player == null) return;
 
-        player.cacheManager.onPacketSend(event);
+        player.entityCache.onPacketSend(event);
         player.spoofManager.onPacketSend(event);
     }
 }
