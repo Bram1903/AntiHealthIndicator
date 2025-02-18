@@ -16,33 +16,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.deathmotion.antihealthindicator.data;
+package com.deathmotion.antihealthindicator.cache.entities;
 
+import com.deathmotion.antihealthindicator.data.AHIPlayer;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
-import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+@Getter
+@Setter
+public class CachedEntity {
+    private EntityType entityType;
 
-public class RidableEntities {
-    private static final Set<EntityType> RIDABLE_ENTITY_TYPES;
-
-    static {
-        RIDABLE_ENTITY_TYPES = new HashSet<>(Arrays.asList(
-                EntityTypes.CAMEL,
-                EntityTypes.CHESTED_HORSE,
-                EntityTypes.DONKEY,
-                EntityTypes.HORSE,
-                EntityTypes.MULE,
-                EntityTypes.PIG,
-                EntityTypes.SKELETON_HORSE,
-                EntityTypes.STRIDER,
-                EntityTypes.ZOMBIE_HORSE
-        ));
-    }
-
-    public static boolean isRideable(EntityType entityType) {
-        return RIDABLE_ENTITY_TYPES.contains(entityType);
+    public void processMetaData(EntityData metaData, AHIPlayer player) {
     }
 }

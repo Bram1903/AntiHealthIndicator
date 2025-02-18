@@ -1,35 +1,38 @@
 /*
- * This file is part of AntiHealthIndicator - https://github.com/Bram1903/AntiHealthIndicator
- * Copyright (C) 2025 Bram and contributors
+ *  This file is part of AntiHealthIndicator - https://github.com/Bram1903/AntiHealthIndicator
+ *  Copyright (C) 2025 Bram and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.deathmotion.antihealthindicator.managers;
+package com.deathmotion.antihealthindicator.util;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.api.versioning.AHIVersion;
 import com.deathmotion.antihealthindicator.data.Constants;
 import com.deathmotion.antihealthindicator.data.Settings;
-import com.deathmotion.antihealthindicator.packetlisteners.UpdateNotifier;
-import com.deathmotion.antihealthindicator.util.AHIVersions;
-import com.github.retrooper.packetevents.PacketEvents;
+import com.deathmotion.antihealthindicator.managers.LogManager;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
+import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -37,12 +40,16 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.CompletableFuture;
 
-public class UpdateManager<P> {
+public class UpdateChecker<P> {
     private final AHIPlatform<P> platform;
     private final Settings settings;
     private final LogManager<P> logManager;
 
-    public UpdateManager(AHIPlatform<P> platform) {
+    @Getter
+    private boolean updateAvailable = false;
+    private @Nullable AHIVersion latestVersion;
+
+    public UpdateChecker(AHIPlatform<P> platform) {
         this.platform = platform;
         this.settings = platform.getConfigManager().getSettings();
         this.logManager = platform.getLogManager();
@@ -56,7 +63,7 @@ public class UpdateManager<P> {
         CompletableFuture.runAsync(() -> {
             try {
                 AHIVersion localVersion = AHIVersions.CURRENT;
-                AHIVersion latestVersion = fetchLatestGitHubVersion();
+                latestVersion = fetchLatestGitHubVersion();
 
                 if (latestVersion != null) {
                     handleVersionComparison(localVersion, latestVersion);
@@ -101,9 +108,8 @@ public class UpdateManager<P> {
                     .append(Component.text(" | New version: ", NamedTextColor.WHITE))
                     .append(Component.text(newVersion.toStringWithoutSnapshot(), NamedTextColor.DARK_PURPLE)));
         }
-        if (settings.getUpdateChecker().isNotifyInGame()) {
-            PacketEvents.getAPI().getEventManager().registerListener(new UpdateNotifier<>(platform, newVersion));
-        }
+
+        updateAvailable = true;
     }
 
     private void notifyOnDevBuild(AHIVersion currentVersion, AHIVersion newVersion) {
@@ -115,5 +121,18 @@ public class UpdateManager<P> {
                     .append(Component.text(" | Latest stable version: ", NamedTextColor.WHITE))
                     .append(Component.text(newVersion.toStringWithoutSnapshot(), NamedTextColor.DARK_AQUA)));
         }
+    }
+
+    public Component getUpdateComponent() {
+        return Component.text()
+                .append(Component.text("[AntiHealthIndicator] ", NamedTextColor.RED)
+                        .decoration(TextDecoration.BOLD, true))
+                .append(Component.text("Version " + latestVersion.toStringWithoutSnapshot() + " is ", NamedTextColor.GREEN))
+                .append(Component.text("now available", NamedTextColor.GREEN)
+                        .decorate(TextDecoration.UNDERLINED)
+                        .hoverEvent(HoverEvent.showText(Component.text("Click to download", NamedTextColor.GREEN)))
+                        .clickEvent(ClickEvent.openUrl(Constants.MODRINTH_URL)))
+                .append(Component.text("!", NamedTextColor.GREEN))
+                .build();
     }
 }

@@ -27,7 +27,6 @@ public class Settings {
     private boolean Debug = false;
 
     private UpdateChecker UpdateChecker = new UpdateChecker();
-    private boolean AllowBypass = false;
     private boolean WorldSeed = false;
     private boolean FoodSaturation = true;
     private boolean TeamScoreboard = true;

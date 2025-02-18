@@ -21,7 +21,12 @@ package com.deathmotion.antihealthindicator;
 import com.deathmotion.antihealthindicator.api.AntiHealthIndicator;
 import com.deathmotion.antihealthindicator.commands.AntiHealthIndicatorCommand;
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
-import com.deathmotion.antihealthindicator.managers.*;
+import com.deathmotion.antihealthindicator.managers.ConfigManager;
+import com.deathmotion.antihealthindicator.managers.LogManager;
+import com.deathmotion.antihealthindicator.managers.PlayerDataManager;
+import com.deathmotion.antihealthindicator.packets.PacketPlayerJoinQuit;
+import com.deathmotion.antihealthindicator.packets.SpoofManagerPacketListener;
+import com.deathmotion.antihealthindicator.util.UpdateChecker;
 import com.github.retrooper.packetevents.PacketEvents;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -31,14 +36,22 @@ import java.util.UUID;
 
 @Getter
 public abstract class AHIPlatform<P> {
+
+    @Getter
+    private static AHIPlatform<?> instance;
+
     protected ConfigManager<P> configManager;
     protected LogManager<P> logManager;
 
     protected Scheduler scheduler;
     protected AntiHealthIndicatorCommand<P> command;
-    private CacheManager<P> cacheManager;
+    protected PlayerDataManager<P> playerDataManager;
+
+    private UpdateChecker<P> updateChecker;
 
     public void commonOnInitialize() {
+        instance = this;
+
         logManager = new LogManager<>(this);
         configManager = new ConfigManager<>(this);
         AntiHealthIndicator.setAPI(new AntiHealthIndicatorAPIImpl<>(this));
@@ -48,11 +61,13 @@ public abstract class AHIPlatform<P> {
      * Called when the platform is enabled.
      */
     public void commonOnEnable() {
-        cacheManager = new CacheManager<>(this);
         command = new AntiHealthIndicatorCommand<>(this);
+        playerDataManager = new PlayerDataManager<>(this);
 
-        new UpdateManager<>(this);
-        new PacketManager<>(this);
+        PacketEvents.getAPI().getEventManager().registerListener(new PacketPlayerJoinQuit<>(this));
+        PacketEvents.getAPI().getEventManager().registerListener(new SpoofManagerPacketListener<>(this));
+
+        this.updateChecker = new UpdateChecker<>(this);
     }
 
     /**

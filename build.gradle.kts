@@ -47,8 +47,14 @@ tasks {
         archiveFileName = "${rootProject.name}-${ext["versionNoHash"]}.jar"
         archiveClassifier = null
 
-        relocate("net.kyori.adventure.text.serializer.gson", "io.github.retrooper.packetevents.adventure.serializer.gson")
-        relocate("net.kyori.adventure.text.serializer.legacy", "io.github.retrooper.packetevents.adventure.serializer.legacy")
+        relocate(
+            "net.kyori.adventure.text.serializer.gson",
+            "io.github.retrooper.packetevents.adventure.serializer.gson"
+        )
+        relocate(
+            "net.kyori.adventure.text.serializer.legacy",
+            "io.github.retrooper.packetevents.adventure.serializer.legacy"
+        )
     }
 
     assemble {
