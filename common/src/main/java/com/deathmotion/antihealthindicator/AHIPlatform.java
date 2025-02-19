@@ -30,7 +30,6 @@ import com.deathmotion.antihealthindicator.util.UpdateChecker;
 import com.github.retrooper.packetevents.PacketEvents;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -74,19 +73,6 @@ public abstract class AHIPlatform<P> {
      * Called when the platform gets disabled.
      */
     public void commonOnDisable() {
-    }
-
-    /**
-     * Sends a broadcast message with a specific component and permission.
-     *
-     * @param component  The component to broadcast.
-     * @param permission The permission required to receive the broadcast. Can be null.
-     */
-    public void broadcastComponent(Component component, @Nullable String permission) {
-        PacketEvents.getAPI().getProtocolManager().getUsers().stream()
-                .filter(user -> user != null && user.getUUID() != null)
-                .filter(user -> permission == null || hasPermission(user.getUUID(), permission))
-                .forEach(user -> user.sendMessage(component));
     }
 
     /**
