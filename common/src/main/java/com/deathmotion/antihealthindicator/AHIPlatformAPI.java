@@ -22,11 +22,11 @@ import com.deathmotion.antihealthindicator.api.AntiHealthIndicatorAPI;
 import com.deathmotion.antihealthindicator.api.versioning.AHIVersion;
 import com.deathmotion.antihealthindicator.util.AHIVersions;
 
-public class AntiHealthIndicatorAPIImpl<P> implements AntiHealthIndicatorAPI {
+public class AHIPlatformAPI<P> implements AntiHealthIndicatorAPI {
 
     private final AHIPlatform<P> platform;
 
-    public AntiHealthIndicatorAPIImpl(AHIPlatform<P> platform) {
+    public AHIPlatformAPI(AHIPlatform<P> platform) {
         this.platform = platform;
     }
 
