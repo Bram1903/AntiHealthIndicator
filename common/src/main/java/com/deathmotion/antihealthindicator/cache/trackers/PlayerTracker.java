@@ -6,6 +6,7 @@ import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoRemove;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
@@ -26,11 +27,13 @@ public class PlayerTracker {
     }
 
     public void onPacketSend(PacketSendEvent event) {
-        if (event.getPacketType() == PacketType.Play.Server.PLAYER_INFO) {
+        final PacketTypeCommon packetType = event.getPacketType();
+
+        if (packetType == PacketType.Play.Server.PLAYER_INFO) {
             handlePlayerInfo(new WrapperPlayServerPlayerInfo(event));
-        } else if (event.getPacketType() == PacketType.Play.Server.PLAYER_INFO_UPDATE) {
+        } else if (packetType == PacketType.Play.Server.PLAYER_INFO_UPDATE) {
             handlePlayerInfoUpdate(new WrapperPlayServerPlayerInfoUpdate(event));
-        } else if (event.getPacketType() == PacketType.Play.Server.PLAYER_INFO_REMOVE) {
+        } else if (packetType == PacketType.Play.Server.PLAYER_INFO_REMOVE) {
             removePlayer(new WrapperPlayServerPlayerInfoRemove(event).getProfileIds());
         }
     }
