@@ -32,7 +32,6 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
-import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 
 /**
@@ -63,7 +62,7 @@ public class EntityTracker {
         } else if (PacketType.Play.Server.SPAWN_PLAYER == type) {
             handleSpawnPlayer(new WrapperPlayServerSpawnPlayer(event));
         } else if (PacketType.Play.Server.ENTITY_METADATA == type) {
-            handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), event.getUser(), settings);
+            handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), settings);
         } else if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
             handleDestroyEntities(new WrapperPlayServerDestroyEntities(event));
         } else if (PacketType.Play.Server.RESPAWN == type) {
@@ -77,44 +76,31 @@ public class EntityTracker {
 
     private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet, Settings settings) {
         EntityType entityType = packet.getEntityType();
-
-        if (settings.getEntityData().isPlayersOnly()) {
-            if (!EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) return;
-        }
-
-        int entityId = packet.getEntityId();
-
-        CachedEntity entityData = createLivingEntity(entityType);
-        entityCache.addLivingEntity(entityId, entityData);
+        if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) return;
+        spawnEntity(packet.getEntityId(), entityType);
     }
 
     private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet, Settings settings) {
         EntityType entityType = packet.getEntityType();
+        if (!EntityTypes.isTypeInstanceOf(entityType, EntityTypes.LIVINGENTITY)) return;
+        if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) return;
 
-        if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.LIVINGENTITY)) {
-            if (settings.getEntityData().isPlayersOnly()) {
-                if (!EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) return;
-            }
-
-            int entityId = packet.getEntityId();
-
-            CachedEntity entityData = createLivingEntity(entityType);
-            entityCache.addLivingEntity(entityId, entityData);
-        }
+        spawnEntity(packet.getEntityId(), entityType);
     }
 
     private void handleSpawnPlayer(WrapperPlayServerSpawnPlayer packet) {
-        CachedEntity livingEntityData = new CachedEntity();
-        livingEntityData.setEntityType(EntityTypes.PLAYER);
-
-        entityCache.addLivingEntity(packet.getEntityId(), livingEntityData);
+        spawnEntity(packet.getEntityId(), EntityTypes.PLAYER);
     }
 
-    private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, User user, Settings settings) {
+    private void spawnEntity(int entityId, EntityType entityType) {
+        CachedEntity entityData = createLivingEntity(entityType);
+        entityCache.addLivingEntity(entityId, entityData);
+    }
+
+    private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, Settings settings) {
         if (settings.getEntityData().isPlayersOnly()) return;
 
         int entityId = packet.getEntityId();
-
         CachedEntity entityData = entityCache.getCachedEntity(entityId).orElse(null);
         if (entityData == null) return;
 
@@ -141,7 +127,6 @@ public class EntityTracker {
 
     private CachedEntity createLivingEntity(EntityType entityType) {
         CachedEntity entityData;
-
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.WOLF)) {
             entityData = new WolfEntity();
         } else if (RidableEntities.isRideable(entityType)) {
@@ -149,7 +134,6 @@ public class EntityTracker {
         } else {
             entityData = new CachedEntity();
         }
-
         entityData.setEntityType(entityType);
         return entityData;
     }
