@@ -31,6 +31,7 @@ import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
@@ -41,6 +42,7 @@ public class EntityCache {
     private final VehicleTracker vehicleTracker;
 
     private final ConcurrentHashMap<Integer, CachedEntity> cache;
+    private final ConcurrentHashMap<UUID, Integer> playerIndex;
     private final ConcurrentHashMap<Integer, Integer> passengerIndex;
 
     public EntityCache(AHIPlayer player) {
@@ -50,6 +52,7 @@ public class EntityCache {
         this.vehicleTracker = new VehicleTracker(player, this);
 
         this.cache = new ConcurrentHashMap<>();
+        this.playerIndex = new ConcurrentHashMap<>();
         this.passengerIndex = new ConcurrentHashMap<>();
     }
 
@@ -81,6 +84,7 @@ public class EntityCache {
 
     public void addLivingEntity(int entityId, @NonNull CachedEntity cachedEntity) {
         cache.put(entityId, cachedEntity);
+
         if (cachedEntity instanceof RidableEntity) {
             RidableEntity ridable = (RidableEntity) cachedEntity;
             // Populate the secondary index based on its current passenger ID.
@@ -88,8 +92,17 @@ public class EntityCache {
         }
     }
 
+    public void addPlayer(UUID uuid, int entityId) {
+        playerIndex.put(uuid, entityId);
+    }
+
     public void removeEntity(int entityId) {
         CachedEntity removed = cache.remove(entityId);
+
+        if (removed instanceof PlayerEntity) {
+            playerIndex.values().removeIf(id -> id == entityId);
+        }
+
         if (removed instanceof RidableEntity) {
             RidableEntity ridable = (RidableEntity) removed;
             // Remove from secondary index.
@@ -99,6 +112,7 @@ public class EntityCache {
 
     public void resetUserCache() {
         cache.clear();
+        playerIndex.clear();
         passengerIndex.clear();
     }
 

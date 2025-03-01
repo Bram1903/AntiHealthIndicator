@@ -86,10 +86,18 @@ public class EntityTracker {
         if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) return;
 
         spawnEntity(packet.getEntityId(), entityType);
+
+        // After 1.20.2
+        if (entityType == EntityTypes.PLAYER) {
+            packet.getUUID().ifPresent(uuid -> entityCache.addPlayer(uuid, packet.getEntityId()));
+        }
     }
 
     private void handleSpawnPlayer(WrapperPlayServerSpawnPlayer packet) {
         spawnEntity(packet.getEntityId(), EntityTypes.PLAYER);
+
+        // Pre 1.20.2
+        entityCache.addPlayer(packet.getUUID(), packet.getEntityId());
     }
 
     private void spawnEntity(int entityId, EntityType entityType) {

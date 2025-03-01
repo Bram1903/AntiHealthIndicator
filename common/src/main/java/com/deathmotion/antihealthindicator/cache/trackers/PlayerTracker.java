@@ -2,14 +2,17 @@ package com.deathmotion.antihealthindicator.cache.trackers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.cache.EntityCache;
-import com.deathmotion.antihealthindicator.cache.entities.PlayerEntity;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoRemove;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.UUID;
 
 public class PlayerTracker {
     private final AHIPlayer player;
@@ -23,60 +26,53 @@ public class PlayerTracker {
     }
 
     public void onPacketSend(PacketSendEvent event) {
-        if (event.getPacketType() != PacketType.Play.Server.PLAYER_INFO) return;
+        if (event.getPacketType() == PacketType.Play.Server.PLAYER_INFO) {
+            handlePlayerInfo(new WrapperPlayServerPlayerInfo(event));
+        } else if (event.getPacketType() == PacketType.Play.Server.PLAYER_INFO_UPDATE) {
+            handlePlayerInfoUpdate(new WrapperPlayServerPlayerInfoUpdate(event));
+        } else if (event.getPacketType() == PacketType.Play.Server.PLAYER_INFO_REMOVE) {
+            removePlayer(new WrapperPlayServerPlayerInfoRemove(event).getProfileIds());
+        }
+    }
 
-        WrapperPlayServerPlayerInfo packet = new WrapperPlayServerPlayerInfo(event);
+    private void handlePlayerInfo(WrapperPlayServerPlayerInfo packet) {
         WrapperPlayServerPlayerInfo.Action action = packet.getAction();
         if (action == null) return;
 
-        List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList = packet.getPlayerDataList();
-
         switch (action) {
             case ADD_PLAYER:
-                handleAddPlayer(playerDataList);
+                addPlayerInfo(packet.getPlayerDataList());
                 break;
             case REMOVE_PLAYER:
-                handleRemovePlayer(playerDataList);
-                break;
-            case UPDATE_GAME_MODE:
-                handleUpdateGamemode(playerDataList);
-                break;
-            case UPDATE_LATENCY:
-                handleUpdateLatency(playerDataList);
-                break;
-            case UPDATE_DISPLAY_NAME:
-                handleUpdateDisplayName(playerDataList);
+                removePlayerInfoLegacy(packet.getPlayerDataList());
                 break;
         }
     }
 
-    private void handleAddPlayer(List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList) {
-        for (WrapperPlayServerPlayerInfo.PlayerData playerData : playerDataList) {
-            // How can I get the entity id of this player data object?
-            PlayerEntity playerEntity = entityCache.getCachedPlayer(-1);
-            if (playerEntity == null) continue;
+    private void handlePlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate packet) {
+        EnumSet<WrapperPlayServerPlayerInfoUpdate.Action> actions = packet.getActions();
 
-            // TODO: Implement player entity handling
+        for (WrapperPlayServerPlayerInfoUpdate.Action action : actions) {
+            switch (action) {
+                case ADD_PLAYER:
+                    addPlayerInfoUpdate(packet.getEntries());
+                    break;
+            }
         }
     }
 
-    private void handleRemovePlayer(List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList) {
+    private void addPlayerInfo(List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList) {
 
     }
 
-    private void handleUpdatePlayer(List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList) {
+    private void addPlayerInfoUpdate(List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> playerInfoList) {
 
     }
 
-    private void handleUpdateGamemode(List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList) {
+    private void removePlayerInfoLegacy(List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList) {
 
     }
 
-    private void handleUpdateLatency(List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList) {
-
-    }
-
-    private void handleUpdateDisplayName(List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList) {
-
+    private void removePlayer(List<UUID> profileUUIDs) {
     }
 }
