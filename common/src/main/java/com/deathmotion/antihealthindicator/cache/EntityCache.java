@@ -27,22 +27,25 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import lombok.Getter;
 import lombok.NonNull;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class EntityCache {
     private final AHIPlayer player;
-    private final ConcurrentHashMap<Integer, CachedEntity> cache;
     private final EntityTracker entityTracker;
     private final VehicleTracker vehicleTracker;
 
+    private final ConcurrentHashMap<Integer, CachedEntity> cache;
+    private final ConcurrentHashMap<Integer, Integer> passengerIndex;
+
     public EntityCache(AHIPlayer player) {
         this.player = player;
-        this.cache = new ConcurrentHashMap<>();
         this.entityTracker = new EntityTracker(player, this);
         this.vehicleTracker = new VehicleTracker(player, this);
+
+        this.cache = new ConcurrentHashMap<>();
+        this.passengerIndex = new ConcurrentHashMap<>();
     }
 
     public void onPacketSend(PacketSendEvent event) {
@@ -55,25 +58,45 @@ public class EntityCache {
     }
 
     public Optional<RidableEntity> getVehicleData(int entityId) {
-        return getCachedEntity(entityId)
-                .filter(entityData -> entityData instanceof RidableEntity)
-                .map(entityData -> (RidableEntity) entityData);
+        CachedEntity entity = cache.get(entityId);
+        if (entity instanceof RidableEntity) {
+            return Optional.of((RidableEntity) entity);
+        }
+        return Optional.empty();
     }
 
     public void addLivingEntity(int entityId, @NonNull CachedEntity cachedEntity) {
         cache.put(entityId, cachedEntity);
+        if (cachedEntity instanceof RidableEntity) {
+            RidableEntity ridable = (RidableEntity) cachedEntity;
+            // Populate the secondary index based on its current passenger ID.
+            passengerIndex.put(ridable.getPassengerId(), entityId);
+        }
     }
 
     public void removeEntity(int entityId) {
-        cache.remove(entityId);
+        CachedEntity removed = cache.remove(entityId);
+        if (removed instanceof RidableEntity) {
+            RidableEntity ridable = (RidableEntity) removed;
+            // Remove from secondary index.
+            passengerIndex.remove(ridable.getPassengerId());
+        }
     }
 
     public void resetUserCache() {
         cache.clear();
+        passengerIndex.clear();
     }
 
-    public void updateVehiclePassenger(int entityId, int passengerId) {
-        getVehicleData(entityId).ifPresent(ridableEntityData -> ridableEntityData.setPassengerId(passengerId));
+    public void updateVehiclePassenger(int entityId, int newPassengerId) {
+        getVehicleData(entityId).ifPresent(ridableEntity -> {
+            int oldPassengerId = ridableEntity.getPassengerId();
+            if (oldPassengerId != newPassengerId) {
+                passengerIndex.remove(oldPassengerId);
+                ridableEntity.setPassengerId(newPassengerId);
+                passengerIndex.put(newPassengerId, entityId);
+            }
+        });
     }
 
     public float getVehicleHealth(int entityId) {
@@ -81,7 +104,9 @@ public class EntityCache {
     }
 
     public boolean isUserPassenger(int entityId) {
-        return getVehicleData(entityId).map(ridableEntityData -> ridableEntityData.getPassengerId() == player.user.getEntityId()).orElse(false);
+        return getVehicleData(entityId)
+                .map(ridableEntity -> ridableEntity.getPassengerId() == player.user.getEntityId())
+                .orElse(false);
     }
 
     public int getPassengerId(int entityId) {
@@ -89,10 +114,6 @@ public class EntityCache {
     }
 
     public int getEntityIdByPassengerId(int passengerId) {
-        return cache.entrySet().stream()
-                .filter(entry -> entry.getValue() instanceof RidableEntity && ((RidableEntity) entry.getValue()).getPassengerId() == passengerId)
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElse(0);
+        return passengerIndex.getOrDefault(passengerId, 0);
     }
 }

@@ -37,9 +37,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSe
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Listens for VehicleState events and manages the caching of various entity state details.
- */
 public class VehicleTracker {
     private final AHIPlayer player;
     private final EntityCache entityCache;
@@ -52,12 +49,12 @@ public class VehicleTracker {
     }
 
     public void onPacketSend(PacketSendEvent event) {
-        final Settings settings = configManager.getSettings();
-        if (!settings.getEntityData().isEnabled()) return;
-        if (settings.getEntityData().isPlayersOnly()) return;
+        Settings settings = configManager.getSettings();
+        if (!settings.getEntityData().isEnabled() || settings.getEntityData().isPlayersOnly()) {
+            return;
+        }
 
-        final PacketTypeCommon type = event.getPacketType();
-
+        PacketTypeCommon type = event.getPacketType();
         if (PacketType.Play.Server.SET_PASSENGERS == type) {
             handlePassengers(new WrapperPlayServerSetPassengers(event));
         } else if (PacketType.Play.Server.ATTACH_ENTITY == type) {
@@ -65,40 +62,77 @@ public class VehicleTracker {
         }
     }
 
+    /**
+     * Processes SET_PASSENGERS packets.
+     */
     private void handlePassengers(WrapperPlayServerSetPassengers packet) {
-        int entityId = packet.getEntityId();
-        if (entityId == player.user.getEntityId() || !isValidVehicle(entityId)) return;
+        int vehicleId = packet.getEntityId();
+        if (!shouldProcess(vehicleId)) {
+            return;
+        }
 
         int[] passengers = packet.getPassengers();
         if (passengers.length > 0) {
-            updatePassengerState(entityId, passengers[0], true);
+            // If there are passengers, update with the first one.
+            updatePassengerState(vehicleId, passengers[0], true);
         } else {
-            int passengerId = entityCache.getPassengerId(entityId);
-            updatePassengerState(entityId, passengerId, false);
+            // If no passengers are present, consider the vehicle empty.
+            int currentPassenger = entityCache.getPassengerId(vehicleId);
+            updatePassengerState(vehicleId, currentPassenger, false);
         }
     }
 
+    /**
+     * Processes ATTACH_ENTITY packets.
+     */
     private void handleAttachEntity(WrapperPlayServerAttachEntity packet) {
-        int entityId = packet.getHoldingId();
-        if (entityId == player.user.getEntityId() || !isValidVehicle(entityId)) return;
+        int vehicleId = packet.getHoldingId();
+        if (!shouldProcess(vehicleId)) {
+            return;
+        }
 
         int passengerId = packet.getAttachedId();
-        if (entityId > 0) {
-            updatePassengerState(entityId, passengerId, true);
+        if (vehicleId > 0) {
+            updatePassengerState(vehicleId, passengerId, true);
         } else {
-            int reversedEntityId = entityCache.getEntityIdByPassengerId(passengerId);
-            updatePassengerState(reversedEntityId, passengerId, false);
+            int cachedVehicleId = entityCache.getEntityIdByPassengerId(passengerId);
+            updatePassengerState(cachedVehicleId, passengerId, false);
         }
     }
 
+    /**
+     * Updates the passenger state in the cache and, when applicable, sends a vehicle health update.
+     *
+     * @param vehicleId   the id of the vehicle entity.
+     * @param passengerId the id of the passenger.
+     * @param entering    true if the passenger is entering, false if leaving.
+     */
     private void updatePassengerState(int vehicleId, int passengerId, boolean entering) {
+        // Update the cached passenger state (use -1 for leaving).
         entityCache.updateVehiclePassenger(vehicleId, entering ? passengerId : -1);
+        // If a passenger is entering or the player's entity is involved, send a health update.
         if (entering || player.user.getEntityId() == passengerId) {
             float healthValue = entering ? entityCache.getVehicleHealth(vehicleId) : 0.5F;
             sendVehicleHealthUpdate(vehicleId, healthValue);
         }
     }
 
+    /**
+     * Determines whether a given entity id should be processed.
+     *
+     * @param entityId the entity id to check.
+     * @return true if it is not the player and represents a valid rideable vehicle.
+     */
+    private boolean shouldProcess(int entityId) {
+        return entityId != player.user.getEntityId() && isValidVehicle(entityId);
+    }
+
+    /**
+     * Checks if the entity is a valid rideable vehicle.
+     *
+     * @param entityId the entity id.
+     * @return true if the entity is present in the cache and is rideable.
+     */
     private boolean isValidVehicle(int entityId) {
         return entityCache.getCachedEntity(entityId)
                 .map(CachedEntity::getEntityType)
@@ -106,8 +140,14 @@ public class VehicleTracker {
                 .orElse(false);
     }
 
-    private void sendVehicleHealthUpdate(int vehicleId, float healthValue) {
-        AHIPlatform.getInstance().getScheduler().runAsyncTask((o) -> {
+    /**
+     * Sends an asynchronous vehicle health update to the client.
+     *
+     * @param vehicleId   the vehicle entity id.
+     * @param healthValue the health value.
+     */
+    private void sendVehicleHealthUpdate(final int vehicleId, final float healthValue) {
+        AHIPlatform.getInstance().getScheduler().runAsyncTask(task -> {
             List<EntityData> metadata = Collections.singletonList(
                     new EntityData(
                             player.metadataIndex.HEALTH,
@@ -115,7 +155,6 @@ public class VehicleTracker {
                             healthValue
                     )
             );
-
             player.user.sendPacketSilently(new WrapperPlayServerEntityMetadata(vehicleId, metadata));
         });
     }
