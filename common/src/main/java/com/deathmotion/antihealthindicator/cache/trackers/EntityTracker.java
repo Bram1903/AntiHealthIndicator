@@ -21,6 +21,7 @@ package com.deathmotion.antihealthindicator.cache.trackers;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.cache.EntityCache;
 import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
+import com.deathmotion.antihealthindicator.cache.entities.PlayerEntity;
 import com.deathmotion.antihealthindicator.cache.entities.RidableEntity;
 import com.deathmotion.antihealthindicator.cache.entities.WolfEntity;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
@@ -127,13 +128,17 @@ public class EntityTracker {
 
     private CachedEntity createLivingEntity(EntityType entityType) {
         CachedEntity entityData;
-        if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.WOLF)) {
+
+        if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) {
+            entityData = new PlayerEntity();
+        } else if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.WOLF)) {
             entityData = new WolfEntity();
         } else if (RidableEntities.isRideable(entityType)) {
             entityData = new RidableEntity();
         } else {
             entityData = new CachedEntity();
         }
+
         entityData.setEntityType(entityType);
         return entityData;
     }
