@@ -2,6 +2,7 @@ package com.deathmotion.antihealthindicator.cache.trackers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.cache.EntityCache;
+import com.deathmotion.antihealthindicator.cache.entities.PlayerEntity;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
@@ -51,7 +52,11 @@ public class PlayerTracker {
 
     private void handleAddPlayer(List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList) {
         for (WrapperPlayServerPlayerInfo.PlayerData playerData : playerDataList) {
-            // TODO: Implement
+            // How can I get the entity id of this player data object?
+            PlayerEntity playerEntity = entityCache.getCachedPlayer(-1);
+            if (playerEntity == null) continue;
+
+            // TODO: Implement player entity handling
         }
     }
 
