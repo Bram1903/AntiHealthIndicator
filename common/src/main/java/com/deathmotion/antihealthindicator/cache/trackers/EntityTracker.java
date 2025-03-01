@@ -43,7 +43,6 @@ public class EntityTracker {
     private final EntityCache entityCache;
     private final ConfigManager<?> configManager;
 
-
     public EntityTracker(AHIPlayer player, EntityCache entityCache) {
         this.player = player;
         this.entityCache = entityCache;

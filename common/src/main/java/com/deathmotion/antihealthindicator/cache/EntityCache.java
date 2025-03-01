@@ -19,13 +19,16 @@
 package com.deathmotion.antihealthindicator.cache;
 
 import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
+import com.deathmotion.antihealthindicator.cache.entities.PlayerEntity;
 import com.deathmotion.antihealthindicator.cache.entities.RidableEntity;
 import com.deathmotion.antihealthindicator.cache.trackers.EntityTracker;
+import com.deathmotion.antihealthindicator.cache.trackers.PlayerTracker;
 import com.deathmotion.antihealthindicator.cache.trackers.VehicleTracker;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import lombok.Getter;
 import lombok.NonNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EntityCache {
     private final AHIPlayer player;
     private final EntityTracker entityTracker;
+    private final PlayerTracker playerTracker;
     private final VehicleTracker vehicleTracker;
 
     private final ConcurrentHashMap<Integer, CachedEntity> cache;
@@ -42,6 +46,7 @@ public class EntityCache {
     public EntityCache(AHIPlayer player) {
         this.player = player;
         this.entityTracker = new EntityTracker(player, this);
+        this.playerTracker = new PlayerTracker(player, this);
         this.vehicleTracker = new VehicleTracker(player, this);
 
         this.cache = new ConcurrentHashMap<>();
@@ -50,11 +55,20 @@ public class EntityCache {
 
     public void onPacketSend(PacketSendEvent event) {
         entityTracker.onPacketSend(event);
+        playerTracker.onPacketSend(event);
         vehicleTracker.onPacketSend(event);
     }
 
     public Optional<CachedEntity> getCachedEntity(int entityId) {
         return Optional.ofNullable(cache.get(entityId));
+    }
+
+    public @Nullable PlayerEntity getCachedPlayer(int entityId) {
+        CachedEntity entity = cache.get(entityId);
+        if (entity instanceof PlayerEntity) {
+            return (PlayerEntity) entity;
+        }
+        return null;
     }
 
     public Optional<RidableEntity> getVehicleData(int entityId) {
