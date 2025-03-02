@@ -126,15 +126,14 @@ public class PlayerTracker {
      * If the player is the current one or the data store is missing, logs a debug message.
      */
     private void updateDataStore(UUID uuid, Consumer<PlayerDataStore> updater) {
-        if (isOwnPlayer(uuid)) {
-            AHIPlatform.getInstance().debug("Skipping the player info update for our own player");
-            return;
-        }
+        if (isOwnPlayer(uuid)) return;
+
         PlayerDataStore store = playerDataStore.get(uuid);
         if (store == null) {
             AHIPlatform.getInstance().debug("Player data store not found for " + uuid);
             return;
         }
+
         updater.accept(store);
     }
 
@@ -172,10 +171,8 @@ public class PlayerTracker {
     private void addPlayerInfoLegacy(List<PlayerData> playerDataList) {
         for (PlayerData data : playerDataList) {
             UUID uuid = data.getUserProfile().getUUID();
-            if (isOwnPlayer(uuid)) {
-                AHIPlatform.getInstance().debug("Skipping the player info update for our own player");
-                continue;
-            }
+            if (isOwnPlayer(uuid)) continue;
+
             PlayerDataStore store = createDataStoreFromLegacy(data);
             playerDataStore.put(uuid, store);
         }
@@ -184,10 +181,8 @@ public class PlayerTracker {
     private void addPlayerInfo(List<PlayerInfo> playerInfoList) {
         for (PlayerInfo info : playerInfoList) {
             UUID uuid = info.getGameProfile().getUUID();
-            if (isOwnPlayer(uuid)) {
-                AHIPlatform.getInstance().debug("Skipping the player info update for our own player");
-                continue;
-            }
+            if (isOwnPlayer(uuid)) continue;
+
             PlayerDataStore store = createDataStore(info);
             playerDataStore.put(uuid, store);
         }
