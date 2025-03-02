@@ -37,6 +37,8 @@ public class SpoofManagerPacketListener<P> extends PacketListenerAbstract {
     @Override
     public void onPacketSend(final PacketSendEvent event) {
         if (event.getConnectionState() != ConnectionState.PLAY) return;
+        platform.getPlayerDataManager().sendGlobalPacket(event);
+
         AHIPlayer player = platform.getPlayerDataManager().getPlayer(event.getUser());
         if (player == null) return;
 

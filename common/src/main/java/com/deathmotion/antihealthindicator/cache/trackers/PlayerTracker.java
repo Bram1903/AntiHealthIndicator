@@ -21,15 +21,15 @@ package com.deathmotion.antihealthindicator.cache.trackers;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.cache.EntityCache;
 import com.deathmotion.antihealthindicator.cache.entities.PlayerDataStore;
+import com.deathmotion.antihealthindicator.cache.entities.PlayerEntity;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
+import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo.PlayerData;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoRemove;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate.PlayerInfo;
 
 import java.util.List;
@@ -64,6 +64,19 @@ public class PlayerTracker {
             handlePlayerInfoUpdate(new WrapperPlayServerPlayerInfoUpdate(event));
         } else if (packetType == PacketType.Play.Server.PLAYER_INFO_REMOVE) {
             removePlayers(new WrapperPlayServerPlayerInfoRemove(event).getProfileIds());
+        }
+    }
+
+    public void onGlobalPacketSend(PacketSendEvent event) {
+        if (event.getUser().getUUID() == player.user.getUUID()) return;
+
+        if (event.getPacketType() == PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_ROTATION) {
+            WrapperPlayServerEntityRelativeMoveAndRotation packet = new WrapperPlayServerEntityRelativeMoveAndRotation(event);
+            if (event.getUser().getEntityId() == packet.getEntityId()) return;
+            PlayerEntity playerEntity = entityCache.getPlayerEntity(event.getUser().getEntityId());
+            if (playerEntity == null) return;
+
+            playerEntity.setLocation(new Location(packet.getDeltaX(), packet.getDeltaY(), packet.getDeltaZ(), packet.getYaw(), packet.getPitch()));
         }
     }
 

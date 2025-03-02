@@ -3,6 +3,7 @@ package com.deathmotion.antihealthindicator.cache.entities;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.deathmotion.antihealthindicator.spoofers.impl.InvisibilitySpoofer;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.world.Location;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +13,8 @@ import java.util.List;
 @Setter
 public class PlayerEntity extends CachedEntity {
     private boolean isInvisible;
+
+    private Location location;
     private List<EntityData> entityDataList;
 
     public void processMetaData(EntityData metaData, AHIPlayer player) {
@@ -26,9 +29,9 @@ public class PlayerEntity extends CachedEntity {
 //        }
 
         if (isInvisible && !invisible) {
-            player.spoofManager.getGenericSpoofer(InvisibilitySpoofer.class).setInvisible(getEntityId(), entityDataList);
+            player.spoofManager.getGenericSpoofer(InvisibilitySpoofer.class).setInvisible(this);
         } else if (!isInvisible && invisible) {
-            player.spoofManager.getGenericSpoofer(InvisibilitySpoofer.class).setVisible(getEntityId(), entityDataList);
+            player.spoofManager.getGenericSpoofer(InvisibilitySpoofer.class).setVisible(this);
         }
 
         isInvisible = invisible;

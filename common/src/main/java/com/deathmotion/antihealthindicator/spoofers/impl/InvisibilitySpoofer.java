@@ -20,16 +20,15 @@ package com.deathmotion.antihealthindicator.spoofers.impl;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.cache.entities.PlayerDataStore;
+import com.deathmotion.antihealthindicator.cache.entities.PlayerEntity;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.deathmotion.antihealthindicator.spoofers.Spoofer;
 import com.deathmotion.antihealthindicator.spoofers.type.GenericSpoofer;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
-import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import net.kyori.adventure.text.Component;
 
@@ -49,28 +48,30 @@ public class InvisibilitySpoofer extends Spoofer implements GenericSpoofer {
         this.UUIDMap = new ConcurrentHashMap<>();
     }
 
-    public void setInvisible(int entityId, List<EntityData> entityData) {
+    public void setInvisible(PlayerEntity playerEntity) {
+        if (playerEntity.getEntityId() == player.user.getEntityId()) return;
+
         AHIPlatform.getInstance().getScheduler().runAsyncTask((o) -> {
-            PlayerDataStore playerDataStore = getPlayerDataStore(entityId);
+            PlayerDataStore playerDataStore = getPlayerDataStore(playerEntity.getEntityId());
             if (playerDataStore == null) return;
 
             if (useModernInfoPacket) {
-                setInvisibleModern(entityId, playerDataStore, entityData);
+                setInvisibleModern(playerEntity, playerDataStore);
             } else {
-                setInvisibleLegacy(entityId, playerDataStore);
+                setInvisibleLegacy(playerEntity, playerDataStore);
             }
         });
     }
 
-    public void setVisible(int entityId, List<EntityData> entityData) {
+    public void setVisible(PlayerEntity playerEntity) {
         AHIPlatform.getInstance().getScheduler().runAsyncTask((o) -> {
-            PlayerDataStore playerDataStore = getPlayerDataStore(entityId);
+            PlayerDataStore playerDataStore = getPlayerDataStore(playerEntity.getEntityId());
             if (playerDataStore == null) return;
 
             if (useModernInfoPacket) {
-                setVisibleModern(entityId, playerDataStore, entityData);
+                setVisibleModern(playerEntity, playerDataStore);
             } else {
-                setVisibleLegacy(entityId, playerDataStore);
+                setVisibleLegacy(playerEntity, playerDataStore);
             }
         });
     }
@@ -82,12 +83,12 @@ public class InvisibilitySpoofer extends Spoofer implements GenericSpoofer {
         return player.entityCache.getPlayerTracker().getPlayerDataStore(uuid);
     }
 
-    private void setInvisibleModern(int entityId, PlayerDataStore playerDataStore, List<EntityData> entityData) {
+    private void setInvisibleModern(PlayerEntity playerEntity, PlayerDataStore playerDataStore) {
         UUID realUUID = playerDataStore.getProfile().getUUID();
         UUID randomUUID = UUID.randomUUID();
         UUIDMap.put(realUUID, randomUUID);
 
-        WrapperPlayServerDestroyEntities destroyRealPlayerPacket = new WrapperPlayServerDestroyEntities(entityId);
+        WrapperPlayServerDestroyEntities destroyRealPlayerPacket = new WrapperPlayServerDestroyEntities(playerEntity.getEntityId());
         player.user.sendPacketSilently(destroyRealPlayerPacket);
 
         WrapperPlayServerPlayerInfoRemove removePacket = new WrapperPlayServerPlayerInfoRemove(realUUID);
@@ -100,15 +101,15 @@ public class InvisibilitySpoofer extends Spoofer implements GenericSpoofer {
         WrapperPlayServerPlayerInfoUpdate spawnFakePlayerPacket = new WrapperPlayServerPlayerInfoUpdate(actions, playerInfoList);
         player.user.sendPacketSilently(spawnFakePlayerPacket);
 
-        spawnPlayer(entityId, randomUUID, entityData);
+        spawnPlayer(playerEntity, randomUUID);
     }
 
-    private void setVisibleModern(int entityId, PlayerDataStore playerDataStore, List<EntityData> entityData) {
+    private void setVisibleModern(PlayerEntity playerEntity, PlayerDataStore playerDataStore) {
         UUID realUUID = playerDataStore.getProfile().getUUID();
         UUID fakeUUID = UUIDMap.remove(realUUID);
         if (fakeUUID == null) return;
 
-        WrapperPlayServerDestroyEntities destroyFakePlayerPacket = new WrapperPlayServerDestroyEntities(entityId);
+        WrapperPlayServerDestroyEntities destroyFakePlayerPacket = new WrapperPlayServerDestroyEntities(playerEntity.getEntityId());
         player.user.sendPacketSilently(destroyFakePlayerPacket);
 
         WrapperPlayServerPlayerInfoRemove removePlayerInfoPacket = new WrapperPlayServerPlayerInfoRemove(fakeUUID);
@@ -121,31 +122,29 @@ public class InvisibilitySpoofer extends Spoofer implements GenericSpoofer {
         WrapperPlayServerPlayerInfoUpdate spawnRealPlayerPacket = new WrapperPlayServerPlayerInfoUpdate(actions, playerInfoList);
         player.user.sendPacketSilently(spawnRealPlayerPacket);
 
-        spawnPlayer(entityId, realUUID, entityData);
+        spawnPlayer(playerEntity, realUUID);
     }
 
-    private void setInvisibleLegacy(int entityId, PlayerDataStore playerDataStore) {
+    private void setInvisibleLegacy(PlayerEntity playerEntity, PlayerDataStore playerDataStore) {
         // TODO
     }
 
-    private void setVisibleLegacy(int entityId, PlayerDataStore playerDataStore) {
+    private void setVisibleLegacy(PlayerEntity playerEntity, PlayerDataStore playerDataStore) {
         // TODO
     }
 
-    private void spawnPlayer(int entityId, UUID uuid, List<EntityData> entityData) {
-        Location location = new Location(0, 0, 0, 0, 0);
-
+    private void spawnPlayer(PlayerEntity playerEntity, UUID uuid) {
         if (useModernSpawnPacket) {
-            WrapperPlayServerSpawnEntity spawnPacket = new WrapperPlayServerSpawnEntity(entityId, uuid, EntityTypes.PLAYER, location, 0, 0, null);
+            WrapperPlayServerSpawnEntity spawnPacket = new WrapperPlayServerSpawnEntity(playerEntity.getEntityId(), uuid, EntityTypes.PLAYER, playerEntity.getLocation(), 0, 0, null);
             player.user.sendPacketSilently(spawnPacket);
         }
 
-        WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata(entityId, entityData);
+        WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata(playerEntity.getEntityId(), playerEntity.getEntityDataList());
         // This needs to be non silent so the metadata can be spoofed
         player.user.sendPacket(metadataPacket);
     }
 
     private UserProfile createSpoofedProfile(UUID randomUUID) {
-        return new UserProfile(randomUUID, "Invisible");
+        return new UserProfile(randomUUID, "§kInvisible");
     }
 }

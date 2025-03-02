@@ -20,6 +20,7 @@ package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 
@@ -45,6 +46,12 @@ public class PlayerDataManager<P> {
     @Nullable
     public AHIPlayer getPlayer(final User user) {
         return playerDataMap.get(user);
+    }
+
+    public void sendGlobalPacket(PacketSendEvent event) {
+        for (AHIPlayer player : playerDataMap.values()) {
+            player.entityCache.onGlobalPacketSend(event);
+        }
     }
 
     public void addUser(final User user) {

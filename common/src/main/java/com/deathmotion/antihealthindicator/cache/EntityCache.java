@@ -61,8 +61,16 @@ public class EntityCache {
         vehicleTracker.onPacketSend(event);
     }
 
+    public void onGlobalPacketSend(PacketSendEvent event) {
+        playerTracker.onGlobalPacketSend(event);
+    }
+
     public Optional<CachedEntity> getCachedEntity(int entityId) {
         return Optional.ofNullable(cache.get(entityId));
+    }
+
+    public PlayerEntity getPlayerEntity(int entityId) {
+        return (PlayerEntity) cache.get(entityId);
     }
 
     public UUID getPlayerUUID(int entityId) {
