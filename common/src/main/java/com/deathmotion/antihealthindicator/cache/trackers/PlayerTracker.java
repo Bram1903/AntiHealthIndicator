@@ -32,7 +32,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate.PlayerInfo;
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -69,7 +68,6 @@ public class PlayerTracker {
     }
 
     private void handlePlayerInfo(WrapperPlayServerPlayerInfo packet) {
-        AHIPlatform.getInstance().debug("Player Info Packet: " + packet.getAction());
         WrapperPlayServerPlayerInfo.Action action = packet.getAction();
         if (action == null) return;
 
@@ -93,10 +91,7 @@ public class PlayerTracker {
     }
 
     private void handlePlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate packet) {
-        EnumSet<WrapperPlayServerPlayerInfoUpdate.Action> actions = packet.getActions();
-        AHIPlatform.getInstance().debug("Player Info Update Packet: " + actions);
-
-        for (WrapperPlayServerPlayerInfoUpdate.Action action : actions) {
+        for (WrapperPlayServerPlayerInfoUpdate.Action action : packet.getActions()) {
             switch (action) {
                 case ADD_PLAYER:
                     addPlayerInfo(packet.getEntries());
