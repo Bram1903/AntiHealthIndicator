@@ -67,6 +67,10 @@ public class PlayerTracker {
         }
     }
 
+    public PlayerDataStore getPlayerDataStore(UUID uuid) {
+        return playerDataStore.get(uuid);
+    }
+
     private void handlePlayerInfo(WrapperPlayServerPlayerInfo packet) {
         WrapperPlayServerPlayerInfo.Action action = packet.getAction();
         if (action == null) return;
@@ -190,12 +194,18 @@ public class PlayerTracker {
 
     private void removePlayerInfoLegacy(List<PlayerData> playerDataList) {
         for (PlayerData data : playerDataList) {
+            PlayerDataStore store = playerDataStore.get(data.getUserProfile().getUUID());
+            AHIPlatform.getInstance().debug("Removed player data store for " + store.getProfile().getName());
+
             playerDataStore.remove(data.getUserProfile().getUUID());
         }
     }
 
     private void removePlayers(List<UUID> profileUUIDs) {
         for (UUID uuid : profileUUIDs) {
+            PlayerDataStore store = playerDataStore.get(uuid);
+            AHIPlatform.getInstance().debug("Removed player data store for " + store.getProfile().getName());
+
             playerDataStore.remove(uuid);
         }
     }

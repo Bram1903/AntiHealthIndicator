@@ -20,6 +20,8 @@ package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.deathmotion.antihealthindicator.spoofers.impl.*;
+import com.deathmotion.antihealthindicator.spoofers.type.AbstractSpoofer;
+import com.deathmotion.antihealthindicator.spoofers.type.GenericSpoofer;
 import com.deathmotion.antihealthindicator.spoofers.type.PacketSpoofer;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.google.common.collect.ClassToInstanceMap;
@@ -27,21 +29,37 @@ import com.google.common.collect.ImmutableClassToInstanceMap;
 
 public class SpoofManager {
 
-    ClassToInstanceMap<PacketSpoofer> spoofers;
+    public ClassToInstanceMap<AbstractSpoofer> allSpoofers;
+    ClassToInstanceMap<PacketSpoofer> packetSpoofers;
+    ClassToInstanceMap<GenericSpoofer> genericSpoofers;
 
     public SpoofManager(AHIPlayer player) {
-        spoofers = new ImmutableClassToInstanceMap.Builder<PacketSpoofer>()
+        packetSpoofers = new ImmutableClassToInstanceMap.Builder<PacketSpoofer>()
                 .put(MetadataSpoofer.class, new MetadataSpoofer(player))
                 .put(EquipmentSpoofer.class, new EquipmentSpoofer(player))
                 .put(ScoreboardSpoofer.class, new ScoreboardSpoofer(player))
                 .put(FoodSaturationSpoofer.class, new FoodSaturationSpoofer(player))
                 .put(WorldSeedSpoofer.class, new WorldSeedSpoofer(player))
                 .build();
+
+        genericSpoofers = new ImmutableClassToInstanceMap.Builder<GenericSpoofer>()
+                .put(InvisibilitySpoofer.class, new InvisibilitySpoofer(player))
+                .build();
+
+        allSpoofers = new ImmutableClassToInstanceMap.Builder<AbstractSpoofer>()
+                .putAll(packetSpoofers)
+                .putAll(genericSpoofers)
+                .build();
     }
 
     public void onPacketSend(final PacketSendEvent packet) {
-        for (PacketSpoofer packetSpoofer : spoofers.values()) {
+        for (PacketSpoofer packetSpoofer : packetSpoofers.values()) {
             packetSpoofer.onPacketSend(packet);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends GenericSpoofer> T getGenericSpoofer(Class<T> check) {
+        return (T) genericSpoofers.get(check);
     }
 }

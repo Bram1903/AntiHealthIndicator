@@ -28,7 +28,6 @@ import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import lombok.Getter;
 import lombok.NonNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -66,12 +65,8 @@ public class EntityCache {
         return Optional.ofNullable(cache.get(entityId));
     }
 
-    public @Nullable PlayerEntity getCachedPlayer(int entityId) {
-        CachedEntity entity = cache.get(entityId);
-        if (entity instanceof PlayerEntity) {
-            return (PlayerEntity) entity;
-        }
-        return null;
+    public UUID getPlayerUUID(int entityId) {
+        return playerIndex.get(entityId);
     }
 
     public Optional<RidableEntity> getVehicleData(int entityId) {

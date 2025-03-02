@@ -29,11 +29,14 @@ import com.deathmotion.antihealthindicator.data.RidableEntities;
 import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
+
+import java.util.List;
 
 /**
  * Listens for EntityState events and manages the caching of various entity state details.
@@ -103,7 +106,7 @@ public class EntityTracker {
     }
 
     private void spawnEntity(int entityId, EntityType entityType) {
-        CachedEntity entityData = createLivingEntity(entityType);
+        CachedEntity entityData = createLivingEntity(entityId, entityType);
         entityCache.addLivingEntity(entityId, entityData);
     }
 
@@ -114,7 +117,14 @@ public class EntityTracker {
         CachedEntity entityData = entityCache.getCachedEntity(entityId).orElse(null);
         if (entityData == null) return;
 
-        packet.getEntityMetadata().forEach(metaData -> entityData.processMetaData(metaData, player));
+        List<EntityData> meta = packet.getEntityMetadata();
+
+        if (entityData instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) entityData;
+            player.setEntityDataList(meta);
+        }
+
+        meta.forEach(metaData -> entityData.processMetaData(metaData, player));
     }
 
     private void handleDestroyEntities(WrapperPlayServerDestroyEntities packet) {
@@ -135,7 +145,7 @@ public class EntityTracker {
         entityCache.resetUserCache();
     }
 
-    private CachedEntity createLivingEntity(EntityType entityType) {
+    private CachedEntity createLivingEntity(int entityId, EntityType entityType) {
         CachedEntity entityData;
 
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) {
@@ -148,6 +158,7 @@ public class EntityTracker {
             entityData = new CachedEntity();
         }
 
+        entityData.setEntityId(entityId);
         entityData.setEntityType(entityType);
         return entityData;
     }

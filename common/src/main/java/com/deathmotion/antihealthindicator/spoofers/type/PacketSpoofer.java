@@ -20,7 +20,7 @@ package com.deathmotion.antihealthindicator.spoofers.type;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 
-public interface PacketSpoofer {
+public interface PacketSpoofer extends AbstractSpoofer {
     default void onPacketSend(final PacketSendEvent event) {
     }
 }

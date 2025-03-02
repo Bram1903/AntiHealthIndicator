@@ -27,6 +27,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CachedEntity {
+    private int entityId;
     private EntityType entityType;
 
     public void processMetaData(EntityData metaData, AHIPlayer player) {
