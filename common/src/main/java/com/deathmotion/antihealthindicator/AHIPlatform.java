@@ -69,6 +69,13 @@ public abstract class AHIPlatform<P> {
         this.updateChecker = new UpdateChecker<>(this);
     }
 
+    public void debug(String message) {
+        sendConsoleMessage(Component.text(message));
+        PacketEvents.getAPI().getProtocolManager().getUsers().forEach(player ->
+                player.sendMessage(message)
+        );
+    }
+
     /**
      * Called when the platform gets disabled.
      */

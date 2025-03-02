@@ -42,7 +42,7 @@ public class EntityCache {
     private final VehicleTracker vehicleTracker;
 
     private final ConcurrentHashMap<Integer, CachedEntity> cache;
-    private final ConcurrentHashMap<UUID, Integer> playerIndex;
+    private final ConcurrentHashMap<Integer, UUID> playerIndex;
     private final ConcurrentHashMap<Integer, Integer> passengerIndex;
 
     public EntityCache(AHIPlayer player) {
@@ -92,15 +92,15 @@ public class EntityCache {
         }
     }
 
-    public void addPlayer(UUID uuid, int entityId) {
-        playerIndex.put(uuid, entityId);
+    public void addPlayer(int entityId, UUID uuid) {
+        playerIndex.put(entityId, uuid);
     }
 
     public void removeEntity(int entityId) {
         CachedEntity removed = cache.remove(entityId);
 
         if (removed instanceof PlayerEntity) {
-            playerIndex.values().removeIf(id -> id == entityId);
+            playerIndex.remove(entityId);
         }
 
         if (removed instanceof RidableEntity) {

@@ -76,20 +76,22 @@ public class EntityTracker {
 
     private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet, Settings settings) {
         EntityType entityType = packet.getEntityType();
-        if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) return;
+        if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER))
+            return;
         spawnEntity(packet.getEntityId(), entityType);
     }
 
     private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet, Settings settings) {
         EntityType entityType = packet.getEntityType();
         if (!EntityTypes.isTypeInstanceOf(entityType, EntityTypes.LIVINGENTITY)) return;
-        if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) return;
+        if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER))
+            return;
 
         spawnEntity(packet.getEntityId(), entityType);
 
         // After 1.20.2
         if (entityType == EntityTypes.PLAYER) {
-            packet.getUUID().ifPresent(uuid -> entityCache.addPlayer(uuid, packet.getEntityId()));
+            packet.getUUID().ifPresent(uuid -> entityCache.addPlayer(packet.getEntityId(), uuid));
         }
     }
 
@@ -97,7 +99,7 @@ public class EntityTracker {
         spawnEntity(packet.getEntityId(), EntityTypes.PLAYER);
 
         // Pre 1.20.2
-        entityCache.addPlayer(packet.getUUID(), packet.getEntityId());
+        entityCache.addPlayer(packet.getEntityId(), packet.getUUID());
     }
 
     private void spawnEntity(int entityId, EntityType entityType) {
