@@ -95,8 +95,8 @@ public class InvisibilitySpoofer extends Spoofer implements GenericSpoofer {
         player.user.sendPacketSilently(removePacket);
 
         List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> playerInfoList = new ArrayList<>();
-        EnumSet<WrapperPlayServerPlayerInfoUpdate.Action> actions = EnumSet.of(WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER);
-        playerInfoList.add(new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(createSpoofedProfile(randomUUID), true, -1, GameMode.SURVIVAL, Component.text("Invisible"), playerDataStore.getChatSession()));
+        EnumSet<WrapperPlayServerPlayerInfoUpdate.Action> actions = EnumSet.allOf(WrapperPlayServerPlayerInfoUpdate.Action.class);
+        playerInfoList.add(new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(createSpoofedProfile(randomUUID), true, 0, GameMode.SURVIVAL, Component.text("Invisible"), playerDataStore.getChatSession()));
 
         WrapperPlayServerPlayerInfoUpdate spawnFakePlayerPacket = new WrapperPlayServerPlayerInfoUpdate(actions, playerInfoList);
         player.user.sendPacketSilently(spawnFakePlayerPacket);
@@ -116,7 +116,7 @@ public class InvisibilitySpoofer extends Spoofer implements GenericSpoofer {
         player.user.sendPacketSilently(removePlayerInfoPacket);
 
         List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> playerInfoList = new ArrayList<>();
-        EnumSet<WrapperPlayServerPlayerInfoUpdate.Action> actions = EnumSet.of(WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER);
+        EnumSet<WrapperPlayServerPlayerInfoUpdate.Action> actions = EnumSet.allOf(WrapperPlayServerPlayerInfoUpdate.Action.class);
         playerInfoList.add(new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(playerDataStore.getProfile(), playerDataStore.isListed(), playerDataStore.getLatency(), playerDataStore.getGameMode(), playerDataStore.getDisplayName(), playerDataStore.getChatSession()));
 
         WrapperPlayServerPlayerInfoUpdate spawnRealPlayerPacket = new WrapperPlayServerPlayerInfoUpdate(actions, playerInfoList);
