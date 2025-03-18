@@ -38,7 +38,9 @@ public class RidableEntities {
                 EntityTypes.PIG,
                 EntityTypes.SKELETON_HORSE,
                 EntityTypes.STRIDER,
-                EntityTypes.ZOMBIE_HORSE
+                EntityTypes.ZOMBIE_HORSE,
+                EntityTypes.LLAMA,
+                EntityTypes.TRADER_LLAMA
         ));
     }
 
