@@ -37,15 +37,9 @@ public class PacketPlayerJoinQuit<P> extends PacketListenerAbstract {
     }
 
     @Override
-    public void onPacketSend(PacketSendEvent event) {
-        if (event.getPacketType() == PacketType.Login.Server.LOGIN_SUCCESS) {
-            // Do this after send to avoid sending packets before the PLAY state
-            event.getTasksAfterSend().add(() -> platform.getPlayerDataManager().addUser(event.getUser()));
-        }
-    }
-
-    @Override
     public void onUserLogin(UserLoginEvent event) {
+        platform.getPlayerDataManager().addUser(event.getUser());
+
         if (platform.getConfigManager().getSettings().getUpdateChecker().isNotifyInGame() && platform.getUpdateChecker().isUpdateAvailable()) {
             User user = event.getUser();
 
