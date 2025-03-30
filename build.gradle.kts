@@ -74,8 +74,8 @@ tasks {
 
     val sharedBukkitPlugins = runPaper.downloadPluginsSpec {
         url("https://github.com/retrooper/packetevents/releases/download/v2.7.0/packetevents-spigot-2.7.0.jar")
-        url("https://github.com/ViaVersion/ViaVersion/releases/download/5.2.1/ViaVersion-5.2.1.jar")
-        url("https://github.com/ViaVersion/ViaBackwards/releases/download/5.2.1/ViaBackwards-5.2.1.jar")
+        url("https://github.com/ViaVersion/ViaVersion/releases/download/5.3.0/ViaVersion-5.3.0.jar")
+        url("https://github.com/ViaVersion/ViaBackwards/releases/download/5.3.0/ViaBackwards-5.3.0.jar")
     }
 
     runServer {
@@ -88,8 +88,8 @@ tasks {
 
         downloadPlugins {
             from(sharedBukkitPlugins)
-            url("https://ci.lucko.me/job/spark/472/artifact/spark-bukkit/build/libs/spark-1.10.124-bukkit.jar")
-            url("https://download.luckperms.net/1569/bukkit/loader/LuckPerms-Bukkit-5.4.152.jar")
+            url("https://ci.lucko.me/job/spark/478/artifact/spark-bukkit/build/libs/spark-1.10.129-bukkit.jar")
+            url("https://download.luckperms.net/1575/bukkit/loader/LuckPerms-Bukkit-5.4.158.jar")
         }
 
         jvmArgs = jvmArgsExternal
