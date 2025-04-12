@@ -65,7 +65,7 @@ tasks {
     // 1.17           = Java 16
     // 1.18 - 1.20.4  = Java 17
     // 1-20.5+        = Java 21
-    val version = "1.21.4"
+    val version = "1.21.5"
     val javaVersion = JavaLanguageVersion.of(21)
 
     val jvmArgsExternal = listOf(
@@ -73,9 +73,9 @@ tasks {
     )
 
     val sharedBukkitPlugins = runPaper.downloadPluginsSpec {
-        url("https://github.com/retrooper/packetevents/releases/download/v2.7.0/packetevents-spigot-2.7.0.jar")
-        url("https://github.com/ViaVersion/ViaVersion/releases/download/5.3.0/ViaVersion-5.3.0.jar")
-        url("https://github.com/ViaVersion/ViaBackwards/releases/download/5.3.0/ViaBackwards-5.3.0.jar")
+        url("https://ci.codemc.io/job/retrooper/job/packetevents/lastSuccessfulBuild/artifact/spigot/build/libs/packetevents-spigot-2.8.0-SNAPSHOT.jar")
+        url("https://github.com/ViaVersion/ViaVersion/releases/download/5.3.1/ViaVersion-5.3.1.jar")
+        url("https://github.com/ViaVersion/ViaBackwards/releases/download/5.3.1/ViaBackwards-5.3.1.jar")
     }
 
     runServer {

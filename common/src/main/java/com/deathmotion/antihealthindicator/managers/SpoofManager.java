@@ -33,6 +33,7 @@ public class SpoofManager {
         spoofers = new ImmutableClassToInstanceMap.Builder<PacketSpoofer>()
                 .put(MetadataSpoofer.class, new MetadataSpoofer(player))
                 .put(EquipmentSpoofer.class, new EquipmentSpoofer(player))
+                .put(GamemodeSpoofer.class, new GamemodeSpoofer(player))
                 .put(ScoreboardSpoofer.class, new ScoreboardSpoofer(player))
                 .put(FoodSaturationSpoofer.class, new FoodSaturationSpoofer(player))
                 .put(WorldSeedSpoofer.class, new WorldSeedSpoofer(player))

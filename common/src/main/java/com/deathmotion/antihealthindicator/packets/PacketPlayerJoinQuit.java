@@ -20,10 +20,8 @@ package com.deathmotion.antihealthindicator.packets;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
-import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 
 import java.util.concurrent.TimeUnit;

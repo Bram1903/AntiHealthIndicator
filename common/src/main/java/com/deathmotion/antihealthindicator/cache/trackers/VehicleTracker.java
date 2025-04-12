@@ -148,8 +148,8 @@ public class VehicleTracker {
      */
     private void sendVehicleHealthUpdate(final int vehicleId, final float healthValue) {
         AHIPlatform.getInstance().getScheduler().runAsyncTask(task -> {
-            List<EntityData> metadata = Collections.singletonList(
-                    new EntityData(
+            List<EntityData<?>> metadata = Collections.singletonList(
+                    new EntityData<>(
                             player.metadataIndex.HEALTH,
                             EntityDataTypes.FLOAT,
                             healthValue

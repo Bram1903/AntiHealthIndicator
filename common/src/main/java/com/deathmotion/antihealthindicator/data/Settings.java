@@ -24,63 +24,64 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Settings {
-    private boolean Debug = false;
+    private boolean debug = false;
 
-    private UpdateChecker UpdateChecker = new UpdateChecker();
-    private boolean WorldSeed = false;
-    private boolean FoodSaturation = true;
-    private boolean TeamScoreboard = true;
-    private EntityData EntityData = new EntityData();
-    private Items Items = new Items();
+    private UpdateChecker updateChecker = new UpdateChecker();
+    private boolean worldSeed = false;
+    private boolean foodSaturation = true;
+    private boolean teamScoreboard = true;
+    private boolean gamemode = true;
+    private EntityData entityData = new EntityData();
+    private Items items = new Items();
 
     @Getter
     @Setter
     public static class UpdateChecker {
-        private boolean Enabled = true;
-        private boolean PrintToConsole = true;
-        private boolean NotifyInGame = true;
+        private boolean enabled = true;
+        private boolean printToConsole = true;
+        private boolean notifyInGame = true;
     }
 
     @Getter
     @Setter
     public static class EntityData {
-        private boolean Enabled = true;
-        private boolean PlayersOnly = false;
-        private boolean AirTicks = true;
+        private boolean enabled = true;
+        private boolean playersOnly = false;
+        private boolean airTicks = true;
 
-        private boolean Health = true;
-        private boolean IgnoreVehicles = true;
+        private boolean health = true;
+        private boolean ignoreVehicles = true;
 
-        private Wolves Wolves = new Wolves();
-        private IronGolems IronGolems = new IronGolems();
-        private boolean Absorption = true;
-        private boolean Xp = true;
+        private Wolves wolves = new Wolves();
+        private IronGolems ironGolems = new IronGolems();
+        private boolean absorption = true;
+        private boolean xp = true;
 
         @Getter
         @Setter
         public static class Wolves {
-            private boolean Enabled = true;
-            private boolean Tamed = false;
-            private boolean Owner = true;
+            private boolean enabled = true;
+            private boolean tamed = false;
+            private boolean owner = true;
         }
 
         @Getter
         @Setter
         public static class IronGolems {
-            private boolean Enabled = true;
-            private boolean Gradual = true;
+            private boolean enabled = true;
+            private boolean gradual = true;
         }
     }
 
     @Getter
     @Setter
     public static class Items {
-        private boolean Enabled = true;
-        private boolean StackAmount = true;
+        private boolean enabled = true;
+        private boolean stackAmount = true;
 
-        private boolean Durability = true;
-        private boolean BrokenElytra = true;
+        private boolean durability = true;
+        private boolean brokenElytra = true;
 
-        private boolean Enchantments = true;
+        private boolean enchantments = true;
     }
 }

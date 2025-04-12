@@ -38,6 +38,13 @@ spoof:
   team-scoreboard:
     enabled: true
 
+  # If enabled, the gamemode of the player will be spoofed to other players.
+  # This means that other players will not see the actual gamemode of the player.
+  # For example, if a player is in creative mode, other players will see the player in survival mode.
+  # Note: Players in spectator will not be spoofed to prevent issues.
+  gamemode:
+    enabled: true
+
   # These options determine what entity data should be spoofed.
   entity-data:
     # If disabled, none of the following settings will have any effect.
