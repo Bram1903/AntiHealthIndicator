@@ -1,3 +1,21 @@
+/*
+ *  This file is part of AntiHealthIndicator - https://github.com/Bram1903/AntiHealthIndicator
+ *  Copyright (C) 2025 Bram and contributors
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.deathmotion.antihealthindicator.spoofers.impl;
 
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
@@ -11,6 +29,7 @@ import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,17 +41,14 @@ public class GamemodeSpoofer extends Spoofer implements PacketSpoofer {
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
+        Settings settings = configManager.getSettings();
+        if (!settings.isGamemode()) return;
+
         final PacketTypeCommon packetType = event.getPacketType();
 
         if (packetType == PacketType.Play.Server.PLAYER_INFO) {
-            Settings settings = configManager.getSettings();
-            if (!settings.isGamemode()) return;
-
             handlePlayerInfo(event, new WrapperPlayServerPlayerInfo(event));
         } else if (packetType == PacketType.Play.Server.PLAYER_INFO_UPDATE) {
-            Settings settings = configManager.getSettings();
-            if (!settings.isGamemode()) return;
-
             handlePlayerInfoUpdate(event, new WrapperPlayServerPlayerInfoUpdate(event));
         }
     }
@@ -43,68 +59,45 @@ public class GamemodeSpoofer extends Spoofer implements PacketSpoofer {
 
         switch (action) {
             case ADD_PLAYER:
-                addPlayerInfoLegacy(packet.getPlayerDataList());
+            case UPDATE_GAME_MODE:
+                spoofLegacyGameModes(packet.getPlayerDataList());
                 event.markForReEncode(true);
                 break;
-            case UPDATE_GAME_MODE:
-                updateGameModeLegacy(packet.getPlayerDataList());
-                event.markForReEncode(true);
+            default:
                 break;
         }
     }
 
     private void handlePlayerInfoUpdate(PacketSendEvent event, WrapperPlayServerPlayerInfoUpdate packet) {
-        for (WrapperPlayServerPlayerInfoUpdate.Action action : packet.getActions()) {
+        EnumSet<WrapperPlayServerPlayerInfoUpdate.Action> actions = packet.getActions();
+        for (WrapperPlayServerPlayerInfoUpdate.Action action : actions) {
             switch (action) {
                 case ADD_PLAYER:
-                    addPlayerInfo(packet.getEntries());
+                case UPDATE_GAME_MODE:
+                    spoofModernGameModes(packet.getEntries());
                     event.markForReEncode(true);
                     break;
-                case UPDATE_GAME_MODE:
-                    updateGameMode(packet.getEntries());
-                    event.markForReEncode(true);
+                default:
                     break;
             }
         }
     }
 
-    private void addPlayerInfoLegacy(List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList) {
-        for (WrapperPlayServerPlayerInfo.PlayerData data : playerDataList) {
+    private void spoofLegacyGameModes(List<WrapperPlayServerPlayerInfo.PlayerData> list) {
+        for (WrapperPlayServerPlayerInfo.PlayerData data : list) {
             UUID uuid = data.getUserProfile().getUUID();
             if (uuid.equals(player.uuid)) continue;
-
             if (data.getGameMode() == GameMode.SPECTATOR) continue;
             data.setGameMode(GameMode.SURVIVAL);
         }
     }
 
-    private void addPlayerInfo(List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> playerInfoList) {
-        for (WrapperPlayServerPlayerInfoUpdate.PlayerInfo info : playerInfoList) {
+    private void spoofModernGameModes(List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> list) {
+        for (WrapperPlayServerPlayerInfoUpdate.PlayerInfo info : list) {
             UUID uuid = info.getGameProfile().getUUID();
             if (uuid.equals(player.uuid)) continue;
-
             if (info.getGameMode() == GameMode.SPECTATOR) continue;
             info.setGameMode(GameMode.SURVIVAL);
-        }
-    }
-
-    private void updateGameMode(List<WrapperPlayServerPlayerInfoUpdate.PlayerInfo> playerInfoList) {
-        for (WrapperPlayServerPlayerInfoUpdate.PlayerInfo info : playerInfoList) {
-            UUID uuid = info.getGameProfile().getUUID();
-            if (uuid.equals(player.uuid)) continue;
-
-            if (info.getGameMode() == GameMode.SPECTATOR) continue;
-            info.setGameMode(GameMode.SURVIVAL);
-        }
-    }
-
-    private void updateGameModeLegacy(List<WrapperPlayServerPlayerInfo.PlayerData> playerDataList) {
-        for (WrapperPlayServerPlayerInfo.PlayerData data : playerDataList) {
-            UUID uuid = data.getUserProfile().getUUID();
-            if (uuid.equals(player.uuid)) continue;
-
-            if (data.getGameMode() == GameMode.SPECTATOR) continue;
-            data.setGameMode(GameMode.SURVIVAL);
         }
     }
 }
