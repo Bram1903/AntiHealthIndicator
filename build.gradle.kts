@@ -55,6 +55,10 @@ tasks {
             "net.kyori.adventure.text.serializer.legacy",
             "io.github.retrooper.packetevents.adventure.serializer.legacy"
         )
+
+        manifest {
+            attributes["paperweight-mappings-namespace"] = "mojang"
+        }
     }
 
     assemble {
