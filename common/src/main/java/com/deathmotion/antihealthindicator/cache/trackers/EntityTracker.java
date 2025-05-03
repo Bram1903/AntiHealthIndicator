@@ -32,6 +32,7 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 
 /**
@@ -42,6 +43,7 @@ public class EntityTracker {
     private final EntityCache entityCache;
     private final ConfigManager<?> configManager;
 
+    private DimensionType currentDimension;
 
     public EntityTracker(AHIPlayer player, EntityCache entityCache) {
         this.player = player;
@@ -68,7 +70,7 @@ public class EntityTracker {
         } else if (PacketType.Play.Server.RESPAWN == type) {
             handleRespawn(new WrapperPlayServerRespawn(event));
         } else if (PacketType.Play.Server.JOIN_GAME == type) {
-            clearCache();
+            handleJoinGame(new WrapperPlayServerJoinGame(event));
         } else if (PacketType.Play.Server.CONFIGURATION_START == type) {
             clearCache();
         }
@@ -114,9 +116,17 @@ public class EntityTracker {
     }
 
     private void handleRespawn(WrapperPlayServerRespawn packet) {
-        byte keptData = packet.getKeptData();
-        if (keptData == WrapperPlayServerRespawn.KEEP_ALL_DATA || keptData == WrapperPlayServerRespawn.KEEP_ENTITY_DATA) return;
+        DimensionType dimension = packet.getDimensionType();
 
+        if (!dimension.equals(currentDimension)) {
+            clearCache();
+        }
+
+        currentDimension = dimension;
+    }
+
+    private void handleJoinGame(WrapperPlayServerJoinGame packet) {
+        currentDimension = packet.getDimensionType();
         clearCache();
     }
 
