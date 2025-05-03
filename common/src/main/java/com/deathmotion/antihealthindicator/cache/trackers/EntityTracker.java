@@ -66,11 +66,11 @@ public class EntityTracker {
         } else if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
             handleDestroyEntities(new WrapperPlayServerDestroyEntities(event));
         } else if (PacketType.Play.Server.RESPAWN == type) {
-            handleRespawn();
+            handleRespawn(new WrapperPlayServerRespawn(event));
         } else if (PacketType.Play.Server.JOIN_GAME == type) {
-            handleJoinGame();
+            clearCache();
         } else if (PacketType.Play.Server.CONFIGURATION_START == type) {
-            handleConfigurationStart();
+            clearCache();
         }
     }
 
@@ -113,15 +113,14 @@ public class EntityTracker {
         }
     }
 
-    private void handleRespawn() {
-        entityCache.resetUserCache();
+    private void handleRespawn(WrapperPlayServerRespawn packet) {
+        byte keptData = packet.getKeptData();
+        if (keptData == WrapperPlayServerRespawn.KEEP_ALL_DATA || keptData == WrapperPlayServerRespawn.KEEP_ENTITY_DATA) return;
+
+        clearCache();
     }
 
-    private void handleJoinGame() {
-        entityCache.resetUserCache();
-    }
-
-    private void handleConfigurationStart() {
+    private void clearCache() {
         entityCache.resetUserCache();
     }
 
