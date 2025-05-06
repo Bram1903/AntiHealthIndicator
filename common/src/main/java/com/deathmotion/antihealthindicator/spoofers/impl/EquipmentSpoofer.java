@@ -43,12 +43,9 @@ public class EquipmentSpoofer extends Spoofer implements PacketSpoofer {
     private final boolean useDamageableInterface;
 
     /**
-     * The enchantment list to spoof the item with
+     * The enchantment lists to spoof the item with
      */
-    private final List<Enchantment> enchantmentList = Collections.singletonList(Enchantment.builder()
-            .type(EnchantmentTypes.BLOCK_FORTUNE)
-            .level(3)
-            .build());
+    private List<Enchantment> enchantmentList;
 
     public EquipmentSpoofer(AHIPlayer player) {
         super(player);
@@ -69,7 +66,7 @@ public class EquipmentSpoofer extends Spoofer implements PacketSpoofer {
             return;
         }
 
-        equipmentList.forEach(equipment -> handleEquipment(equipment, packet.getClientVersion(), settings));
+        equipmentList.forEach(equipment -> handleEquipment(equipment, settings));
 
         packet.setEquipment(equipmentList);
         event.markForReEncode(true);
@@ -85,13 +82,10 @@ public class EquipmentSpoofer extends Spoofer implements PacketSpoofer {
      * the enchantments on the item are set to enchantmentList.
      *
      * @param equipment     a single piece of equipment
-     * @param clientVersion the player's client version
      */
-    private void handleEquipment(Equipment equipment, ClientVersion clientVersion, Settings settings) {
+    private void handleEquipment(Equipment equipment, Settings settings) {
         ItemStack itemStack = equipment.getItem();
-        if (itemStack == null) {
-            return;
-        }
+        if (itemStack == null) return;
 
         if (settings.getItems().isStackAmount() && itemStack.getAmount() > 1) {
             itemStack.setAmount(1);
@@ -118,8 +112,16 @@ public class EquipmentSpoofer extends Spoofer implements PacketSpoofer {
             }
         }
 
-        if (settings.getItems().isEnchantments() && itemStack.isEnchanted(clientVersion)) {
-            itemStack.setEnchantments(enchantmentList, clientVersion);
+        if (settings.getItems().isEnchantments() && itemStack.isEnchanted()) {
+            if (enchantmentList == null) {
+                // Lazy load to prevent issues where PacketEvents hasn't loaded the proper mappings yet
+                enchantmentList = Collections.singletonList(Enchantment.builder()
+                        .type(EnchantmentTypes.BLOCK_FORTUNE)
+                        .level(3)
+                        .build());
+            }
+
+            itemStack.setEnchantments(enchantmentList);
             equipment.setItem(itemStack);
         }
     }
