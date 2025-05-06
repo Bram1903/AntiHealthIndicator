@@ -18,6 +18,8 @@
 
 package com.deathmotion.antihealthindicator.util;
 
+import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 
 public class MetadataIndex {
@@ -30,6 +32,10 @@ public class MetadataIndex {
     public final int TAMABLE_OWNER;
 
     public MetadataIndex(ClientVersion version) {
+        if (!AHIPlatform.getInstance().isProxy()) {
+            version = PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+        }
+
         AIR_TICKS = 1;
         HEALTH = getHealthIndex(version);
         ABSORPTION = getAbsorptionIndex(version);

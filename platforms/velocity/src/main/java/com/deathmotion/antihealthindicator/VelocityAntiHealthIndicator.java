@@ -35,6 +35,7 @@ public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
 
     @Inject
     public VelocityAntiHealthIndicator(ProxyServer proxy, @DataDirectory Path dataDirectory) {
+        super(true);
         this.proxy = proxy;
         this.dataDirectory = dataDirectory;
     }
