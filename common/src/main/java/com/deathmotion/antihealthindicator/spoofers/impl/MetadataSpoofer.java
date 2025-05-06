@@ -62,7 +62,7 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
         // Skip processing if the packet refers to the user's own entity.
         if (entityId == player.user.getEntityId()) return;
 
-        CachedEntity cachedEntity = entityCache.getCachedEntity(entityId).orElse(null);
+        CachedEntity cachedEntity = entityCache.getEntityRaw(entityId);
         if (cachedEntity == null) return;
 
         EntityType entityType = cachedEntity.getEntityType();

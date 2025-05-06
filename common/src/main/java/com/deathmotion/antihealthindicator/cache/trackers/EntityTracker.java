@@ -78,14 +78,16 @@ public class EntityTracker {
 
     private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet, Settings settings) {
         EntityType entityType = packet.getEntityType();
-        if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) return;
+        if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER))
+            return;
         spawnEntity(packet.getEntityId(), entityType);
     }
 
     private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet, Settings settings) {
         EntityType entityType = packet.getEntityType();
         if (!EntityTypes.isTypeInstanceOf(entityType, EntityTypes.LIVINGENTITY)) return;
-        if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) return;
+        if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER))
+            return;
 
         spawnEntity(packet.getEntityId(), entityType);
     }
@@ -103,7 +105,7 @@ public class EntityTracker {
         if (settings.getEntityData().isPlayersOnly()) return;
 
         int entityId = packet.getEntityId();
-        CachedEntity entityData = entityCache.getCachedEntity(entityId).orElse(null);
+        CachedEntity entityData = entityCache.getEntityRaw(entityId);
         if (entityData == null) return;
 
         packet.getEntityMetadata().forEach(metaData -> entityData.processMetaData(metaData, player));

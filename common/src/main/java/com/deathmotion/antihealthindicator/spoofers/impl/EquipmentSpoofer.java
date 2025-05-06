@@ -30,7 +30,6 @@ import com.github.retrooper.packetevents.protocol.item.enchantment.Enchantment;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
 import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
@@ -81,7 +80,7 @@ public class EquipmentSpoofer extends Spoofer implements PacketSpoofer {
      * If the spoofEnchantments are enabled and the item is enchanted,
      * the enchantments on the item are set to enchantmentList.
      *
-     * @param equipment     a single piece of equipment
+     * @param equipment a single piece of equipment
      */
     private void handleEquipment(Equipment equipment, Settings settings) {
         ItemStack itemStack = equipment.getItem();
