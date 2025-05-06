@@ -35,7 +35,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 
 public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
 
-    // Constants for Iron Golem health thresholds
     private static final float IRON_GOLEM_HEALTH_MAX = 100f;
     private static final float IRON_GOLEM_THRESHOLD_1 = 74f;
     private static final float IRON_GOLEM_THRESHOLD_2 = 49f;
@@ -69,29 +68,21 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
         EntityType entityType = cachedEntity.getEntityType();
         if (shouldIgnoreEntity(entityType, entityId, cachedEntity, settings)) return;
 
-        // Process each metadata entry for spoofing.
         packet.getEntityMetadata().forEach(entityData -> handleEntityMetadata(entityType, entityData, settings));
-
         event.markForReEncode(true);
     }
 
     private boolean shouldIgnoreEntity(EntityType entityType, int entityId, CachedEntity cachedEntity, Settings settings) {
-        // Ignore entities with built-in health displays (e.g., bosses).
-        if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) {
+        if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) return true;
+
+        if (settings.getEntityData().isPlayersOnly() && entityType != EntityTypes.PLAYER) return true;
+
+        if (!settings.getEntityData().isPlayersOnly()
+                && settings.getEntityData().isIgnoreVehicles()
+                && entityCache.isUserPassenger(entityId)) {
             return true;
         }
 
-        // If only players should be processed, skip non-player entities.
-        if (settings.getEntityData().isPlayersOnly() && entityType != EntityTypes.PLAYER) {
-            return true;
-        }
-
-        // Optionally ignore vehicles.
-        if (!settings.getEntityData().isPlayersOnly() && settings.getEntityData().isIgnoreVehicles() && entityCache.isUserPassenger(entityId)) {
-            return true;
-        }
-
-        // Special handling for wolves.
         if (entityType == EntityTypes.WOLF && settings.getEntityData().getWolves().isEnabled()) {
             return shouldIgnoreWolf(cachedEntity, settings);
         }
@@ -99,30 +90,18 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
         return false;
     }
 
-    /**
-     * Determines whether a wolf entity should be ignored based on its tamed/owner state and the settings.
-     */
     private boolean shouldIgnoreWolf(CachedEntity cachedEntity, Settings settings) {
         WolfEntity wolfEntity = (WolfEntity) cachedEntity;
         Settings.EntityData.Wolves wolfSettings = settings.getEntityData().getWolves();
 
-        // If neither tamed nor owner conditions are enabled, ignore the wolf.
-        if (!wolfSettings.isTamed() && !wolfSettings.isOwner()) {
-            return true;
-        }
-        // Ignore if the wolf is tamed and tamed wolves should be ignored.
-        if (wolfSettings.isTamed() && wolfEntity.isTamed()) {
-            return true;
-        }
-
-        // Ignore if the user owns the wolf and owner wolves should be ignored.
-        return wolfSettings.isOwner() && wolfEntity.isOwnerPresent() && wolfEntity.getOwnerUUID().equals(player.uuid);
+        if (!wolfSettings.isTamed() && !wolfSettings.isOwner()) return true;
+        if (wolfSettings.isTamed() && wolfEntity.isTamed()) return true;
+        return wolfSettings.isOwner()
+                && wolfEntity.isOwnerPresent()
+                && wolfEntity.getOwnerUUID().equals(player.uuid);
     }
 
-    /**
-     * Modifies the metadata for the given entity based on its type and the configured settings.
-     */
-    private void handleEntityMetadata(EntityType entityType, EntityData entityData, Settings settings) {
+    private void handleEntityMetadata(EntityType entityType, EntityData<?> entityData, Settings settings) {
         if (entityType == EntityTypes.IRON_GOLEM && settings.getEntityData().getIronGolems().isEnabled()) {
             if (!settings.getEntityData().getIronGolems().isGradual() || !healthTexturesSupported) {
                 applyDefaultSpoofing(entityData, settings);
@@ -137,43 +116,39 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
         }
     }
 
-    /**
-     * Applies default spoofing logic to common metadata.
-     */
-    private void applyDefaultSpoofing(EntityData entityData, Settings settings) {
+    @SuppressWarnings("unchecked")
+    private void applyDefaultSpoofing(EntityData<?> entityData, Settings settings) {
         updateAirTicks(entityData, settings);
         if (entityData.getIndex() == player.metadataIndex.HEALTH && settings.getEntityData().isHealth()) {
-            float health = (Float) entityData.getValue();
-            if (health > 0) {
-                // Spoof health value to a fixed, low value.
-                entityData.setValue(0.5f);
+            Object value = entityData.getValue();
+            if (value instanceof Float && (Float) value > 0f) {
+                ((EntityData<Float>) entityData).setValue(0.5f);
             }
         }
     }
 
-    /**
-     * Applies gradual spoofing for iron golem health based on thresholds.
-     */
-    private void spoofIronGolemMetadata(EntityData entityData, Settings settings) {
+    @SuppressWarnings("unchecked")
+    private void spoofIronGolemMetadata(EntityData<?> entityData, Settings settings) {
         updateAirTicks(entityData, settings);
         if (entityData.getIndex() == player.metadataIndex.HEALTH && settings.getEntityData().isHealth()) {
-            float health = (Float) entityData.getValue();
-            if (health > IRON_GOLEM_THRESHOLD_1) {
-                entityData.setValue(IRON_GOLEM_HEALTH_MAX);
-            } else if (health > IRON_GOLEM_THRESHOLD_2) {
-                entityData.setValue(IRON_GOLEM_THRESHOLD_1);
-            } else if (health > IRON_GOLEM_THRESHOLD_3) {
-                entityData.setValue(IRON_GOLEM_THRESHOLD_2);
-            } else {
-                entityData.setValue(IRON_GOLEM_THRESHOLD_3);
+            Object value = entityData.getValue();
+            if (value instanceof Float) {
+                float health = (Float) value;
+                if (health > IRON_GOLEM_THRESHOLD_1) {
+                    ((EntityData<Float>) entityData).setValue(IRON_GOLEM_HEALTH_MAX);
+                } else if (health > IRON_GOLEM_THRESHOLD_2) {
+                    ((EntityData<Float>) entityData).setValue(IRON_GOLEM_THRESHOLD_1);
+                } else if (health > IRON_GOLEM_THRESHOLD_3) {
+                    ((EntityData<Float>) entityData).setValue(IRON_GOLEM_THRESHOLD_2);
+                } else {
+                    ((EntityData<Float>) entityData).setValue(IRON_GOLEM_THRESHOLD_3);
+                }
             }
         }
     }
 
-    /**
-     * Spoofs player-specific metadata such as absorption and experience.
-     */
-    private void spoofPlayerMetadata(EntityData entityData, Settings settings) {
+
+    private void spoofPlayerMetadata(EntityData<?> entityData, Settings settings) {
         if (entityData.getIndex() == player.metadataIndex.ABSORPTION && settings.getEntityData().isAbsorption()) {
             setDynamicValue(entityData, 0);
         }
@@ -182,39 +157,28 @@ public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
         }
     }
 
-    /**
-     * Updates the air ticks metadata if enabled in the settings.
-     */
-    private void updateAirTicks(EntityData entityData, Settings settings) {
+    private void updateAirTicks(EntityData<?> entityData, Settings settings) {
         if (entityData.getIndex() == player.metadataIndex.AIR_TICKS && settings.getEntityData().isAirTicks()) {
             setDynamicValue(entityData, 1);
         }
     }
 
-    /**
-     * Sets a new value for the entity data while preserving its original numeric type.
-     * <p>
-     * This method is necessary because the metadata value is stored as an {@code Object}
-     * and can be of different numeric types (e.g., Integer, Short, Byte, Long, Float, or Double).
-     *
-     * @param entityData The metadata object to modify.
-     * @param spoofValue The new value to set.
-     */
-    private void setDynamicValue(EntityData entityData, int spoofValue) {
+    @SuppressWarnings("unchecked")
+    private <T> void setDynamicValue(EntityData<?> entityData, int spoofValue) {
         Object value = entityData.getValue();
 
         if (value instanceof Integer) {
-            entityData.setValue(spoofValue);
+            ((EntityData<Integer>) entityData).setValue(spoofValue);
         } else if (value instanceof Short) {
-            entityData.setValue((short) spoofValue);
+            ((EntityData<Short>) entityData).setValue((short) spoofValue);
         } else if (value instanceof Byte) {
-            entityData.setValue((byte) spoofValue);
+            ((EntityData<Byte>) entityData).setValue((byte) spoofValue);
         } else if (value instanceof Long) {
-            entityData.setValue((long) spoofValue);
+            ((EntityData<Long>) entityData).setValue((long) spoofValue);
         } else if (value instanceof Float) {
-            entityData.setValue((float) spoofValue);
+            ((EntityData<Float>) entityData).setValue((float) spoofValue);
         } else if (value instanceof Double) {
-            entityData.setValue((double) spoofValue);
+            ((EntityData<Double>) entityData).setValue((double) spoofValue);
         }
     }
 }
