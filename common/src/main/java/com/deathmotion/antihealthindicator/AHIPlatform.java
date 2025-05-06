@@ -39,6 +39,7 @@ public abstract class AHIPlatform<P> {
     @Getter
     private static AHIPlatform<?> instance;
 
+    protected final boolean proxy;
     protected ConfigManager<P> configManager;
     protected LogManager<P> logManager;
 
@@ -47,6 +48,15 @@ public abstract class AHIPlatform<P> {
     protected PlayerDataManager<P> playerDataManager;
 
     private UpdateChecker<P> updateChecker;
+
+    /**
+     * Constructor for the AHIPlatform class.
+     *
+     * @param proxy true if the platform is a proxy, false otherwise.
+     */
+    public AHIPlatform(boolean proxy) {
+        this.proxy = proxy;
+    }
 
     public void commonOnInitialize() {
         instance = this;

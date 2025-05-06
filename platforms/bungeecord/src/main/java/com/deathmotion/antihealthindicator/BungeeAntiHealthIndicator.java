@@ -37,6 +37,7 @@ public class BungeeAntiHealthIndicator extends AHIPlatform<Plugin> {
     private final Plugin plugin;
 
     public BungeeAntiHealthIndicator(Plugin plugin) {
+        super(true);
         this.plugin = plugin;
     }
 
