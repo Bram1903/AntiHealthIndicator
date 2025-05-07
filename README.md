@@ -71,10 +71,10 @@ The plugin includes various spoofing features:
 
 ## Permission Nodes
 
-Operators (OPs) have these permissions by default:
+Operators (OPs) have these permissions by default, except for `AntiHealthIndicator.Bypass`:
 
 - `AntiHealthIndicator.Notify` - Notifies player of updates.
-- `AntiHealthIndicator.Bypass` - Prevents receiving spoofed data (if enabled in config).
+- `AntiHealthIndicator.Bypass` - Prevents receiving spoofed data
 - `AntiHealthIndicator.Reload` - Grants access to the `/antihealthindicator reload` command.
 - `AntiHealthIndicator.Debug` - Receives debug messages if debugging is enabled.
 

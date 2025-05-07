@@ -18,7 +18,7 @@ permissions:
     default: op
   AntiHealthIndicator.Bypass:
     description: "This permission prevents the player from receiving spoofed data."
-    default: op
+    default: false
   AntiHealthIndicator.Reload:
     description: "This permission allows players to reload the configuration."
     default: op
