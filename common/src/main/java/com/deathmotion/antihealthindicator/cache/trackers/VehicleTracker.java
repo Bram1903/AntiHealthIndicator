@@ -113,18 +113,15 @@ public class VehicleTracker {
     }
 
     private void sendMetadata(final int vehicleId, final float health) {
-        AHIPlatform.getInstance().getScheduler().runAsyncTask(task -> {
-            EntityData<Float> data = new EntityData<>(
-                    player.metadataIndex.HEALTH,
-                    EntityDataTypes.FLOAT,
-                    health
-            );
-            player.user.sendPacketSilently(
-                    new WrapperPlayServerEntityMetadata(
-                            vehicleId,
-                            Collections.singletonList(data)
-                    )
-            );
-        });
+        AHIPlatform.getInstance().getScheduler().runAsyncTask(task -> player.user.sendPacketSilently(
+                new WrapperPlayServerEntityMetadata(
+                        vehicleId,
+                        Collections.singletonList(new EntityData<>(
+                                player.metadataIndex.HEALTH,
+                                EntityDataTypes.FLOAT,
+                                health
+                        ))
+                )
+        ));
     }
 }
