@@ -44,7 +44,7 @@ public class WolfEntity extends CachedEntity {
     }
 
     @Override
-    public void processMetaData(EntityData metaData, AHIPlayer player) {
+    public void processMetaData(EntityData<?> metaData, AHIPlayer player) {
         int index = metaData.getIndex();
 
         if (index == player.metadataIndex.TAMABLE_TAMED) {

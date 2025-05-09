@@ -30,7 +30,7 @@ public class RidableEntity extends CachedEntity {
     private int passengerId;
 
     @Override
-    public void processMetaData(EntityData metaData, AHIPlayer player) {
+    public void processMetaData(EntityData<?> metaData, AHIPlayer player) {
         if (metaData.getIndex() == player.metadataIndex.HEALTH) {
             setHealth((float) metaData.getValue());
         }
