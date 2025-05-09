@@ -27,10 +27,9 @@ public class Settings {
     private boolean debug = false;
 
     private UpdateChecker updateChecker = new UpdateChecker();
-    private boolean worldSeed = false;
-    private boolean foodSaturation = true;
-    private boolean teamScoreboard = true;
+    private boolean foodSaturation = false;
     private boolean gamemode = true;
+    private boolean teamScoreboard = true;
     private EntityData entityData = new EntityData();
     private Items items = new Items();
 

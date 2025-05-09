@@ -22,27 +22,22 @@ update-checker:
 
 # These options determine what information should be spoofed.
 spoof:
-  # Sets the seed which is being sent to the client to zero.
-  # Keep in mind that this doesn't make it impossible to predict the world seed, it just makes it more difficult.
-  world-seed:
-    enabled: false
-
   # Prevents the player from receiving the current saturation of their food bar,
   # which can be used by mods or cheats to determine when the food bar itself will be drained.
   food-saturation:
-    enabled: true
-
-  # Prevents the health of team members from being sent to the players due to being on the same team.
-  # Some bad plugins use minecraft teams to color names, etc. and this can be used to determine health.
-  # If this causes issues with other plugins that use teams, you can disable this.
-  team-scoreboard:
-    enabled: true
+    enabled: false
 
   # If enabled, the gamemode of the player will be spoofed to other players.
   # This means that other players will not see the actual gamemode of the player.
   # For example, if a player is in creative mode, other players will see the player in survival mode.
   # Note: Players in spectator will not be spoofed to prevent issues.
   gamemode:
+    enabled: true
+
+  # Prevents the health of team members from being sent to the players due to being on the same team.
+  # Some bad plugins use minecraft teams to color names, etc. and this can be used to determine health.
+  # If this causes issues with other plugins that use teams, you can disable this.
+  team-scoreboard:
     enabled: true
 
   # These options determine what entity data should be spoofed.

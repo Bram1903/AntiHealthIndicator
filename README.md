@@ -63,7 +63,6 @@ The plugin includes various spoofing features:
 - Item Durability
 - Item Enchantments
 - Item Stack Amount
-- World Seed
 
 ## Commands
 
