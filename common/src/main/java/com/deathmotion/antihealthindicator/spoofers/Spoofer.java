@@ -21,8 +21,9 @@ package com.deathmotion.antihealthindicator.spoofers;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 
-public class Spoofer {
+public abstract class Spoofer {
 
     protected final AHIPlayer player;
     protected final ConfigManager<?> configManager;
@@ -31,4 +32,6 @@ public class Spoofer {
         this.player = player;
         this.configManager = AHIPlatform.getInstance().getConfigManager();
     }
+
+    public abstract void onPacketSend(final PacketSendEvent event);
 }

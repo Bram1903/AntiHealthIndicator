@@ -21,7 +21,6 @@ package com.deathmotion.antihealthindicator.spoofers.impl;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.spoofers.Spoofer;
-import com.deathmotion.antihealthindicator.spoofers.type.PacketSpoofer;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
@@ -33,7 +32,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
-public class GamemodeSpoofer extends Spoofer implements PacketSpoofer {
+public final class GamemodeSpoofer extends Spoofer {
 
     public GamemodeSpoofer(AHIPlayer player) {
         super(player);

@@ -92,8 +92,7 @@ public class ConfigManager<P> {
         settings.getUpdateChecker().setEnabled(getBoolean(yamlData, "update-checker.enabled", true));
         settings.getUpdateChecker().setPrintToConsole(getBoolean(yamlData, "update-checker.print-to-console", true));
         settings.getUpdateChecker().setNotifyInGame(getBoolean(yamlData, "update-checker.notify-in-game", true));
-        settings.setWorldSeed(getBoolean(yamlData, "spoof.world-seed.enabled", false));
-        settings.setFoodSaturation(getBoolean(yamlData, "spoof.food-saturation.enabled", true));
+        settings.setFoodSaturation(getBoolean(yamlData, "spoof.food-saturation.enabled", false));
         settings.setTeamScoreboard(getBoolean(yamlData, "spoof.team-scoreboard.enabled", true));
         settings.setGamemode(getBoolean(yamlData, "spoof.gamemode.enabled", true));
 

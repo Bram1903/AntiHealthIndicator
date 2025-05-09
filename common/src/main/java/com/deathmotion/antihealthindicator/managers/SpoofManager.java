@@ -19,18 +19,18 @@
 package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
+import com.deathmotion.antihealthindicator.spoofers.Spoofer;
 import com.deathmotion.antihealthindicator.spoofers.impl.*;
-import com.deathmotion.antihealthindicator.spoofers.type.PacketSpoofer;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 
 public class SpoofManager {
 
-    ClassToInstanceMap<PacketSpoofer> spoofers;
+    ClassToInstanceMap<Spoofer> spoofers;
 
     public SpoofManager(AHIPlayer player) {
-        spoofers = new ImmutableClassToInstanceMap.Builder<PacketSpoofer>()
+        spoofers = new ImmutableClassToInstanceMap.Builder<Spoofer>()
                 .put(MetadataSpoofer.class, new MetadataSpoofer(player))
                 .put(EquipmentSpoofer.class, new EquipmentSpoofer(player))
                 .put(GamemodeSpoofer.class, new GamemodeSpoofer(player))
@@ -40,8 +40,8 @@ public class SpoofManager {
     }
 
     public void onPacketSend(final PacketSendEvent packet) {
-        for (PacketSpoofer packetSpoofer : spoofers.values()) {
-            packetSpoofer.onPacketSend(packet);
+        for (Spoofer spoofer : spoofers.values()) {
+            spoofer.onPacketSend(packet);
         }
     }
 }

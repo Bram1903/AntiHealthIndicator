@@ -24,7 +24,6 @@ import com.deathmotion.antihealthindicator.cache.entities.WolfEntity;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.spoofers.Spoofer;
-import com.deathmotion.antihealthindicator.spoofers.type.PacketSpoofer;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
@@ -33,7 +32,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 
-public class MetadataSpoofer extends Spoofer implements PacketSpoofer {
+public final class MetadataSpoofer extends Spoofer {
 
     private static final float IRON_GOLEM_HEALTH_MAX = 100f;
     private static final float IRON_GOLEM_THRESHOLD_1 = 74f;

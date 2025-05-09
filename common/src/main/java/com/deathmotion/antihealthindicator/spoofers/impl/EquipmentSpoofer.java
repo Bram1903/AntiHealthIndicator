@@ -21,7 +21,6 @@ package com.deathmotion.antihealthindicator.spoofers.impl;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.spoofers.Spoofer;
-import com.deathmotion.antihealthindicator.spoofers.type.PacketSpoofer;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
@@ -37,7 +36,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import java.util.Collections;
 import java.util.List;
 
-public class EquipmentSpoofer extends Spoofer implements PacketSpoofer {
+public final class EquipmentSpoofer extends Spoofer {
 
     private final boolean useDamageableInterface;
 
