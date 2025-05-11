@@ -21,9 +21,7 @@ package com.deathmotion.antihealthindicator.spoofers.impl;
 import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.spoofers.Spoofer;
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.enchantment.Enchantment;
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes;
@@ -38,97 +36,61 @@ import java.util.List;
 
 public final class EquipmentSpoofer extends Spoofer {
 
-    private final boolean useDamageableInterface;
-
-    /**
-     * The enchantment lists to spoof the item with
-     */
-    private List<Enchantment> enchantmentList;
-
     public EquipmentSpoofer(AHIPlayer player) {
         super(player);
-
-        this.useDamageableInterface = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_13);
     }
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() != PacketType.Play.Server.ENTITY_EQUIPMENT) return;
 
-        final Settings settings = configManager.getSettings();
-        if (!settings.getItems().isEnabled()) return;
+        Settings.Items settings = configManager.getSettings().getItems();
+        if (!settings.isEnabled()) return;
 
         WrapperPlayServerEntityEquipment packet = new WrapperPlayServerEntityEquipment(event);
-        List<Equipment> equipmentList = packet.getEquipment();
-        if (equipmentList.isEmpty()) {
-            return;
-        }
+        List<Equipment> items = packet.getEquipment();
+        if (items.isEmpty()) return;
 
-        equipmentList.forEach(equipment -> handleEquipment(equipment, settings));
-
-        packet.setEquipment(equipmentList);
+        items.forEach(eq -> applySpoof(eq.getItem(), eq.getSlot(), settings));
+        packet.setEquipment(items);
         event.markForReEncode(true);
     }
 
-    /**
-     * Handles the modification of an equipment item as per configurations.
-     * If the spoofStackAmount is enabled and the item amount exceeds 1, the item amount is set to 1.
-     * If the spoofDurability is enabled and the item is damageable,
-     * the damage value on the item is set to 0 for non-legacy items
-     * and the legacy data on the item is set to 0 for legacy items.
-     * If the spoofEnchantments are enabled and the item is enchanted,
-     * the enchantments on the item are set to enchantmentList.
-     *
-     * @param equipment a single piece of equipment
-     */
-    private void handleEquipment(Equipment equipment, Settings settings) {
-        ItemStack itemStack = equipment.getItem();
-        if (itemStack == null) return;
+    private void applySpoof(ItemStack item, EquipmentSlot slot, Settings.Items settings) {
+        if (item.getType() == ItemTypes.AIR) return;
 
-        if (settings.getItems().isStackAmount() && itemStack.getAmount() > 1) {
-            itemStack.setAmount(1);
-            equipment.setItem(itemStack);
+        if (settings.isStackAmount() && item.getAmount() > 1) {
+            item.setAmount(1);
         }
 
-        if (settings.getItems().isDurability() && itemStack.isDamageableItem() && itemStack.getDamageValue() > 0) {
-            boolean isElytra = (itemStack.getType() == ItemTypes.ELYTRA);
-
-            // Additional checks if the item is Elytra
-            if (isElytra) {
-                boolean isInAllowedElytraSlot = (equipment.getSlot() == EquipmentSlot.MAIN_HAND || equipment.getSlot() == EquipmentSlot.OFF_HAND || equipment.getSlot() == EquipmentSlot.HELMET);
-                boolean isReallyBroken = (itemStack.getDamageValue() >= itemStack.getMaxDamage() - 1);
-
-                // Prevent resetting Elytra durability unless allowed by settings
-                if (!settings.getItems().isBrokenElytra() || !isInAllowedElytraSlot || !isReallyBroken) {
-                    resetItemDamage(itemStack);
-                    equipment.setItem(itemStack);
-                }
-            } else {
-                // For non-Elytra items, reset damage unconditionally when durability is disabled
-                resetItemDamage(itemStack);
-                equipment.setItem(itemStack);
+        if (settings.isDurability() && item.isDamaged()) {
+            if (!isBrokenElytra(item, slot, settings)) {
+                item.setDamageValue(0);
             }
         }
 
-        if (settings.getItems().isEnchantments() && itemStack.isEnchanted()) {
-            if (enchantmentList == null) {
-                // Lazy load to prevent issues where PacketEvents hasn't loaded the proper mappings yet
-                enchantmentList = Collections.singletonList(Enchantment.builder()
-                        .type(EnchantmentTypes.BLOCK_FORTUNE)
-                        .level(3)
-                        .build());
-            }
-
-            itemStack.setEnchantments(enchantmentList);
-            equipment.setItem(itemStack);
+        if (settings.isEnchantments() && item.isEnchanted()) {
+            item.setEnchantments(getDefaultEnchants());
         }
     }
 
-    private void resetItemDamage(ItemStack itemStack) {
-        if (useDamageableInterface) {
-            itemStack.setDamageValue(0);
-        } else {
-            itemStack.setLegacyData((short) 0);
-        }
+    private boolean isBrokenElytra(ItemStack item, EquipmentSlot slot, Settings.Items settings) {
+        if (item.getType() != ItemTypes.ELYTRA) return false;
+        boolean broken = item.getDamageValue() >= item.getMaxDamage() - 1;
+        boolean allowedSlot = slot == EquipmentSlot.MAIN_HAND || slot == EquipmentSlot.OFF_HAND || slot == EquipmentSlot.HELMET;
+        return settings.isBrokenElytra() && broken && allowedSlot;
+    }
+
+    private static List<Enchantment> getDefaultEnchants() {
+        return LazyHolder.DEFAULT_ENCHANTS;
+    }
+
+    private static class LazyHolder {
+        private static final List<Enchantment> DEFAULT_ENCHANTS = Collections.singletonList(
+                Enchantment.builder()
+                        .type(EnchantmentTypes.BLOCK_FORTUNE)
+                        .level(3)
+                        .build()
+        );
     }
 }

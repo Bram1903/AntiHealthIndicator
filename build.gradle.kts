@@ -90,6 +90,8 @@ tasks {
             languageVersion = javaVersion
         }
 
+        //serverJar(file("./1.8.8.jar"))
+
         downloadPlugins {
             from(sharedBukkitPlugins)
             url("https://ci.lucko.me/job/spark/478/artifact/spark-bukkit/build/libs/spark-1.10.129-bukkit.jar")
