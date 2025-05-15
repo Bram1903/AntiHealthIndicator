@@ -77,7 +77,7 @@ tasks {
     )
 
     val sharedBukkitPlugins = runPaper.downloadPluginsSpec {
-        url("https://ci.codemc.io/job/retrooper/job/packetevents/lastSuccessfulBuild/artifact/spigot/build/libs/packetevents-spigot-2.8.0-SNAPSHOT.jar")
+        url("https://cdn.modrinth.com/data/HYKaKraK/versions/2HJtPM2W/packetevents-spigot-2.8.0.jar")
         url("https://github.com/ViaVersion/ViaVersion/releases/download/5.3.2/ViaVersion-5.3.2.jar")
         url("https://github.com/ViaVersion/ViaBackwards/releases/download/5.3.2/ViaBackwards-5.3.2.jar")
     }

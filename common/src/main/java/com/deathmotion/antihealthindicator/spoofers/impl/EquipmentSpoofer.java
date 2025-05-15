@@ -57,7 +57,7 @@ public final class EquipmentSpoofer extends Spoofer {
     }
 
     private void applySpoof(ItemStack item, EquipmentSlot slot, Settings.Items settings) {
-        if (item.getType() == ItemTypes.AIR) return;
+        if (item.isEmpty()) return;
 
         if (settings.isStackAmount() && item.getAmount() > 1) {
             item.setAmount(1);
