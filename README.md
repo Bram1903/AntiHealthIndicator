@@ -84,7 +84,7 @@ Operators (OPs) have these permissions by default, except for `AntiHealthIndicat
    the [GitHub release page](https://github.com/Bram1903/AntiHealthIndicator/releases/latest).
 3. **Installation**: Move the downloaded plugin to your server's plugins directory.
 4. **Configuration**: Customize settings in `config.yml`.
-5. **Restart**: Restart the server for changes to take effect.
+5. **Reload**: Reload the plugin using `/antihealthindicator reload` or restart the server to apply changes.
 
 ## Compiling From Source
 
