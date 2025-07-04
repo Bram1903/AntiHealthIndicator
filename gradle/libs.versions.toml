@@ -1,9 +1,9 @@
 [versions]
-adventure = "4.21.0"
-packetevents = "2.8.0"
+adventure = "4.23.0"
+packetevents = "2.9.0-SNAPSHOT"
 betterreload = "v1.0.0"
 guava = "33.3.1-jre"
-paper = "1.21.5-R0.1-SNAPSHOT"
+paper = "1.21.7-R0.1-SNAPSHOT"
 velocity = "3.4.0-SNAPSHOT"
 bungeecord = "1.21-R0.2-SNAPSHOT"
 sponge = "13.0.0"

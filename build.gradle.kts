@@ -69,7 +69,7 @@ tasks {
     // 1.17           = Java 16
     // 1.18 - 1.20.4  = Java 17
     // 1-20.5+        = Java 21
-    val version = "1.21.5"
+    val version = "1.21.7"
     val javaVersion = JavaLanguageVersion.of(21)
 
     val jvmArgsExternal = listOf(
@@ -77,9 +77,9 @@ tasks {
     )
 
     val sharedBukkitPlugins = runPaper.downloadPluginsSpec {
-        url("https://cdn.modrinth.com/data/HYKaKraK/versions/2HJtPM2W/packetevents-spigot-2.8.0.jar")
-        url("https://github.com/ViaVersion/ViaVersion/releases/download/5.3.2/ViaVersion-5.3.2.jar")
-        url("https://github.com/ViaVersion/ViaBackwards/releases/download/5.3.2/ViaBackwards-5.3.2.jar")
+        url("https://ci.codemc.io/job/retrooper/job/packetevents/lastSuccessfulBuild/artifact/spigot/build/libs/packetevents-spigot-2.9.0-SNAPSHOT.jar")
+        url("https://github.com/ViaVersion/ViaVersion/releases/download/5.4.1/ViaVersion-5.4.1.jar")
+        url("https://github.com/ViaVersion/ViaBackwards/releases/download/5.4.1/ViaBackwards-5.4.1.jar")
     }
 
     runServer {
@@ -94,8 +94,8 @@ tasks {
 
         downloadPlugins {
             from(sharedBukkitPlugins)
-            url("https://ci.lucko.me/job/spark/478/artifact/spark-bukkit/build/libs/spark-1.10.129-bukkit.jar")
-            url("https://download.luckperms.net/1575/bukkit/loader/LuckPerms-Bukkit-5.4.158.jar")
+            url("https://ci.lucko.me/job/spark/490/artifact/spark-bukkit/build/libs/spark-1.10.140-bukkit.jar")
+            url("https://download.luckperms.net/1594/bukkit/loader/LuckPerms-Bukkit-5.5.9.jar")
         }
 
         jvmArgs = jvmArgsExternal
@@ -125,8 +125,8 @@ tasks {
         }
 
         downloadPlugins {
-            url("https://ci.codemc.io/job/retrooper/job/packetevents/lastSuccessfulBuild/artifact/velocity/build/libs/packetevents-velocity-2.6.1-SNAPSHOT.jar")
-            url("https://ci.lucko.me/job/spark/418/artifact/spark-velocity/build/libs/spark-1.10.73-velocity.jar")
+            url("https://ci.codemc.io/job/retrooper/job/packetevents/lastSuccessfulBuild/artifact/velocity/build/libs/packetevents-velocity-2.9.0-SNAPSHOT.jar")
+            url("https://ci.lucko.me/job/spark/490/artifact/spark-velocity/build/libs/spark-1.10.140-velocity.jar")
         }
     }
 }
