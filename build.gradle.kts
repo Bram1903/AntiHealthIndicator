@@ -77,7 +77,7 @@ tasks {
     )
 
     val sharedBukkitPlugins = runPaper.downloadPluginsSpec {
-        url("https://ci.codemc.io/job/retrooper/job/packetevents/lastSuccessfulBuild/artifact/spigot/build/libs/packetevents-spigot-2.9.0-SNAPSHOT.jar")
+        url("https://cdn.modrinth.com/data/HYKaKraK/versions/mRt1VxQX/packetevents-spigot-2.9.1.jar")
         url("https://github.com/ViaVersion/ViaVersion/releases/download/5.4.1/ViaVersion-5.4.1.jar")
         url("https://github.com/ViaVersion/ViaBackwards/releases/download/5.4.1/ViaBackwards-5.4.1.jar")
     }
@@ -125,8 +125,8 @@ tasks {
         }
 
         downloadPlugins {
-            url("https://ci.codemc.io/job/retrooper/job/packetevents/lastSuccessfulBuild/artifact/velocity/build/libs/packetevents-velocity-2.9.0-SNAPSHOT.jar")
-            url("https://ci.lucko.me/job/spark/490/artifact/spark-velocity/build/libs/spark-1.10.140-velocity.jar")
+            url("https://ci.codemc.io/job/retrooper/job/packetevents/lastSuccessfulBuild/artifact/velocity/build/libs/packetevents-velocity-2.6.1-SNAPSHOT.jar")
+            url("https://ci.lucko.me/job/spark/418/artifact/spark-velocity/build/libs/spark-1.10.73-velocity.jar")
         }
     }
 }
