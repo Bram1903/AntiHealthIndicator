@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.deathmotion.antihealthindicator.data;
+package com.deathmotion.antihealthindicator.models;
 
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
@@ -40,7 +40,8 @@ public class RidableEntities {
                 EntityTypes.STRIDER,
                 EntityTypes.ZOMBIE_HORSE,
                 EntityTypes.LLAMA,
-                EntityTypes.TRADER_LLAMA
+                EntityTypes.TRADER_LLAMA,
+                EntityTypes.HAPPY_GHAST
         ));
     }
 

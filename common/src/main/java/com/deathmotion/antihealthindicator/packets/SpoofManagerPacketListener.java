@@ -19,7 +19,7 @@
 package com.deathmotion.antihealthindicator.packets;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.data.AHIPlayer;
+import com.deathmotion.antihealthindicator.models.AHIPlayer;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.PacketSendEvent;

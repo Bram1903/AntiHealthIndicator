@@ -77,7 +77,7 @@ tasks {
     )
 
     val sharedBukkitPlugins = runPaper.downloadPluginsSpec {
-        url("https://cdn.modrinth.com/data/HYKaKraK/versions/mRt1VxQX/packetevents-spigot-2.9.1.jar")
+        url("https://cdn.modrinth.com/data/HYKaKraK/versions/Ks05ZluI/packetevents-spigot-2.9.3.jar")
         url("https://github.com/ViaVersion/ViaVersion/releases/download/5.4.1/ViaVersion-5.4.1.jar")
         url("https://github.com/ViaVersion/ViaBackwards/releases/download/5.4.1/ViaBackwards-5.4.1.jar")
     }

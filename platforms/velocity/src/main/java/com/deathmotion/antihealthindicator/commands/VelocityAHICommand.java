@@ -19,7 +19,7 @@
 package com.deathmotion.antihealthindicator.commands;
 
 import com.deathmotion.antihealthindicator.AHIVelocity;
-import com.deathmotion.antihealthindicator.data.CommonUser;
+import com.deathmotion.antihealthindicator.models.CommonUser;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.velocitypowered.api.command.CommandMeta;

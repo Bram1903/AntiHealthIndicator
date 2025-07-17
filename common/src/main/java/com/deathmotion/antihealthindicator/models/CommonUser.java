@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.deathmotion.antihealthindicator.data;
+package com.deathmotion.antihealthindicator.models;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.github.retrooper.packetevents.protocol.player.User;

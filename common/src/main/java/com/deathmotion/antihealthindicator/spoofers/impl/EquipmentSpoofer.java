@@ -18,8 +18,8 @@
 
 package com.deathmotion.antihealthindicator.spoofers.impl;
 
-import com.deathmotion.antihealthindicator.data.AHIPlayer;
-import com.deathmotion.antihealthindicator.data.Settings;
+import com.deathmotion.antihealthindicator.models.AHIPlayer;
+import com.deathmotion.antihealthindicator.models.Settings;
 import com.deathmotion.antihealthindicator.spoofers.Spoofer;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
@@ -38,6 +38,10 @@ public final class EquipmentSpoofer extends Spoofer {
 
     public EquipmentSpoofer(AHIPlayer player) {
         super(player);
+    }
+
+    private static List<Enchantment> getDefaultEnchants() {
+        return LazyHolder.DEFAULT_ENCHANTS;
     }
 
     @Override
@@ -79,10 +83,6 @@ public final class EquipmentSpoofer extends Spoofer {
         boolean broken = item.getDamageValue() >= item.getMaxDamage() - 1;
         boolean allowedSlot = slot == EquipmentSlot.MAIN_HAND || slot == EquipmentSlot.OFF_HAND || slot == EquipmentSlot.HELMET;
         return settings.isBrokenElytra() && broken && allowedSlot;
-    }
-
-    private static List<Enchantment> getDefaultEnchants() {
-        return LazyHolder.DEFAULT_ENCHANTS;
     }
 
     private static class LazyHolder {

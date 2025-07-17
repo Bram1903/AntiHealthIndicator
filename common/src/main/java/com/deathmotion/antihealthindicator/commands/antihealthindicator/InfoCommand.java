@@ -19,7 +19,7 @@
 package com.deathmotion.antihealthindicator.commands.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.commands.SubCommand;
-import com.deathmotion.antihealthindicator.data.CommonUser;
+import com.deathmotion.antihealthindicator.models.CommonUser;
 import com.deathmotion.antihealthindicator.util.CommandComponentCreator;
 import net.kyori.adventure.text.Component;
 

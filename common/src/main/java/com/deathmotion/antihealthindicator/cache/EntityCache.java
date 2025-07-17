@@ -22,7 +22,7 @@ import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
 import com.deathmotion.antihealthindicator.cache.entities.RidableEntity;
 import com.deathmotion.antihealthindicator.cache.trackers.EntityTracker;
 import com.deathmotion.antihealthindicator.cache.trackers.VehicleTracker;
-import com.deathmotion.antihealthindicator.data.AHIPlayer;
+import com.deathmotion.antihealthindicator.models.AHIPlayer;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import lombok.Getter;
 

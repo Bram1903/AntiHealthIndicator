@@ -20,8 +20,8 @@ package com.deathmotion.antihealthindicator.commands.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.commands.SubCommand;
-import com.deathmotion.antihealthindicator.data.CommonUser;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
+import com.deathmotion.antihealthindicator.models.CommonUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;

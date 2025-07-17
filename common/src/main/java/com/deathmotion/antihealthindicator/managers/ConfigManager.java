@@ -19,7 +19,7 @@
 package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.data.Settings;
+import com.deathmotion.antihealthindicator.models.Settings;
 import lombok.Getter;
 import org.yaml.snakeyaml.Yaml;
 

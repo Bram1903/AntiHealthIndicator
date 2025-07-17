@@ -18,8 +18,8 @@
 
 package com.deathmotion.antihealthindicator.spoofers.impl;
 
-import com.deathmotion.antihealthindicator.data.AHIPlayer;
-import com.deathmotion.antihealthindicator.data.Settings;
+import com.deathmotion.antihealthindicator.models.AHIPlayer;
+import com.deathmotion.antihealthindicator.models.Settings;
 import com.deathmotion.antihealthindicator.spoofers.Spoofer;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;

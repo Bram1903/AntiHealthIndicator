@@ -20,9 +20,9 @@ package com.deathmotion.antihealthindicator.util;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.api.versioning.AHIVersion;
-import com.deathmotion.antihealthindicator.data.Constants;
-import com.deathmotion.antihealthindicator.data.Settings;
 import com.deathmotion.antihealthindicator.managers.LogManager;
+import com.deathmotion.antihealthindicator.models.Constants;
+import com.deathmotion.antihealthindicator.models.Settings;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.Getter;

@@ -19,8 +19,8 @@
 package com.deathmotion.antihealthindicator.spoofers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
-import com.deathmotion.antihealthindicator.data.AHIPlayer;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
+import com.deathmotion.antihealthindicator.models.AHIPlayer;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 
 public abstract class Spoofer {

@@ -18,7 +18,7 @@
 
 package com.deathmotion.antihealthindicator.commands;
 
-import com.deathmotion.antihealthindicator.data.CommonUser;
+import com.deathmotion.antihealthindicator.models.CommonUser;
 
 import java.util.List;
 
