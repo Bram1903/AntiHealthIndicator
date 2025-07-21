@@ -36,10 +36,7 @@ public class PlayerDataManager<P> {
     }
 
     public boolean shouldCheck(User user) {
-        if (user == null) return false;
         if (!ChannelHelper.isOpen(user.getChannel())) return false;
-        if (user.getUUID() == null) return false;
-
         return !platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Bypass");
     }
 

@@ -37,6 +37,8 @@ public class PacketPlayerJoinQuit<P> extends PacketListenerAbstract {
     @Override
     public void onUserLogin(UserLoginEvent event) {
         User user = event.getUser();
+        if (user == null || user.getUUID() == null) return;
+
         platform.getPlayerDataManager().addUser(user);
 
         if (platform.getConfigManager().getSettings().getUpdateChecker().isNotifyInGame() && platform.getUpdateChecker().isUpdateAvailable()) {
@@ -49,7 +51,7 @@ public class PacketPlayerJoinQuit<P> extends PacketListenerAbstract {
     @Override
     public void onUserDisconnect(UserDisconnectEvent event) {
         User user = event.getUser();
-        if (user.getUUID() == null) return;
+        if (user == null || user.getUUID() == null) return;
 
         platform.getPlayerDataManager().remove(user);
     }
