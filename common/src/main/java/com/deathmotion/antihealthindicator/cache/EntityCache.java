@@ -19,13 +19,14 @@
 package com.deathmotion.antihealthindicator.cache;
 
 import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
-import com.deathmotion.antihealthindicator.cache.entities.RidableEntity;
 import com.deathmotion.antihealthindicator.cache.trackers.EntityTracker;
 import com.deathmotion.antihealthindicator.cache.trackers.VehicleTracker;
 import com.deathmotion.antihealthindicator.models.AHIPlayer;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import lombok.Getter;
+import lombok.Setter;
 
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
@@ -35,7 +36,8 @@ public class EntityCache {
     private final VehicleTracker vehicleTracker;
 
     private final ConcurrentHashMap<Integer, CachedEntity> cache = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer, Integer> passengerIndex = new ConcurrentHashMap<>();
+    @Setter
+    private Integer currentVehicleId = null;
 
     public EntityCache(AHIPlayer player) {
         this.player = player;
@@ -48,71 +50,24 @@ public class EntityCache {
         vehicleTracker.onPacketSend(event);
     }
 
-    public boolean isRideableVehicle(int entityId) {
-        CachedEntity ce = cache.get(entityId);
-        return ce instanceof RidableEntity;
-    }
-
     public void addLivingEntity(int entityId, CachedEntity entity) {
         cache.put(entityId, entity);
-        if (entity instanceof RidableEntity) {
-            RidableEntity r = (RidableEntity) entity;
-            passengerIndex.put(r.getPassengerId(), entityId);
-        }
     }
 
     public void removeEntity(int entityId) {
-        CachedEntity removed = cache.remove(entityId);
-        if (removed instanceof RidableEntity) {
-            passengerIndex.remove(((RidableEntity) removed).getPassengerId());
-        }
+        cache.remove(entityId);
     }
 
     public void resetUserCache() {
         cache.clear();
-        passengerIndex.clear();
     }
 
-    public void updateVehiclePassenger(int vehicleId, int newPassengerId) {
-        cache.computeIfPresent(vehicleId, (vid, ce) -> {
-            if (ce instanceof RidableEntity) {
-                RidableEntity r = (RidableEntity) ce;
-                int oldPid = r.getPassengerId();
-                if (oldPid != newPassengerId) {
-                    passengerIndex.remove(oldPid);
-                    r.setPassengerId(newPassengerId);
-                    passengerIndex.put(newPassengerId, vehicleId);
-                }
-            }
-            return ce;
-        });
-    }
-
-    public CachedEntity getEntityRaw(int entityId) {
+    public CachedEntity getEntity(int entityId) {
         return cache.get(entityId);
     }
 
-    public float getVehicleHealth(int vehicleId) {
-        CachedEntity ce = cache.get(vehicleId);
-        if (ce instanceof RidableEntity) {
-            return ((RidableEntity) ce).getHealth();
-        }
-        return 0.5F;
+    public Optional<Integer> getCurrentVehicleId() {
+        return Optional.ofNullable(currentVehicleId);
     }
 
-    public int getPassengerId(int vehicleId) {
-        CachedEntity ce = cache.get(vehicleId);
-        if (ce instanceof RidableEntity) {
-            return ((RidableEntity) ce).getPassengerId();
-        }
-        return 0;
-    }
-
-    public boolean isUserPassenger(int entityId) {
-        return getPassengerId(entityId) == player.user.getEntityId();
-    }
-
-    public int getEntityIdByPassengerId(int passengerId) {
-        return passengerIndex.getOrDefault(passengerId, 0);
-    }
 }

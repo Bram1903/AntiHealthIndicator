@@ -21,11 +21,9 @@ package com.deathmotion.antihealthindicator.cache.trackers;
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.cache.EntityCache;
 import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
-import com.deathmotion.antihealthindicator.cache.entities.RidableEntity;
 import com.deathmotion.antihealthindicator.cache.entities.WolfEntity;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.deathmotion.antihealthindicator.models.AHIPlayer;
-import com.deathmotion.antihealthindicator.models.RidableEntities;
 import com.deathmotion.antihealthindicator.models.Settings;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
@@ -105,7 +103,7 @@ public class EntityTracker {
         if (settings.getEntityData().isPlayersOnly()) return;
 
         int entityId = packet.getEntityId();
-        CachedEntity entityData = entityCache.getEntityRaw(entityId);
+        CachedEntity entityData = entityCache.getEntity(entityId);
         if (entityData == null) return;
 
         packet.getEntityMetadata().forEach(metaData -> entityData.processMetaData(metaData, player));
@@ -140,8 +138,6 @@ public class EntityTracker {
         CachedEntity entityData;
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.WOLF)) {
             entityData = new WolfEntity();
-        } else if (RidableEntities.isRideable(entityType)) {
-            entityData = new RidableEntity();
         } else {
             entityData = new CachedEntity();
         }

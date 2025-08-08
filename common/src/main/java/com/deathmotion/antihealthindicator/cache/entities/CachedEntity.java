@@ -29,6 +29,11 @@ import lombok.Setter;
 public class CachedEntity {
     private EntityType entityType;
 
+    private float health;
+
     public void processMetaData(EntityData<?> metaData, AHIPlayer player) {
+        if (metaData.getIndex() == player.metadataIndex.HEALTH) {
+            setHealth((float) metaData.getValue());
+        }
     }
 }

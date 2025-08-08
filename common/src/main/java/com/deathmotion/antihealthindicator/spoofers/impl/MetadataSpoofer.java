@@ -61,7 +61,7 @@ public final class MetadataSpoofer extends Spoofer {
         // Skip processing if the packet refers to the user's own entity.
         if (entityId == player.user.getEntityId()) return;
 
-        CachedEntity cachedEntity = entityCache.getEntityRaw(entityId);
+        CachedEntity cachedEntity = entityCache.getEntity(entityId);
         if (cachedEntity == null) return;
 
         EntityType entityType = cachedEntity.getEntityType();
@@ -72,13 +72,15 @@ public final class MetadataSpoofer extends Spoofer {
     }
 
     private boolean shouldIgnoreEntity(EntityType entityType, int entityId, CachedEntity cachedEntity, Settings settings) {
-        if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) return true;
+        if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) {
+            return true;
+        }
 
-        if (settings.getEntityData().isPlayersOnly() && entityType != EntityTypes.PLAYER) return true;
+        if (settings.getEntityData().isPlayersOnly() && entityType != EntityTypes.PLAYER) {
+            return true;
+        }
 
-        if (!settings.getEntityData().isPlayersOnly()
-                && settings.getEntityData().isIgnoreVehicles()
-                && entityCache.isUserPassenger(entityId)) {
+        if (!settings.getEntityData().isPlayersOnly() && settings.getEntityData().isIgnoreVehicles() && entityCache.getCurrentVehicleId().map(currentVehicleId -> currentVehicleId == entityId).orElse(false)) {
             return true;
         }
 
@@ -88,6 +90,7 @@ public final class MetadataSpoofer extends Spoofer {
 
         return false;
     }
+
 
     private boolean shouldIgnoreWolf(CachedEntity cachedEntity, Settings settings) {
         WolfEntity wolfEntity = (WolfEntity) cachedEntity;
