@@ -1,3 +1,21 @@
+/*
+ *  This file is part of AntiHealthIndicator - https://github.com/Bram1903/AntiHealthIndicator
+ *  Copyright (C) 2025 Bram and contributors
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.deathmotion.antihealthindicator.cache.trackers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
@@ -15,27 +33,28 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerAt
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 public class VehicleTracker {
+
+    private static final float MIN_SPOOF_HEALTH = 0.5F;
+
     private final AHIPlayer player;
     private final EntityCache cache;
     private final ConfigManager<?> configManager;
 
-    public VehicleTracker(AHIPlayer player, EntityCache cache) {
+    public VehicleTracker(final AHIPlayer player, final EntityCache cache) {
         this.player = player;
         this.cache = cache;
         this.configManager = AHIPlatform.getInstance().getConfigManager();
     }
 
-    public void onPacketSend(PacketSendEvent event) {
-        Settings settings = configManager.getSettings();
-        if (!settings.getEntityData().isEnabled() || settings.getEntityData().isPlayersOnly()) {
-            return;
-        }
+    public void onPacketSend(final PacketSendEvent event) {
+        final Settings settings = configManager.getSettings();
+        if (!settings.getEntityData().isEnabled() || settings.getEntityData().isPlayersOnly()) return;
 
-        PacketTypeCommon type = event.getPacketType();
+        final PacketTypeCommon type = event.getPacketType();
         if (type == PacketType.Play.Server.SET_PASSENGERS) {
             handleSetPassengers(new WrapperPlayServerSetPassengers(event));
         } else if (type == PacketType.Play.Server.ATTACH_ENTITY) {
@@ -43,26 +62,26 @@ public class VehicleTracker {
         }
     }
 
-    private void handleSetPassengers(WrapperPlayServerSetPassengers packet) {
-        int vehicleId = packet.getEntityId();
-        if (!shouldProcess(vehicleId)) return;
+    private void handleSetPassengers(final WrapperPlayServerSetPassengers packet) {
+        final int vehicleId = packet.getEntityId();
+        if (vehicleId == player.user.getEntityId()) return;
 
-        int[] passengers = packet.getPassengers();
+        boolean iAmPassenger = false;
+        for (int id : packet.getPassengers()) {
+            if (id == player.user.getEntityId()) {
+                iAmPassenger = true;
+                break;
+            }
+        }
 
-        if (passengers.length > 0) {
-            if (Arrays.stream(passengers).anyMatch(passenger -> passenger == player.user.getEntityId())) {
-                if (cache.getCurrentVehicleId().map(currentVehicleId -> currentVehicleId != vehicleId).orElse(true)) {
-                    updateState(vehicleId, true);
-                }
-            } else {
-                cache.getCurrentVehicleId().ifPresent(currentVehicleId -> {
-                    if (currentVehicleId == vehicleId) {
-                        updateState(vehicleId, false);
-                    }
-                });
+        Optional<Integer> currentOpt = cache.getCurrentVehicleId();
+
+        if (iAmPassenger) {
+            if (currentOpt.map(id -> id != vehicleId).orElse(true)) {
+                updateState(vehicleId, true);
             }
         } else {
-            cache.getCurrentVehicleId().ifPresent(currentVehicleId -> {
+            currentOpt.ifPresent(currentVehicleId -> {
                 if (currentVehicleId == vehicleId) {
                     updateState(vehicleId, false);
                 }
@@ -70,47 +89,44 @@ public class VehicleTracker {
         }
     }
 
-    private void handleAttachEntity(WrapperPlayServerAttachEntity packet) {
-        int vehicleId = packet.getHoldingId();
-        int passenger = packet.getAttachedId();
+    private void handleAttachEntity(final WrapperPlayServerAttachEntity packet) {
+        final int vehicleId = packet.getHoldingId();
+        final int passengerId = packet.getAttachedId();
 
-        // Make sure we only process the packet if the passenger is the current player
-        if (passenger != player.user.getEntityId()) {
-            return;
-        }
+        if (passengerId != player.user.getEntityId()) return;
 
-        // attaching to a vehicle (>0) is enter; holdingId==0 is detach
+        Optional<Integer> currentOpt = cache.getCurrentVehicleId();
+
         if (vehicleId > 0) {
-            if (!shouldProcess(vehicleId)) return;
-            updateState(vehicleId, true);
+            if (vehicleId != player.user.getEntityId() && currentOpt.map(id -> id != vehicleId).orElse(true)) {
+                updateState(vehicleId, true);
+            }
         } else {
-            // Detach from current vehicle (if any)
-            cache.getCurrentVehicleId().ifPresent(currentVehicleId -> {
-                if (!shouldProcess(currentVehicleId)) return;
-                updateState(currentVehicleId, false);
+            currentOpt.ifPresent(currentVehicleId -> {
+                if (currentVehicleId != player.user.getEntityId()) {
+                    updateState(currentVehicleId, false);
+                }
             });
         }
     }
 
-    private void updateState(int vehicleId, boolean entering) {
-        CachedEntity cachedEntity = cache.getEntity(vehicleId);
-        if (cachedEntity == null) return;
+    private void updateState(final int vehicleId, final boolean entering) {
+        final CachedEntity entity = cache.getEntity(vehicleId);
+        if (entity == null) {
+            if (!entering) cache.setCurrentVehicleId(null);
+            return;
+        }
 
+        Optional<Integer> currentOpt = cache.getCurrentVehicleId();
         if (entering) {
+            if (currentOpt.isPresent() && currentOpt.get() == vehicleId) return;
             cache.setCurrentVehicleId(vehicleId);
         } else {
+            if (currentOpt.map(id -> id != vehicleId).orElse(true)) return;
             cache.setCurrentVehicleId(null);
         }
 
-        sendMetadata(vehicleId, entering ? cachedEntity.getHealth() : 0.5F);
-    }
-
-    private boolean shouldProcess(int entityId) {
-        // Don't try to treat the player as their own vehicle
-        return entityId != player.user.getEntityId();
-    }
-
-    private void sendMetadata(final int vehicleId, final float health) {
+        float health = entering ? Math.max(entity.getHealth(), MIN_SPOOF_HEALTH) : MIN_SPOOF_HEALTH;
         AHIPlatform.getInstance().getScheduler().runAsyncTask(task ->
                 player.user.sendPacketSilently(
                         new WrapperPlayServerEntityMetadata(
