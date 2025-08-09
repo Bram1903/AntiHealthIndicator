@@ -74,6 +74,7 @@ public class VehicleTracker {
         int vehicleId = packet.getHoldingId();
         int passenger = packet.getAttachedId();
 
+        // Make sure we only process the packet if the passenger is the current player
         if (passenger != player.user.getEntityId()) {
             return;
         }
@@ -110,8 +111,6 @@ public class VehicleTracker {
     }
 
     private void sendMetadata(final int vehicleId, final float health) {
-        AHIPlatform.getInstance().getLogManager().info("Spoofing vehicle metadata for vehicle ID: " + vehicleId + " (Type: " + cache.getEntity(vehicleId).getEntityType().getName().getKey() + ") with health: " + health);
-
         AHIPlatform.getInstance().getScheduler().runAsyncTask(task ->
                 player.user.sendPacketSilently(
                         new WrapperPlayServerEntityMetadata(

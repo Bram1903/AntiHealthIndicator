@@ -36,6 +36,7 @@ public class EntityCache {
     private final VehicleTracker vehicleTracker;
 
     private final ConcurrentHashMap<Integer, CachedEntity> cache = new ConcurrentHashMap<>();
+
     @Setter
     private Integer currentVehicleId = null;
 
@@ -69,5 +70,4 @@ public class EntityCache {
     public Optional<Integer> getCurrentVehicleId() {
         return Optional.ofNullable(currentVehicleId);
     }
-
 }
