@@ -10,7 +10,7 @@ sponge = "13.0.0"
 snakeyaml = "2.2"
 run-paper = "2.3.1"
 lombok = "1.18.38"
-shadow = "8.3.6"
+shadow = "9.0.1"
 spongeGradle = "2.3.0"
 
 [libraries]

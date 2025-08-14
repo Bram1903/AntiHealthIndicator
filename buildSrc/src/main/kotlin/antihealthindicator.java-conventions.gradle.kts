@@ -28,10 +28,19 @@ tasks {
         options.release = 8
     }
 
+    withType<Test> {
+        failOnNoDiscoveredTests = false
+    }
+
     processResources {
-        inputs.property("version", rootProject.ext["versionNoHash"])
+        inputs.properties(
+            "version" to rootProject.ext["versionNoHash"].toString()
+        )
+
         filesMatching(listOf("plugin.yml", "bungee.yml", "velocity-plugin.json")) {
-            expand("version" to rootProject.ext["versionNoHash"])
+            expand(
+                "version" to rootProject.ext["versionNoHash"].toString()
+            )
         }
     }
 
