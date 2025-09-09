@@ -52,6 +52,14 @@ public abstract class AHIPlatform<P> {
     /**
      * Constructor for the AHIPlatform class.
      *
+     */
+    public AHIPlatform() {
+        this.proxy = false;
+    }
+
+    /**
+     * Constructor for the AHIPlatform class.
+     *
      * @param proxy true if the platform is a proxy, false otherwise.
      */
     public AHIPlatform(boolean proxy) {

@@ -38,7 +38,6 @@ public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
     private final boolean useAdventure;
 
     public BukkitAntiHealthIndicator(JavaPlugin plugin) {
-        super(false);
         this.plugin = plugin;
         useAdventure = checkAdventureCompatibility();
     }

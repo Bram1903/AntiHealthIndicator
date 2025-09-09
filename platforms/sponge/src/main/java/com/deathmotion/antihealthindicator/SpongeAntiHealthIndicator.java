@@ -34,7 +34,6 @@ public class SpongeAntiHealthIndicator extends AHIPlatform<Platform> {
 
     @Inject
     public SpongeAntiHealthIndicator(@ConfigDir(sharedRoot = false) Path configDirectory) {
-        super(false);
         this.configDirectory = configDirectory;
     }
 
