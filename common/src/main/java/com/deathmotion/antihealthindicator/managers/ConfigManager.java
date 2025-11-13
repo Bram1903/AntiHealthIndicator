@@ -67,8 +67,8 @@ public class ConfigManager<P> {
         File configFile = new File(platform.getPluginDirectory(), "config.yml");
 
         if (!configFile.exists()) {
-            platform.getLogManager().severe("Config file not found! Saving default configuration.");
-            saveDefaultConfiguration();
+            platform.getLogManager().severe("Config file not found!");
+            return;
         }
 
         try (InputStream inputStream = Files.newInputStream(configFile.toPath())) {
@@ -84,6 +84,13 @@ public class ConfigManager<P> {
     }
 
     public void reloadConfig() {
+        File configFile = new File(platform.getPluginDirectory(), "config.yml");
+
+        if (!configFile.exists()) {
+            platform.getLogManager().severe("Recreating config file as it does not exist");
+            saveDefaultConfiguration();
+        }
+
         loadConfig();
     }
 
