@@ -95,6 +95,7 @@ public class ConfigManager<P> {
         settings.setFoodSaturation(getBoolean(yamlData, "spoof.food-saturation.enabled", false));
         settings.setTeamScoreboard(getBoolean(yamlData, "spoof.team-scoreboard.enabled", true));
         settings.setGamemode(getBoolean(yamlData, "spoof.gamemode.enabled", true));
+        settings.setAttributes(getBoolean(yamlData, "spoof.attributes.enabled", true));
 
         setEntityDataOptions(yamlData, settings);
         setItemOptions(yamlData, settings);
