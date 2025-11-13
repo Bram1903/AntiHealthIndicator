@@ -25,7 +25,6 @@ import com.deathmotion.antihealthindicator.spoofers.Spoofer;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.attribute.Attribute;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes;
 
 public final class AttributeSpoofer extends Spoofer {
@@ -52,15 +51,15 @@ public final class AttributeSpoofer extends Spoofer {
 
         for (WrapperPlayServerUpdateAttributes.Property property : packet.getProperties()) {
             final Attribute attribute = property.getAttribute();
-            final ResourceLocation attributeName = attribute.getName();
+            final String attributeName = attribute.getName().getKey();
 
-            if (attributeName.getKey().equals(MAX_HEALTH_KEY)) {
+            if (attributeName.equals(MAX_HEALTH_KEY)) {
                 //AHIPlatform.getInstance().getLogManager().info("Spoofing max_health from " + property.getValue() + " to " + attribute.getDefaultValue() + " for entity " + entityId);
                 property.setValue(attribute.getDefaultValue());
                 event.markForReEncode(true);
             }
 
-            if (attributeName.getKey().equals(MAX_ABSORPTION_KEY)) {
+            if (attributeName.equals(MAX_ABSORPTION_KEY)) {
                 //AHIPlatform.getInstance().getLogManager().info("Spoofing max_absorption from " + property.getValue() + " to " + attribute.getDefaultValue() + " for entity " + entityId);
                 property.setValue(attribute.getDefaultValue());
                 event.markForReEncode(true);
