@@ -30,6 +30,7 @@ public class Settings {
     private boolean foodSaturation = false;
     private boolean gamemode = true;
     private boolean teamScoreboard = true;
+    private boolean attributes = true;
     private EntityData entityData = new EntityData();
     private Items items = new Items();
 

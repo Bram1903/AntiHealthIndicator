@@ -84,6 +84,13 @@ public class ConfigManager<P> {
     }
 
     public void reloadConfig() {
+        File configFile = new File(platform.getPluginDirectory(), "config.yml");
+
+        if (!configFile.exists()) {
+            platform.getLogManager().severe("Recreating config file as it does not exist");
+            saveDefaultConfiguration();
+        }
+
         loadConfig();
     }
 
@@ -95,6 +102,7 @@ public class ConfigManager<P> {
         settings.setFoodSaturation(getBoolean(yamlData, "spoof.food-saturation.enabled", false));
         settings.setTeamScoreboard(getBoolean(yamlData, "spoof.team-scoreboard.enabled", true));
         settings.setGamemode(getBoolean(yamlData, "spoof.gamemode.enabled", true));
+        settings.setAttributes(getBoolean(yamlData, "spoof.attributes.enabled", true));
 
         setEntityDataOptions(yamlData, settings);
         setItemOptions(yamlData, settings);
