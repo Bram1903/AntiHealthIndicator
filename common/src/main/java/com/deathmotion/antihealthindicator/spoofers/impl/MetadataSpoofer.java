@@ -144,6 +144,8 @@ public final class MetadataSpoofer extends Spoofer {
         Object value = entityData.getValue();
         if (value instanceof Float) {
             float health = (Float) value;
+            if (health <= 0f) return;
+
             float spoofedHealth;
 
             if (health > IRON_GOLEM_THRESHOLD_1) {
