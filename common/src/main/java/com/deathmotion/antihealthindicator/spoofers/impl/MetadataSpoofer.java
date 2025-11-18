@@ -31,6 +31,7 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
+import org.jetbrains.annotations.NotNull;
 
 public final class MetadataSpoofer extends Spoofer {
 
@@ -46,6 +47,11 @@ public final class MetadataSpoofer extends Spoofer {
         super(player);
         this.entityCache = player.entityCache;
         this.healthTexturesSupported = player.user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_15);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> void setValue(EntityData<?> data, T spoofValue) {
+        ((EntityData<@NotNull T>) data).setValue(spoofValue);
     }
 
     @Override
@@ -91,7 +97,6 @@ public final class MetadataSpoofer extends Spoofer {
         return false;
     }
 
-
     private boolean shouldIgnoreWolf(CachedEntity cachedEntity, Settings settings) {
         WolfEntity wolfEntity = (WolfEntity) cachedEntity;
         Settings.EntityData.Wolves wolfSettings = settings.getEntityData().getWolves();
@@ -118,37 +123,42 @@ public final class MetadataSpoofer extends Spoofer {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void applyDefaultSpoofing(EntityData<?> entityData, Settings settings) {
         updateAirTicks(entityData, settings);
-        if (entityData.getIndex() == player.metadataIndex.HEALTH && settings.getEntityData().isHealth()) {
-            Object value = entityData.getValue();
-            if (value instanceof Float && (Float) value > 0f) {
-                ((EntityData<Float>) entityData).setValue(0.5f);
-            }
+
+        if (entityData.getIndex() != player.metadataIndex.HEALTH) return;
+        if (!settings.getEntityData().isHealth()) return;
+
+        Object value = entityData.getValue();
+        if (value instanceof Float && (Float) value > 0f) {
+            setValue(entityData, 0.5f);
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void spoofIronGolemMetadata(EntityData<?> entityData, Settings settings) {
         updateAirTicks(entityData, settings);
-        if (entityData.getIndex() == player.metadataIndex.HEALTH && settings.getEntityData().isHealth()) {
-            Object value = entityData.getValue();
-            if (value instanceof Float) {
-                float health = (Float) value;
-                if (health > IRON_GOLEM_THRESHOLD_1) {
-                    ((EntityData<Float>) entityData).setValue(IRON_GOLEM_HEALTH_MAX);
-                } else if (health > IRON_GOLEM_THRESHOLD_2) {
-                    ((EntityData<Float>) entityData).setValue(IRON_GOLEM_THRESHOLD_1);
-                } else if (health > IRON_GOLEM_THRESHOLD_3) {
-                    ((EntityData<Float>) entityData).setValue(IRON_GOLEM_THRESHOLD_2);
-                } else {
-                    ((EntityData<Float>) entityData).setValue(IRON_GOLEM_THRESHOLD_3);
-                }
+
+        if (entityData.getIndex() != player.metadataIndex.HEALTH) return;
+        if (!settings.getEntityData().isHealth()) return;
+
+        Object value = entityData.getValue();
+        if (value instanceof Float) {
+            float health = (Float) value;
+            float spoofedHealth;
+
+            if (health > IRON_GOLEM_THRESHOLD_1) {
+                spoofedHealth = IRON_GOLEM_HEALTH_MAX;
+            } else if (health > IRON_GOLEM_THRESHOLD_2) {
+                spoofedHealth = IRON_GOLEM_THRESHOLD_1;
+            } else if (health > IRON_GOLEM_THRESHOLD_3) {
+                spoofedHealth = IRON_GOLEM_THRESHOLD_2;
+            } else {
+                spoofedHealth = IRON_GOLEM_THRESHOLD_3;
             }
+
+            setValue(entityData, spoofedHealth);
         }
     }
-
 
     private void spoofPlayerMetadata(EntityData<?> entityData, Settings settings) {
         if (entityData.getIndex() == player.metadataIndex.ABSORPTION && settings.getEntityData().isAbsorption()) {
@@ -165,22 +175,21 @@ public final class MetadataSpoofer extends Spoofer {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> void setDynamicValue(EntityData<?> entityData, int spoofValue) {
+    private void setDynamicValue(EntityData<?> entityData, int spoofValue) {
         Object value = entityData.getValue();
 
         if (value instanceof Integer) {
-            ((EntityData<Integer>) entityData).setValue(spoofValue);
+            setValue(entityData, spoofValue);
         } else if (value instanceof Short) {
-            ((EntityData<Short>) entityData).setValue((short) spoofValue);
+            setValue(entityData, (short) spoofValue);
         } else if (value instanceof Byte) {
-            ((EntityData<Byte>) entityData).setValue((byte) spoofValue);
+            setValue(entityData, (byte) spoofValue);
         } else if (value instanceof Long) {
-            ((EntityData<Long>) entityData).setValue((long) spoofValue);
+            setValue(entityData, (long) spoofValue);
         } else if (value instanceof Float) {
-            ((EntityData<Float>) entityData).setValue((float) spoofValue);
+            setValue(entityData, (float) spoofValue);
         } else if (value instanceof Double) {
-            ((EntityData<Double>) entityData).setValue((double) spoofValue);
+            setValue(entityData, (double) spoofValue);
         }
     }
 }
