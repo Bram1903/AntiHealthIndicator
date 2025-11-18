@@ -64,6 +64,7 @@ public final class AttributeSpoofer extends Spoofer {
         }
 
         // TODO: FIX Vehicles showing the wrong health due to this (I think)
+        // TODO: FIX Golems not showing the right health texture assuming the texture is based on percentages (I think)
 
         for (WrapperPlayServerUpdateAttributes.Property property : packet.getProperties()) {
             final Attribute attribute = property.getAttribute();
