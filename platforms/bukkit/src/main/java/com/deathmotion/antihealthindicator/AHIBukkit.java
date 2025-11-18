@@ -19,10 +19,8 @@
 package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.commands.BukkitAHICommand;
-import com.deathmotion.antihealthindicator.listener.ReloadListener;
 import com.deathmotion.antihealthindicator.schedulers.BukkitScheduler;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
@@ -37,9 +35,6 @@ public class AHIBukkit extends JavaPlugin {
 
         ahi.commonOnEnable();
         new BukkitAHICommand(this);
-
-        if (Bukkit.getPluginManager().getPlugin("BetterReload") != null)
-            Bukkit.getPluginManager().registerEvents(new ReloadListener(this), this);
 
         ahi.enableBStats();
     }
