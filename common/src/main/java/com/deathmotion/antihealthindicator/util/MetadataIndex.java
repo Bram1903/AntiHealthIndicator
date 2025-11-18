@@ -57,7 +57,9 @@ public class MetadataIndex {
     }
 
     private int getAbsorptionIndex(ClientVersion version) {
-        if (version.isNewerThanOrEquals(ClientVersion.V_1_17)) {
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
+            return 17;
+        } else if (version.isNewerThanOrEquals(ClientVersion.V_1_17)) {
             return 15;
         } else if (version.isNewerThanOrEquals(ClientVersion.V_1_15)) {
             return 14;
@@ -73,7 +75,9 @@ public class MetadataIndex {
     }
 
     private int getXPIndex(ClientVersion version) {
-        if (version.isNewerThanOrEquals(ClientVersion.V_1_17)) {
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_21_9)) {
+            return 18;
+        } else if (version.isNewerThanOrEquals(ClientVersion.V_1_17)) {
             return 16;
         } else if (version.isNewerThanOrEquals(ClientVersion.V_1_15)) {
             return 15;
