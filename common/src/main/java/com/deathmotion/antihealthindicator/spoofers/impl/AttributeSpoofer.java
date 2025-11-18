@@ -18,12 +18,15 @@
 
 package com.deathmotion.antihealthindicator.spoofers.impl;
 
-import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.deathmotion.antihealthindicator.cache.EntityCache;
+import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
 import com.deathmotion.antihealthindicator.models.AHIPlayer;
 import com.deathmotion.antihealthindicator.models.Settings;
 import com.deathmotion.antihealthindicator.spoofers.Spoofer;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.attribute.Attribute;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes;
 
@@ -32,8 +35,11 @@ public final class AttributeSpoofer extends Spoofer {
     private final static String MAX_HEALTH_KEY = "max_health";
     private final static String MAX_ABSORPTION_KEY = "max_absorption";
 
+    private final EntityCache entityCache;
+
     public AttributeSpoofer(AHIPlayer player) {
         super(player);
+        entityCache = player.entityCache;
     }
 
     @Override
@@ -48,6 +54,16 @@ public final class AttributeSpoofer extends Spoofer {
 
         // Skip processing if the packet refers to the user's own entity.
         if (entityId == player.user.getEntityId()) return;
+
+        final CachedEntity cachedEntity = entityCache.getEntity(entityId);
+        if (cachedEntity == null) return;
+
+        final EntityType entityType = cachedEntity.getEntityType();
+        if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) {
+            return;
+        }
+
+        // TODO: FIX Vehicles showing the wrong health due to this (I think)
 
         for (WrapperPlayServerUpdateAttributes.Property property : packet.getProperties()) {
             final Attribute attribute = property.getAttribute();
