@@ -33,12 +33,12 @@ import static com.deathmotion.antihealthindicator.util.AttributeConstants.MAX_HE
 public class CachedEntity {
     private final EntityType entityType;
 
+    private float health;
+    private float maxHealth;
+
     public CachedEntity(EntityType entityType) {
         this.entityType = entityType;
     }
-
-    private float health;
-    private float maxHealth;
 
     public void processMetaData(List<EntityData<?>> entityDataList, AHIPlayer player) {
         for (EntityData<?> entityData : entityDataList) {

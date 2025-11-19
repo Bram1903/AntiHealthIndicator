@@ -40,10 +40,6 @@ spoof:
   team-scoreboard:
     enabled: true
 
-  # Prevents a player from receiving max health and max absorption attributes from other players.
-  attributes:
-    enabled: true
-
   # These options determine what entity data should be spoofed.
   entity-data:
     # If disabled, none of the following settings will have any effect.
@@ -54,6 +50,10 @@ spoof:
     # When enabled, the ignored vehicles, wolves and iron golems settings will have no effect.
     players-only:
       enabled: false
+
+    # Prevents a player from receiving max health and max absorption attributes from other players.
+    attributes:
+      enabled: true
 
     # If enabled, hides the oxygen number of other entities.
     air-ticks:

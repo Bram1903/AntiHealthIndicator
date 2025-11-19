@@ -102,7 +102,6 @@ public class ConfigManager<P> {
         settings.setFoodSaturation(getBoolean(yamlData, "spoof.food-saturation.enabled", false));
         settings.setTeamScoreboard(getBoolean(yamlData, "spoof.team-scoreboard.enabled", true));
         settings.setGamemode(getBoolean(yamlData, "spoof.gamemode.enabled", true));
-        settings.setAttributes(getBoolean(yamlData, "spoof.attributes.enabled", true));
 
         setEntityDataOptions(yamlData, settings);
         setItemOptions(yamlData, settings);
@@ -111,6 +110,7 @@ public class ConfigManager<P> {
     private void setEntityDataOptions(Map<String, Object> yamlData, Settings settings) {
         settings.getEntityData().setEnabled(getBoolean(yamlData, "spoof.entity-data.enabled", true));
         settings.getEntityData().setPlayersOnly(getBoolean(yamlData, "spoof.entity-data.players-only.enabled", false));
+        settings.getEntityData().setAttributes(getBoolean(yamlData, "spoof.entity-data.attributes.enabled", true));
         settings.getEntityData().setAirTicks(getBoolean(yamlData, "spoof.entity-data.air-ticks.enabled", true));
         settings.getEntityData().setHealth(getBoolean(yamlData, "spoof.entity-data.health.enabled", true));
         settings.getEntityData().setIgnoreVehicles(getBoolean(yamlData, "spoof.entity-data.health.ignore-vehicles", true));

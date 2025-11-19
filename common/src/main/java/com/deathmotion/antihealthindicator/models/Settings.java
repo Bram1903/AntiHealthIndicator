@@ -30,7 +30,6 @@ public class Settings {
     private boolean foodSaturation = false;
     private boolean gamemode = true;
     private boolean teamScoreboard = true;
-    private boolean attributes = true;
     private EntityData entityData = new EntityData();
     private Items items = new Items();
 
@@ -47,6 +46,7 @@ public class Settings {
     public static class EntityData {
         private boolean enabled = true;
         private boolean playersOnly = false;
+        private boolean attributes = true;
         private boolean airTicks = true;
 
         private boolean health = true;
