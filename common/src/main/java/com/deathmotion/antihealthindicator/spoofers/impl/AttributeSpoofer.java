@@ -47,7 +47,7 @@ public final class AttributeSpoofer extends Spoofer {
         if (event.getPacketType() != PacketType.Play.Server.UPDATE_ATTRIBUTES) return;
 
         Settings settings = configManager.getSettings();
-        if (!settings.isAttributes()) return;
+        if (!settings.getEntityData().isAttributes()) return;
 
         WrapperPlayServerUpdateAttributes packet = new WrapperPlayServerUpdateAttributes(event);
         int entityId = packet.getEntityId();

@@ -62,9 +62,11 @@ public class EntityTracker {
         } else if (PacketType.Play.Server.SPAWN_PLAYER == type) {
             handleSpawnPlayer(new WrapperPlayServerSpawnPlayer(event));
         } else if (PacketType.Play.Server.ENTITY_METADATA == type) {
-            handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), settings);
+            if (settings.getEntityData().isPlayersOnly()) return;
+            handleEntityMetadata(new WrapperPlayServerEntityMetadata(event));
         } else if (PacketType.Play.Server.UPDATE_ATTRIBUTES == type) {
-            handleEntityAttribute(new WrapperPlayServerUpdateAttributes(event), settings);
+            if (settings.getEntityData().isPlayersOnly()) return;
+            handleEntityAttribute(new WrapperPlayServerUpdateAttributes(event));
         } else if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
             handleDestroyEntities(new WrapperPlayServerDestroyEntities(event));
         } else if (PacketType.Play.Server.RESPAWN == type) {
@@ -101,9 +103,7 @@ public class EntityTracker {
         entityCache.addLivingEntity(entityId, entityData);
     }
 
-    private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet, Settings settings) {
-        if (settings.getEntityData().isPlayersOnly()) return;
-
+    private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet) {
         int entityId = packet.getEntityId();
         CachedEntity entityData = entityCache.getEntity(entityId);
         if (entityData == null) return;
@@ -111,9 +111,7 @@ public class EntityTracker {
         entityData.processMetaData(packet.getEntityMetadata(), player);
     }
 
-    private void handleEntityAttribute(WrapperPlayServerUpdateAttributes packet, Settings settings) {
-        if (settings.getEntityData().isPlayersOnly()) return;
-
+    private void handleEntityAttribute(WrapperPlayServerUpdateAttributes packet) {
         int entityId = packet.getEntityId();
         CachedEntity entityData = entityCache.getEntity(entityId);
         if (entityData == null) return;
