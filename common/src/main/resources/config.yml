@@ -63,10 +63,6 @@ spoof:
     health:
       enabled: true
 
-      # If enabled, it will allow the person on the vehicle to see the actual health of the vehicle.
-      # For example, if a player is riding a horse, the player will see the horse's health.
-      ignore-vehicles: true
-
       # If enabled, the health of wolves will be ignored while spoofing health, since the client will render the position
       # of the tail depending on the health of the wolf.
       ignore-wolves:

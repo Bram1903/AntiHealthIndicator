@@ -18,6 +18,7 @@
 
 package com.deathmotion.antihealthindicator.cache.entities;
 
+import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.models.AHIPlayer;
 import com.github.retrooper.packetevents.protocol.attribute.Attribute;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;

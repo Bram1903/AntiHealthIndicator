@@ -65,7 +65,6 @@ public class EntityTracker {
             if (settings.getEntityData().isPlayersOnly()) return;
             handleEntityMetadata(new WrapperPlayServerEntityMetadata(event));
         } else if (PacketType.Play.Server.UPDATE_ATTRIBUTES == type) {
-            if (settings.getEntityData().isPlayersOnly()) return;
             handleEntityAttribute(new WrapperPlayServerUpdateAttributes(event));
         } else if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
             handleDestroyEntities(new WrapperPlayServerDestroyEntities(event));
@@ -80,8 +79,7 @@ public class EntityTracker {
 
     private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet, Settings settings) {
         EntityType entityType = packet.getEntityType();
-        if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER))
-            return;
+        if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) return;
         spawnEntity(packet.getEntityId(), entityType);
     }
 

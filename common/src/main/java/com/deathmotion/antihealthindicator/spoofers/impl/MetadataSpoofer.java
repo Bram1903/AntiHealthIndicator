@@ -82,7 +82,7 @@ public final class MetadataSpoofer extends Spoofer {
             return true;
         }
 
-        if (!settings.getEntityData().isPlayersOnly() && settings.getEntityData().isIgnoreVehicles() && entityCache.getCurrentVehicleId().map(currentVehicleId -> currentVehicleId == entityId).orElse(false)) {
+        if (!settings.getEntityData().isPlayersOnly() && entityCache.getCurrentVehicleId().map(currentVehicleId -> currentVehicleId == entityId).orElse(false)) {
             return true;
         }
 
@@ -98,8 +98,8 @@ public final class MetadataSpoofer extends Spoofer {
         final EntityType entityType = cachedEntity.getEntityType();
         updateAirTicks(entityData, settings);
 
-        if (entityType == EntityTypes.IRON_GOLEM && settings.getEntityData().getIronGolems().isEnabled()) {
-            if (!settings.getEntityData().getIronGolems().isGradual() || !healthTexturesSupported) {
+        if (entityType == EntityTypes.IRON_GOLEM) {
+            if (!healthTexturesSupported) {
                 applyDefaultSpoofing(entityData, settings);
             } else {
                 spoofIronGolemMetadata(cachedEntity, entityData, settings);
@@ -123,8 +123,6 @@ public final class MetadataSpoofer extends Spoofer {
     }
 
     private void spoofIronGolemMetadata(CachedEntity cachedEntity, EntityData<?> entityData, Settings settings) {
-        updateAirTicks(entityData, settings);
-
         if (entityData.getIndex() != player.metadataIndex.HEALTH || !settings.getEntityData().isHealth()) return;
 
         final Object value = entityData.getValue();
@@ -151,7 +149,6 @@ public final class MetadataSpoofer extends Spoofer {
 
         setValue(entityData, spoofed);
     }
-
 
     private void spoofPlayerMetadata(EntityData<?> entityData, Settings settings) {
         if (entityData.getIndex() == player.metadataIndex.ABSORPTION && settings.getEntityData().isAbsorption()) {

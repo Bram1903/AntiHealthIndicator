@@ -110,15 +110,11 @@ public class ConfigManager<P> {
     private void setEntityDataOptions(Map<String, Object> yamlData, Settings settings) {
         settings.getEntityData().setEnabled(getBoolean(yamlData, "spoof.entity-data.enabled", true));
         settings.getEntityData().setPlayersOnly(getBoolean(yamlData, "spoof.entity-data.players-only.enabled", false));
-        settings.getEntityData().setAttributes(getBoolean(yamlData, "spoof.entity-data.attributes.enabled", true));
         settings.getEntityData().setAirTicks(getBoolean(yamlData, "spoof.entity-data.air-ticks.enabled", true));
         settings.getEntityData().setHealth(getBoolean(yamlData, "spoof.entity-data.health.enabled", true));
-        settings.getEntityData().setIgnoreVehicles(getBoolean(yamlData, "spoof.entity-data.health.ignore-vehicles", true));
         settings.getEntityData().getWolves().setEnabled(getBoolean(yamlData, "spoof.entity-data.health.ignore-wolves.enabled", true));
         settings.getEntityData().getWolves().setTamed(getBoolean(yamlData, "spoof.entity-data.health.ignore-wolves.when.for-tamed-wolves", false));
         settings.getEntityData().getWolves().setOwner(getBoolean(yamlData, "spoof.entity-data.health.ignore-wolves.when.for-owned-wolves", true));
-        settings.getEntityData().getIronGolems().setEnabled(getBoolean(yamlData, "spoof.entity-data.health.ignore-iron-golems.enabled", true));
-        settings.getEntityData().getIronGolems().setGradual(getBoolean(yamlData, "spoof.entity-data.health.ignore-iron-golems.gradual.enabled", true));
         settings.getEntityData().setAbsorption(getBoolean(yamlData, "spoof.entity-data.absorption.enabled", true));
         settings.getEntityData().setXp(getBoolean(yamlData, "spoof.entity-data.xp.enabled", true));
     }

@@ -18,6 +18,7 @@
 
 package com.deathmotion.antihealthindicator.spoofers.impl;
 
+import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.cache.EntityCache;
 import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
 import com.deathmotion.antihealthindicator.cache.entities.WolfEntity;
@@ -51,7 +52,7 @@ public final class AttributeSpoofer extends Spoofer {
         if (event.getPacketType() != PacketType.Play.Server.UPDATE_ATTRIBUTES) return;
 
         Settings settings = configManager.getSettings();
-        if (!settings.getEntityData().isAttributes()) return;
+        if (!settings.getEntityData().isHealth()) return;
 
         WrapperPlayServerUpdateAttributes packet = new WrapperPlayServerUpdateAttributes(event);
         int entityId = packet.getEntityId();
@@ -61,7 +62,6 @@ public final class AttributeSpoofer extends Spoofer {
 
         final CachedEntity cachedEntity = entityCache.getEntity(entityId);
         if (cachedEntity == null) return;
-
 
         final EntityType entityType = cachedEntity.getEntityType();
         if (settings.getEntityData().isPlayersOnly() && entityType != EntityTypes.PLAYER) {
@@ -73,8 +73,11 @@ public final class AttributeSpoofer extends Spoofer {
         }
 
         if (entityType == EntityTypes.IRON_GOLEM) {
-            if (!settings.getEntityData().getIronGolems().isEnabled()) return;
-            if (settings.getEntityData().getIronGolems().isGradual() && healthTexturesSupported) return;
+            return;
+        }
+
+        if (!settings.getEntityData().isPlayersOnly() && entityCache.getCurrentVehicleId().map(currentVehicleId -> currentVehicleId == entityId).orElse(false)) {
+            return;
         }
 
         if (entityType == EntityTypes.WOLF) {
@@ -82,14 +85,11 @@ public final class AttributeSpoofer extends Spoofer {
             if (wolfEntity.shouldIgnoreWolf(player.uuid, settings)) return;
         }
 
-        // TODO: FIX Vehicles showing the wrong health
-        // TODO: FIX Wolves rendering their tail wrong
-
         for (WrapperPlayServerUpdateAttributes.Property property : packet.getProperties()) {
             final Attribute attribute = property.getAttribute();
             final String attributeName = attribute.getName().getKey();
 
-            if (attributeName.equals(MAX_HEALTH_KEY) && settings.getEntityData().isHealth()) {
+            if (attributeName.equals(MAX_HEALTH_KEY)) {
                 property.setValue(1f);
                 event.markForReEncode(true);
             } else if (attributeName.equals(MAX_ABSORPTION_KEY) && settings.getEntityData().isAbsorption()) {

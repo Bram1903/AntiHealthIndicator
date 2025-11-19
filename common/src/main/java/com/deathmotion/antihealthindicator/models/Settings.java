@@ -46,14 +46,11 @@ public class Settings {
     public static class EntityData {
         private boolean enabled = true;
         private boolean playersOnly = false;
-        private boolean attributes = true;
         private boolean airTicks = true;
 
         private boolean health = true;
-        private boolean ignoreVehicles = true;
 
         private Wolves wolves = new Wolves();
-        private IronGolems ironGolems = new IronGolems();
         private boolean absorption = true;
         private boolean xp = true;
 
@@ -63,13 +60,6 @@ public class Settings {
             private boolean enabled = true;
             private boolean tamed = false;
             private boolean owner = true;
-        }
-
-        @Getter
-        @Setter
-        public static class IronGolems {
-            private boolean enabled = true;
-            private boolean gradual = true;
         }
     }
 
