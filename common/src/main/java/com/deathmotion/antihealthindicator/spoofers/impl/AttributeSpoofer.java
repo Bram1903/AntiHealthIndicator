@@ -77,7 +77,10 @@ public final class AttributeSpoofer extends Spoofer {
             if (settings.getEntityData().getIronGolems().isGradual() && healthTexturesSupported) return;
         }
 
-        if (entityType == EntityTypes.WOLF && shouldIgnoreWolf(cachedEntity, settings)) return;
+        if (entityType == EntityTypes.WOLF) {
+            WolfEntity wolfEntity = (WolfEntity) cachedEntity;
+            if (wolfEntity.shouldIgnoreWolf(player.uuid, settings)) return;
+        }
 
         // TODO: FIX Vehicles showing the wrong health
         // TODO: FIX Wolves rendering their tail wrong
@@ -94,18 +97,5 @@ public final class AttributeSpoofer extends Spoofer {
                 event.markForReEncode(true);
             }
         }
-    }
-
-    private boolean shouldIgnoreWolf(CachedEntity cachedEntity, Settings settings) {
-        if (settings.getEntityData().getWolves().isEnabled()) return true;
-
-        WolfEntity wolfEntity = (WolfEntity) cachedEntity;
-        Settings.EntityData.Wolves wolfSettings = settings.getEntityData().getWolves();
-
-        if (!wolfSettings.isTamed() && !wolfSettings.isOwner()) return true;
-        if (wolfSettings.isTamed() && wolfEntity.isTamed()) return true;
-        return wolfSettings.isOwner()
-                && wolfEntity.isOwnerPresent()
-                && wolfEntity.getOwnerUUID().equals(player.uuid);
     }
 }

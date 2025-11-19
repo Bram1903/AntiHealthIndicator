@@ -19,6 +19,7 @@
 package com.deathmotion.antihealthindicator.cache.entities;
 
 import com.deathmotion.antihealthindicator.models.AHIPlayer;
+import com.deathmotion.antihealthindicator.models.Settings;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import lombok.Getter;
@@ -67,5 +68,16 @@ public class WolfEntity extends CachedEntity {
                         .orElse(null);
             }
         }
+    }
+
+    public boolean shouldIgnoreWolf(UUID playerUuid, Settings settings) {
+        Settings.EntityData.Wolves wolfSettings = settings.getEntityData().getWolves();
+        if (wolfSettings.isEnabled()) return true;
+
+        if (!wolfSettings.isTamed() && !wolfSettings.isOwner()) return true;
+        if (wolfSettings.isTamed() && isTamed()) return true;
+        return wolfSettings.isOwner()
+                && isOwnerPresent()
+                && getOwnerUUID().equals(playerUuid);
     }
 }

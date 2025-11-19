@@ -86,22 +86,12 @@ public final class MetadataSpoofer extends Spoofer {
             return true;
         }
 
-        if (entityType == EntityTypes.WOLF && settings.getEntityData().getWolves().isEnabled()) {
-            return shouldIgnoreWolf(cachedEntity, settings);
+        if (entityType == EntityTypes.WOLF) {
+            WolfEntity wolfEntity = (WolfEntity) cachedEntity;
+            return (wolfEntity.shouldIgnoreWolf(player.uuid, settings));
         }
 
         return false;
-    }
-
-    private boolean shouldIgnoreWolf(CachedEntity cachedEntity, Settings settings) {
-        WolfEntity wolfEntity = (WolfEntity) cachedEntity;
-        Settings.EntityData.Wolves wolfSettings = settings.getEntityData().getWolves();
-
-        if (!wolfSettings.isTamed() && !wolfSettings.isOwner()) return true;
-        if (wolfSettings.isTamed() && wolfEntity.isTamed()) return true;
-        return wolfSettings.isOwner()
-                && wolfEntity.isOwnerPresent()
-                && wolfEntity.getOwnerUUID().equals(player.uuid);
     }
 
     private void handleEntityMetadata(CachedEntity cachedEntity, EntityData<?> entityData, Settings settings) {
