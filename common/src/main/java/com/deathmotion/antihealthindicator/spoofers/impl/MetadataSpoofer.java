@@ -118,7 +118,7 @@ public final class MetadataSpoofer extends Spoofer {
 
         Object value = entityData.getValue();
         if (value instanceof Float && (Float) value > 0f) {
-            setValue(entityData, 0.5f);
+            setValue(entityData, 1f);
         }
     }
 

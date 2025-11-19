@@ -90,10 +90,10 @@ public final class AttributeSpoofer extends Spoofer {
             final String attributeName = attribute.getName().getKey();
 
             if (attributeName.equals(MAX_HEALTH_KEY) && settings.getEntityData().isHealth()) {
-                property.setValue(0.5f);
+                property.setValue(1f);
                 event.markForReEncode(true);
             } else if (attributeName.equals(MAX_ABSORPTION_KEY) && settings.getEntityData().isAbsorption()) {
-                property.setValue(0.5f);
+                property.setValue(0f);
                 event.markForReEncode(true);
             }
         }
