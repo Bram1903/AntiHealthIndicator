@@ -19,21 +19,43 @@
 package com.deathmotion.antihealthindicator.cache.entities;
 
 import com.deathmotion.antihealthindicator.models.AHIPlayer;
+import com.github.retrooper.packetevents.protocol.attribute.Attribute;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes;
 import lombok.Getter;
-import lombok.Setter;
+
+import java.util.List;
+
+import static com.deathmotion.antihealthindicator.util.AttributeConstants.MAX_HEALTH_KEY;
 
 @Getter
-@Setter
 public class CachedEntity {
-    private EntityType entityType;
+    private final EntityType entityType;
+
+    public CachedEntity(EntityType entityType) {
+        this.entityType = entityType;
+    }
 
     private float health;
+    private float maxHealth;
 
-    public void processMetaData(EntityData<?> metaData, AHIPlayer player) {
-        if (metaData.getIndex() == player.metadataIndex.HEALTH) {
-            setHealth((float) metaData.getValue());
+    public void processMetaData(List<EntityData<?>> entityDataList, AHIPlayer player) {
+        for (EntityData<?> entityData : entityDataList) {
+            if (entityData.getIndex() == player.metadataIndex.HEALTH) {
+                health = (float) entityData.getValue();
+                return;
+            }
+        }
+    }
+
+    public void processAttributes(List<WrapperPlayServerUpdateAttributes.Property> properties, AHIPlayer player) {
+        for (WrapperPlayServerUpdateAttributes.Property property : properties) {
+            final Attribute attribute = property.getAttribute();
+            final String attributeName = attribute.getName().getKey();
+
+            if (!attributeName.equals(MAX_HEALTH_KEY)) continue;
+            maxHealth = (float) property.calcValue();
         }
     }
 }

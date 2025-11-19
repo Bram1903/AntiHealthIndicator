@@ -30,10 +30,10 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes;
 
-public final class AttributeSpoofer extends Spoofer {
+import static com.deathmotion.antihealthindicator.util.AttributeConstants.MAX_ABSORPTION_KEY;
+import static com.deathmotion.antihealthindicator.util.AttributeConstants.MAX_HEALTH_KEY;
 
-    private final static String MAX_HEALTH_KEY = "max_health";
-    private final static String MAX_ABSORPTION_KEY = "max_absorption";
+public final class AttributeSpoofer extends Spoofer {
 
     private final EntityCache entityCache;
 
@@ -74,9 +74,7 @@ public final class AttributeSpoofer extends Spoofer {
                 //AHIPlatform.getInstance().getLogManager().info("Spoofing max_health from " + property.getValue() + " to " + attribute.getDefaultValue() + " for entity " + entityId);
                 property.setValue(attribute.getDefaultValue());
                 event.markForReEncode(true);
-            }
-
-            if (attributeName.equals(MAX_ABSORPTION_KEY)) {
+            } else if (attributeName.equals(MAX_ABSORPTION_KEY)) {
                 //AHIPlatform.getInstance().getLogManager().info("Spoofing max_absorption from " + property.getValue() + " to " + attribute.getDefaultValue() + " for entity " + entityId);
                 property.setValue(attribute.getDefaultValue());
                 event.markForReEncode(true);

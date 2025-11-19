@@ -63,6 +63,8 @@ public class EntityTracker {
             handleSpawnPlayer(new WrapperPlayServerSpawnPlayer(event));
         } else if (PacketType.Play.Server.ENTITY_METADATA == type) {
             handleEntityMetadata(new WrapperPlayServerEntityMetadata(event), settings);
+        } else if (PacketType.Play.Server.UPDATE_ATTRIBUTES == type) {
+            handleEntityAttribute(new WrapperPlayServerUpdateAttributes(event), settings);
         } else if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
             handleDestroyEntities(new WrapperPlayServerDestroyEntities(event));
         } else if (PacketType.Play.Server.RESPAWN == type) {
@@ -106,7 +108,17 @@ public class EntityTracker {
         CachedEntity entityData = entityCache.getEntity(entityId);
         if (entityData == null) return;
 
-        packet.getEntityMetadata().forEach(metaData -> entityData.processMetaData(metaData, player));
+        entityData.processMetaData(packet.getEntityMetadata(), player);
+    }
+
+    private void handleEntityAttribute(WrapperPlayServerUpdateAttributes packet, Settings settings) {
+        if (settings.getEntityData().isPlayersOnly()) return;
+
+        int entityId = packet.getEntityId();
+        CachedEntity entityData = entityCache.getEntity(entityId);
+        if (entityData == null) return;
+
+        entityData.processAttributes(packet.getProperties(), player);
     }
 
     private void handleDestroyEntities(WrapperPlayServerDestroyEntities packet) {
@@ -139,9 +151,9 @@ public class EntityTracker {
         if (EntityTypes.isTypeInstanceOf(entityType, EntityTypes.WOLF)) {
             entityData = new WolfEntity();
         } else {
-            entityData = new CachedEntity();
+            entityData = new CachedEntity(entityType);
         }
-        entityData.setEntityType(entityType);
+
         return entityData;
     }
 }

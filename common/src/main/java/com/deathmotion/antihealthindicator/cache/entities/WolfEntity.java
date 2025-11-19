@@ -20,9 +20,11 @@ package com.deathmotion.antihealthindicator.cache.entities;
 
 import com.deathmotion.antihealthindicator.models.AHIPlayer;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,6 +33,10 @@ import java.util.UUID;
 public class WolfEntity extends CachedEntity {
     private boolean isTamed;
     private UUID ownerUUID;
+
+    public WolfEntity() {
+        super(EntityTypes.WOLF);
+    }
 
     public boolean isOwnerPresent() {
         return ownerUUID != null;
@@ -44,24 +50,26 @@ public class WolfEntity extends CachedEntity {
     }
 
     @Override
-    public void processMetaData(EntityData<?> metaData, AHIPlayer player) {
-        int index = metaData.getIndex();
+    public void processMetaData(List<EntityData<?>> entityDataList, AHIPlayer player) {
+        for (EntityData<?> entityData : entityDataList) {
+            int index = entityData.getIndex();
 
-        if (index == player.metadataIndex.TAMABLE_TAMED) {
-            setTamed(((Byte) metaData.getValue() & 0x04) != 0);
-        } else if (index == player.metadataIndex.TAMABLE_OWNER) {
-            Object value = metaData.getValue();
+            if (index == player.metadataIndex.TAMABLE_TAMED) {
+                setTamed(((Byte) entityData.getValue() & 0x04) != 0);
+            } else if (index == player.metadataIndex.TAMABLE_OWNER) {
+                Object value = entityData.getValue();
 
-            UUID ownerUUID = value instanceof String
-                    ? Optional.of((String) value)
-                    .filter(player.uuid.toString()::equals)
-                    .map(UUID::fromString)
-                    .orElse(null)
-                    : ((Optional<UUID>) value)
-                    .filter(player.uuid::equals)
-                    .orElse(null);
+                UUID ownerUUID = value instanceof String
+                        ? Optional.of((String) value)
+                        .filter(player.uuid.toString()::equals)
+                        .map(UUID::fromString)
+                        .orElse(null)
+                        : ((Optional<UUID>) value)
+                        .filter(player.uuid::equals)
+                        .orElse(null);
 
-            setOwnerUUID(ownerUUID);
+                setOwnerUUID(ownerUUID);
+            }
         }
     }
 }
