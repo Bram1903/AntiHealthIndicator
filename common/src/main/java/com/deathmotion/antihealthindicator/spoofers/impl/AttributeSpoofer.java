@@ -20,6 +20,7 @@ package com.deathmotion.antihealthindicator.spoofers.impl;
 
 import com.deathmotion.antihealthindicator.cache.EntityCache;
 import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
+import com.deathmotion.antihealthindicator.cache.entities.WolfEntity;
 import com.deathmotion.antihealthindicator.models.AHIPlayer;
 import com.deathmotion.antihealthindicator.models.Settings;
 import com.deathmotion.antihealthindicator.spoofers.Spoofer;
@@ -61,7 +62,12 @@ public final class AttributeSpoofer extends Spoofer {
         final CachedEntity cachedEntity = entityCache.getEntity(entityId);
         if (cachedEntity == null) return;
 
+
         final EntityType entityType = cachedEntity.getEntityType();
+        if (settings.getEntityData().isPlayersOnly() && entityType != EntityTypes.PLAYER) {
+            return;
+        }
+
         if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) {
             return;
         }
@@ -71,6 +77,8 @@ public final class AttributeSpoofer extends Spoofer {
             if (settings.getEntityData().getIronGolems().isGradual() && healthTexturesSupported) return;
         }
 
+        if (entityType == EntityTypes.WOLF && shouldIgnoreWolf(cachedEntity, settings)) return;
+
         // TODO: FIX Vehicles showing the wrong health
         // TODO: FIX Wolves rendering their tail wrong
 
@@ -78,13 +86,26 @@ public final class AttributeSpoofer extends Spoofer {
             final Attribute attribute = property.getAttribute();
             final String attributeName = attribute.getName().getKey();
 
-            if (attributeName.equals(MAX_HEALTH_KEY)) {
+            if (attributeName.equals(MAX_HEALTH_KEY) && settings.getEntityData().isHealth()) {
                 property.setValue(0.5f);
                 event.markForReEncode(true);
-            } else if (attributeName.equals(MAX_ABSORPTION_KEY)) {
+            } else if (attributeName.equals(MAX_ABSORPTION_KEY) && settings.getEntityData().isAbsorption()) {
                 property.setValue(0.5f);
                 event.markForReEncode(true);
             }
         }
+    }
+
+    private boolean shouldIgnoreWolf(CachedEntity cachedEntity, Settings settings) {
+        if (settings.getEntityData().getWolves().isEnabled()) return true;
+
+        WolfEntity wolfEntity = (WolfEntity) cachedEntity;
+        Settings.EntityData.Wolves wolfSettings = settings.getEntityData().getWolves();
+
+        if (!wolfSettings.isTamed() && !wolfSettings.isOwner()) return true;
+        if (wolfSettings.isTamed() && wolfEntity.isTamed()) return true;
+        return wolfSettings.isOwner()
+                && wolfEntity.isOwnerPresent()
+                && wolfEntity.getOwnerUUID().equals(player.uuid);
     }
 }

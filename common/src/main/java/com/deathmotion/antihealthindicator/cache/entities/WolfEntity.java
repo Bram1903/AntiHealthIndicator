@@ -22,14 +22,12 @@ import com.deathmotion.antihealthindicator.models.AHIPlayer;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Getter
-@Setter
 public class WolfEntity extends CachedEntity {
     private boolean isTamed;
     private UUID ownerUUID;
@@ -55,11 +53,11 @@ public class WolfEntity extends CachedEntity {
             int index = entityData.getIndex();
 
             if (index == player.metadataIndex.TAMABLE_TAMED) {
-                setTamed(((Byte) entityData.getValue() & 0x04) != 0);
+                isTamed = (((Byte) entityData.getValue() & 0x04) != 0);
             } else if (index == player.metadataIndex.TAMABLE_OWNER) {
                 Object value = entityData.getValue();
 
-                UUID ownerUUID = value instanceof String
+                ownerUUID = value instanceof String
                         ? Optional.of((String) value)
                         .filter(player.uuid.toString()::equals)
                         .map(UUID::fromString)
@@ -67,8 +65,6 @@ public class WolfEntity extends CachedEntity {
                         : ((Optional<UUID>) value)
                         .filter(player.uuid::equals)
                         .orElse(null);
-
-                setOwnerUUID(ownerUUID);
             }
         }
     }
