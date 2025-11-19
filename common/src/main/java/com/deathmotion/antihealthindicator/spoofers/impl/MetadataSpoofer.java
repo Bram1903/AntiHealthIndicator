@@ -35,11 +35,6 @@ import org.jetbrains.annotations.NotNull;
 
 public final class MetadataSpoofer extends Spoofer {
 
-    private static final float IRON_GOLEM_HEALTH_MAX = 100f;
-    private static final float IRON_GOLEM_THRESHOLD_1 = 74f;
-    private static final float IRON_GOLEM_THRESHOLD_2 = 49f;
-    private static final float IRON_GOLEM_THRESHOLD_3 = 24f;
-
     private final EntityCache entityCache;
     private final boolean healthTexturesSupported;
 
@@ -70,14 +65,15 @@ public final class MetadataSpoofer extends Spoofer {
         CachedEntity cachedEntity = entityCache.getEntity(entityId);
         if (cachedEntity == null) return;
 
-        EntityType entityType = cachedEntity.getEntityType();
-        if (shouldIgnoreEntity(entityType, entityId, cachedEntity, settings)) return;
+        if (shouldIgnoreEntity(entityId, cachedEntity, settings)) return;
 
-        packet.getEntityMetadata().forEach(entityData -> handleEntityMetadata(entityType, entityData, settings));
+        packet.getEntityMetadata().forEach(entityData -> handleEntityMetadata(cachedEntity, entityData, settings));
         event.markForReEncode(true);
     }
 
-    private boolean shouldIgnoreEntity(EntityType entityType, int entityId, CachedEntity cachedEntity, Settings settings) {
+    private boolean shouldIgnoreEntity(int entityId, CachedEntity cachedEntity, Settings settings) {
+        final EntityType entityType = cachedEntity.getEntityType();
+
         if (entityType == EntityTypes.WITHER || entityType == EntityTypes.ENDER_DRAGON) {
             return true;
         }
@@ -108,12 +104,15 @@ public final class MetadataSpoofer extends Spoofer {
                 && wolfEntity.getOwnerUUID().equals(player.uuid);
     }
 
-    private void handleEntityMetadata(EntityType entityType, EntityData<?> entityData, Settings settings) {
+    private void handleEntityMetadata(CachedEntity cachedEntity, EntityData<?> entityData, Settings settings) {
+        final EntityType entityType = cachedEntity.getEntityType();
+        updateAirTicks(entityData, settings);
+
         if (entityType == EntityTypes.IRON_GOLEM && settings.getEntityData().getIronGolems().isEnabled()) {
             if (!settings.getEntityData().getIronGolems().isGradual() || !healthTexturesSupported) {
                 applyDefaultSpoofing(entityData, settings);
             } else {
-                spoofIronGolemMetadata(entityData, settings);
+                spoofIronGolemMetadata(cachedEntity, entityData, settings);
             }
         } else {
             applyDefaultSpoofing(entityData, settings);
@@ -124,8 +123,6 @@ public final class MetadataSpoofer extends Spoofer {
     }
 
     private void applyDefaultSpoofing(EntityData<?> entityData, Settings settings) {
-        updateAirTicks(entityData, settings);
-
         if (entityData.getIndex() != player.metadataIndex.HEALTH) return;
         if (!settings.getEntityData().isHealth()) return;
 
@@ -135,32 +132,36 @@ public final class MetadataSpoofer extends Spoofer {
         }
     }
 
-    private void spoofIronGolemMetadata(EntityData<?> entityData, Settings settings) {
+    private void spoofIronGolemMetadata(CachedEntity cachedEntity, EntityData<?> entityData, Settings settings) {
         updateAirTicks(entityData, settings);
 
-        if (entityData.getIndex() != player.metadataIndex.HEALTH) return;
-        if (!settings.getEntityData().isHealth()) return;
+        if (entityData.getIndex() != player.metadataIndex.HEALTH || !settings.getEntityData().isHealth()) return;
 
-        Object value = entityData.getValue();
-        if (value instanceof Float) {
-            float health = (Float) value;
-            if (health <= 0f) return;
+        final Object value = entityData.getValue();
+        if (!(value instanceof Float)) return;
 
-            float spoofedHealth;
+        final float health = (Float) value;
+        if (health <= 0f) return;
 
-            if (health > IRON_GOLEM_THRESHOLD_1) {
-                spoofedHealth = IRON_GOLEM_HEALTH_MAX;
-            } else if (health > IRON_GOLEM_THRESHOLD_2) {
-                spoofedHealth = IRON_GOLEM_THRESHOLD_1;
-            } else if (health > IRON_GOLEM_THRESHOLD_3) {
-                spoofedHealth = IRON_GOLEM_THRESHOLD_2;
-            } else {
-                spoofedHealth = IRON_GOLEM_THRESHOLD_3;
-            }
+        final float maxHealth = cachedEntity.getMaxHealth();
+        if (maxHealth <= 0f) return;
 
-            setValue(entityData, spoofedHealth);
+        final float ratio = health / maxHealth;
+        final float spoofed;
+
+        if (ratio >= 0.75f) {
+            spoofed = maxHealth;          // No cracks
+        } else if (ratio >= 0.50f) {
+            spoofed = maxHealth * 0.74f;  // Minor cracks
+        } else if (ratio >= 0.25f) {
+            spoofed = maxHealth * 0.49f;  // Medium cracks
+        } else {
+            spoofed = maxHealth * 0.24f;  // Heavy cracks
         }
+
+        setValue(entityData, spoofed);
     }
+
 
     private void spoofPlayerMetadata(EntityData<?> entityData, Settings settings) {
         if (entityData.getIndex() == player.metadataIndex.ABSORPTION && settings.getEntityData().isAbsorption()) {

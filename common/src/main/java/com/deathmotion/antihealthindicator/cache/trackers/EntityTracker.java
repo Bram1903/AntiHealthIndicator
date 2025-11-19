@@ -116,7 +116,7 @@ public class EntityTracker {
         CachedEntity entityData = entityCache.getEntity(entityId);
         if (entityData == null) return;
 
-        entityData.processAttributes(packet.getProperties(), player);
+        entityData.processAttributes(packet.getProperties());
     }
 
     private void handleDestroyEntities(WrapperPlayServerDestroyEntities packet) {

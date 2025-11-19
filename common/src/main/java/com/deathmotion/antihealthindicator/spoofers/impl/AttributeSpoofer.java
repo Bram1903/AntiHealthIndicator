@@ -28,6 +28,7 @@ import com.github.retrooper.packetevents.protocol.attribute.Attribute;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes;
 
 import static com.deathmotion.antihealthindicator.util.AttributeConstants.MAX_ABSORPTION_KEY;
@@ -36,10 +37,12 @@ import static com.deathmotion.antihealthindicator.util.AttributeConstants.MAX_HE
 public final class AttributeSpoofer extends Spoofer {
 
     private final EntityCache entityCache;
+    private final boolean healthTexturesSupported;
 
     public AttributeSpoofer(AHIPlayer player) {
         super(player);
-        entityCache = player.entityCache;
+        this.entityCache = player.entityCache;
+        this.healthTexturesSupported = player.user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_15);
     }
 
     @Override
@@ -63,20 +66,23 @@ public final class AttributeSpoofer extends Spoofer {
             return;
         }
 
-        // TODO: FIX Vehicles showing the wrong health due to this (I think)
-        // TODO: FIX Golems not showing the right health texture assuming the texture is based on percentages (I think)
+        if (entityType == EntityTypes.IRON_GOLEM) {
+            if (!settings.getEntityData().getIronGolems().isEnabled()) return;
+            if (settings.getEntityData().getIronGolems().isGradual() && healthTexturesSupported) return;
+        }
+
+        // TODO: FIX Vehicles showing the wrong health
+        // TODO: FIX Wolves rendering their tail wrong
 
         for (WrapperPlayServerUpdateAttributes.Property property : packet.getProperties()) {
             final Attribute attribute = property.getAttribute();
             final String attributeName = attribute.getName().getKey();
 
             if (attributeName.equals(MAX_HEALTH_KEY)) {
-                //AHIPlatform.getInstance().getLogManager().info("Spoofing max_health from " + property.getValue() + " to " + attribute.getDefaultValue() + " for entity " + entityId);
-                property.setValue(attribute.getDefaultValue());
+                property.setValue(0.5f);
                 event.markForReEncode(true);
             } else if (attributeName.equals(MAX_ABSORPTION_KEY)) {
-                //AHIPlatform.getInstance().getLogManager().info("Spoofing max_absorption from " + property.getValue() + " to " + attribute.getDefaultValue() + " for entity " + entityId);
-                property.setValue(attribute.getDefaultValue());
+                property.setValue(0.5f);
                 event.markForReEncode(true);
             }
         }

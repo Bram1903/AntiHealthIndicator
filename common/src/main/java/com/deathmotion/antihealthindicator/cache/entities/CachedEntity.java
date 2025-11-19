@@ -49,7 +49,7 @@ public class CachedEntity {
         }
     }
 
-    public void processAttributes(List<WrapperPlayServerUpdateAttributes.Property> properties, AHIPlayer player) {
+    public void processAttributes(List<WrapperPlayServerUpdateAttributes.Property> properties) {
         for (WrapperPlayServerUpdateAttributes.Property property : properties) {
             final Attribute attribute = property.getAttribute();
             final String attributeName = attribute.getName().getKey();
