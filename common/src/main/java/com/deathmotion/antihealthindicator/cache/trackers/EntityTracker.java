@@ -80,7 +80,9 @@ public class EntityTracker {
     private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet, Settings settings) {
         EntityType entityType = packet.getEntityType();
         if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) return;
-        spawnEntity(packet.getEntityId(), entityType);
+
+        CachedEntity cachedEntity = spawnEntity(packet.getEntityId(), entityType);
+        cachedEntity.processMetaData(packet.getEntityMetadata(), player);
     }
 
     private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet, Settings settings) {
@@ -96,9 +98,10 @@ public class EntityTracker {
         spawnEntity(packet.getEntityId(), EntityTypes.PLAYER);
     }
 
-    private void spawnEntity(int entityId, EntityType entityType) {
+    private CachedEntity spawnEntity(int entityId, EntityType entityType) {
         CachedEntity entityData = createLivingEntity(entityType);
         entityCache.addLivingEntity(entityId, entityData);
+        return entityData;
     }
 
     private void handleEntityMetadata(WrapperPlayServerEntityMetadata packet) {

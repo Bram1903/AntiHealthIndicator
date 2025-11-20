@@ -18,11 +18,12 @@
 
 package com.deathmotion.antihealthindicator.cache.entities;
 
-import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.models.AHIPlayer;
 import com.github.retrooper.packetevents.protocol.attribute.Attribute;
+import com.github.retrooper.packetevents.protocol.attribute.Attributes;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes;
 import lombok.Getter;
 
@@ -30,10 +31,10 @@ import java.util.List;
 
 import static com.deathmotion.antihealthindicator.util.AttributeConstants.MAX_HEALTH_KEY;
 
-@Getter
 public class CachedEntity {
+    @Getter
     private final EntityType entityType;
-
+    @Getter
     private float health;
     private float maxHealth;
 
@@ -58,5 +59,16 @@ public class CachedEntity {
             if (!attributeName.equals(MAX_HEALTH_KEY)) continue;
             maxHealth = (float) property.calcValue();
         }
+    }
+
+    public float getMaxHealth() {
+        if (maxHealth == 0) {
+            if (entityType == EntityTypes.IRON_GOLEM) {
+                return 100f;
+            }
+            return (float) Attributes.MAX_HEALTH.getDefaultValue();
+        }
+
+        return maxHealth;
     }
 }

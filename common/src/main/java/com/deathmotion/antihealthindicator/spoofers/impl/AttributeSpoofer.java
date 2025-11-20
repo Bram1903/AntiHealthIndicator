@@ -18,7 +18,6 @@
 
 package com.deathmotion.antihealthindicator.spoofers.impl;
 
-import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.cache.EntityCache;
 import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
 import com.deathmotion.antihealthindicator.cache.entities.WolfEntity;
@@ -30,8 +29,9 @@ import com.github.retrooper.packetevents.protocol.attribute.Attribute;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes;
+
+import java.util.ArrayList;
 
 import static com.deathmotion.antihealthindicator.util.AttributeConstants.MAX_ABSORPTION_KEY;
 import static com.deathmotion.antihealthindicator.util.AttributeConstants.MAX_HEALTH_KEY;
@@ -39,12 +39,10 @@ import static com.deathmotion.antihealthindicator.util.AttributeConstants.MAX_HE
 public final class AttributeSpoofer extends Spoofer {
 
     private final EntityCache entityCache;
-    private final boolean healthTexturesSupported;
 
     public AttributeSpoofer(AHIPlayer player) {
         super(player);
         this.entityCache = player.entityCache;
-        this.healthTexturesSupported = player.user.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_15);
     }
 
     @Override
@@ -52,7 +50,7 @@ public final class AttributeSpoofer extends Spoofer {
         if (event.getPacketType() != PacketType.Play.Server.UPDATE_ATTRIBUTES) return;
 
         Settings settings = configManager.getSettings();
-        if (!settings.getEntityData().isHealth()) return;
+        if (!settings.getEntityData().isHealth() && !settings.getEntityData().isAbsorption()) return;
 
         WrapperPlayServerUpdateAttributes packet = new WrapperPlayServerUpdateAttributes(event);
         int entityId = packet.getEntityId();
@@ -89,11 +87,13 @@ public final class AttributeSpoofer extends Spoofer {
             final Attribute attribute = property.getAttribute();
             final String attributeName = attribute.getName().getKey();
 
-            if (attributeName.equals(MAX_HEALTH_KEY)) {
-                property.setValue(1f);
+            if (attributeName.equals(MAX_HEALTH_KEY) && settings.getEntityData().isHealth()) {
+                property.setValue(attribute.getDefaultValue());
+                property.setModifiers(new ArrayList<>());
                 event.markForReEncode(true);
             } else if (attributeName.equals(MAX_ABSORPTION_KEY) && settings.getEntityData().isAbsorption()) {
-                property.setValue(0f);
+                property.setValue(attribute.getDefaultValue());
+                property.setModifiers(new ArrayList<>());
                 event.markForReEncode(true);
             }
         }
