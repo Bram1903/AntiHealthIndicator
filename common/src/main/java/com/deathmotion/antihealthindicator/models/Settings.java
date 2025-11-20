@@ -46,21 +46,11 @@ public class Settings {
     public static class EntityData {
         private boolean enabled = true;
         private boolean playersOnly = false;
+
         private boolean airTicks = true;
-
         private boolean health = true;
-
-        private Wolves wolves = new Wolves();
         private boolean absorption = true;
         private boolean xp = true;
-
-        @Getter
-        @Setter
-        public static class Wolves {
-            private boolean enabled = true;
-            private boolean tamed = false;
-            private boolean owner = true;
-        }
     }
 
     @Getter

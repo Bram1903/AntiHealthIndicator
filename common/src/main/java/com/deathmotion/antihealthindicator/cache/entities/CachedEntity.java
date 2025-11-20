@@ -31,7 +31,7 @@ import java.util.List;
 
 import static com.deathmotion.antihealthindicator.util.AttributeConstants.MAX_HEALTH_KEY;
 
-public class CachedEntity {
+public final class CachedEntity {
     @Getter
     private final EntityType entityType;
     @Getter

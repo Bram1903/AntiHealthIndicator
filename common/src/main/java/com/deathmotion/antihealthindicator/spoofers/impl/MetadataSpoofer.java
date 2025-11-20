@@ -20,7 +20,6 @@ package com.deathmotion.antihealthindicator.spoofers.impl;
 
 import com.deathmotion.antihealthindicator.cache.EntityCache;
 import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
-import com.deathmotion.antihealthindicator.cache.entities.WolfEntity;
 import com.deathmotion.antihealthindicator.models.AHIPlayer;
 import com.deathmotion.antihealthindicator.models.Settings;
 import com.deathmotion.antihealthindicator.spoofers.Spoofer;
@@ -78,17 +77,16 @@ public final class MetadataSpoofer extends Spoofer {
             return true;
         }
 
+        if (entityType == EntityTypes.WOLF) {
+            return true;
+        }
+
         if (settings.getEntityData().isPlayersOnly() && entityType != EntityTypes.PLAYER) {
             return true;
         }
 
         if (!settings.getEntityData().isPlayersOnly() && entityCache.getCurrentVehicleId().map(currentVehicleId -> currentVehicleId == entityId).orElse(false)) {
             return true;
-        }
-
-        if (entityType == EntityTypes.WOLF) {
-            WolfEntity wolfEntity = (WolfEntity) cachedEntity;
-            return (wolfEntity.shouldIgnoreWolf(player.uuid, settings));
         }
 
         return false;
