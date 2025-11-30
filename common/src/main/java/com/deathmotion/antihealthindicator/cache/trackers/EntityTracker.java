@@ -63,8 +63,6 @@ public class EntityTracker {
         } else if (PacketType.Play.Server.ENTITY_METADATA == type) {
             if (settings.getEntityData().isPlayersOnly()) return;
             handleEntityMetadata(new WrapperPlayServerEntityMetadata(event));
-        } else if (PacketType.Play.Server.UPDATE_ATTRIBUTES == type) {
-            handleEntityAttribute(new WrapperPlayServerUpdateAttributes(event));
         } else if (PacketType.Play.Server.DESTROY_ENTITIES == type) {
             handleDestroyEntities(new WrapperPlayServerDestroyEntities(event));
         } else if (PacketType.Play.Server.RESPAWN == type) {
@@ -78,7 +76,8 @@ public class EntityTracker {
 
     private void handleSpawnLivingEntity(WrapperPlayServerSpawnLivingEntity packet, Settings settings) {
         EntityType entityType = packet.getEntityType();
-        if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER)) return;
+        if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER))
+            return;
 
         CachedEntity cachedEntity = spawnEntity(packet.getEntityId(), entityType);
         cachedEntity.processMetaData(packet.getEntityMetadata(), player);
@@ -109,14 +108,6 @@ public class EntityTracker {
         if (entityData == null) return;
 
         entityData.processMetaData(packet.getEntityMetadata(), player);
-    }
-
-    private void handleEntityAttribute(WrapperPlayServerUpdateAttributes packet) {
-        int entityId = packet.getEntityId();
-        CachedEntity entityData = entityCache.getEntity(entityId);
-        if (entityData == null) return;
-
-        entityData.processAttributes(packet.getProperties());
     }
 
     private void handleDestroyEntities(WrapperPlayServerDestroyEntities packet) {

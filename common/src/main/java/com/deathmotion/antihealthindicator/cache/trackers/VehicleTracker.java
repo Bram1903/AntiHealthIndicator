@@ -25,7 +25,6 @@ import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.deathmotion.antihealthindicator.models.AHIPlayer;
 import com.deathmotion.antihealthindicator.models.Settings;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.attribute.Attributes;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -33,8 +32,6 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerAttachEntity;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes;
-import lombok.Getter;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -118,81 +115,31 @@ public class VehicleTracker {
     private void updateState(final int vehicleId, final boolean entering) {
         final CachedEntity entity = cache.getEntity(vehicleId);
         if (entity == null) {
-            if (!entering) {
-                cache.setCurrentVehicleId(null);
-            }
+            if (!entering) cache.setCurrentVehicleId(null);
             return;
         }
 
-        final Optional<Integer> currentOpt = cache.getCurrentVehicleId();
-
+        Optional<Integer> currentOpt = cache.getCurrentVehicleId();
         if (entering) {
-            if (currentOpt.isPresent() && currentOpt.get() == vehicleId) {
-                return;
-            }
+            if (currentOpt.isPresent() && currentOpt.get() == vehicleId) return;
             cache.setCurrentVehicleId(vehicleId);
         } else {
-            if (currentOpt.map(id -> id != vehicleId).orElse(true)) {
-                return;
-            }
+            if (currentOpt.map(id -> id != vehicleId).orElse(true)) return;
             cache.setCurrentVehicleId(null);
         }
 
-        AHIPlatform.getInstance().getScheduler().runAsyncTask(task -> {
-            PacketPair pair = createPackets(vehicleId, entity, entering);
-
-            if (configManager.getSettings().getEntityData().isHealth()) {
-                player.user.sendPacketSilently(pair.getAttributePacket());
-                player.user.sendPacketSilently(pair.getMetadataPacket());
-            }
-        });
-    }
-
-    private PacketPair createPackets(int vehicleId, CachedEntity entity, boolean entering) {
-
-        final float spoofedMaxHealth = entering
-                ? Math.max(entity.getMaxHealth(), MIN_SPOOF_HEALTH)
-                : 1.0f;
-
-        WrapperPlayServerUpdateAttributes attributePacket =
-                new WrapperPlayServerUpdateAttributes(
-                        vehicleId,
-                        Collections.singletonList(
-                                new WrapperPlayServerUpdateAttributes.Property(
-                                        Attributes.MAX_HEALTH,
-                                        spoofedMaxHealth,
-                                        Collections.emptyList()
-                                )
-                        )
-                );
-
-        final float spoofedHealth = entering
-                ? Math.max(entity.getHealth(), MIN_SPOOF_HEALTH)
-                : MIN_SPOOF_HEALTH;
-
-        WrapperPlayServerEntityMetadata metadataPacket =
-                new WrapperPlayServerEntityMetadata(
-                        vehicleId,
-                        Collections.singletonList(
-                                new EntityData<>(
+        float health = entering ? Math.max(entity.getHealth(), MIN_SPOOF_HEALTH) : MIN_SPOOF_HEALTH;
+        AHIPlatform.getInstance().getScheduler().runAsyncTask(task ->
+                player.user.sendPacketSilently(
+                        new WrapperPlayServerEntityMetadata(
+                                vehicleId,
+                                Collections.singletonList(new EntityData<>(
                                         player.metadataIndex.HEALTH,
                                         EntityDataTypes.FLOAT,
-                                        spoofedHealth
-                                )
+                                        health
+                                ))
                         )
-                );
-
-        return new PacketPair(attributePacket, metadataPacket);
-    }
-
-    @Getter
-    private static final class PacketPair {
-        private final WrapperPlayServerUpdateAttributes attributePacket;
-        private final WrapperPlayServerEntityMetadata metadataPacket;
-
-        public PacketPair(WrapperPlayServerUpdateAttributes attributePacket, WrapperPlayServerEntityMetadata metadataPacket) {
-            this.attributePacket = attributePacket;
-            this.metadataPacket = metadataPacket;
-        }
+                )
+        );
     }
 }

@@ -85,11 +85,7 @@ public final class MetadataSpoofer extends Spoofer {
             return true;
         }
 
-        if (!settings.getEntityData().isPlayersOnly() && entityCache.getCurrentVehicleId().map(currentVehicleId -> currentVehicleId == entityId).orElse(false)) {
-            return true;
-        }
-
-        return false;
+        return !settings.getEntityData().isPlayersOnly() && entityCache.getCurrentVehicleId().map(currentVehicleId -> currentVehicleId == entityId).orElse(false);
     }
 
     private void handleEntityMetadata(CachedEntity cachedEntity, EntityData<?> entityData, Settings settings) {
@@ -100,7 +96,7 @@ public final class MetadataSpoofer extends Spoofer {
             if (!healthTexturesSupported) {
                 applyDefaultSpoofing(entityData, settings);
             } else {
-                spoofIronGolemMetadata(cachedEntity, entityData, settings);
+                spoofIronGolemMetadata(entityData, settings);
             }
         } else {
             applyDefaultSpoofing(entityData, settings);
@@ -120,7 +116,7 @@ public final class MetadataSpoofer extends Spoofer {
         }
     }
 
-    private void spoofIronGolemMetadata(CachedEntity cachedEntity, EntityData<?> entityData, Settings settings) {
+    private void spoofIronGolemMetadata(EntityData<?> entityData, Settings settings) {
         if (entityData.getIndex() != player.metadataIndex.HEALTH || !settings.getEntityData().isHealth()) return;
 
         final Object value = entityData.getValue();
@@ -129,9 +125,7 @@ public final class MetadataSpoofer extends Spoofer {
         final float health = (Float) value;
         if (health <= 0f) return;
 
-        final float maxHealth = cachedEntity.getMaxHealth();
-        if (maxHealth <= 0f) return;
-
+        final float maxHealth = 100f;
         final float ratio = health / maxHealth;
         final float spoofed;
 

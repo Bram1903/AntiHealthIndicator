@@ -32,7 +32,6 @@ public class SpoofManager {
     public SpoofManager(AHIPlayer player) {
         spoofers = new ImmutableClassToInstanceMap.Builder<Spoofer>()
                 .put(MetadataSpoofer.class, new MetadataSpoofer(player))
-                .put(AttributeSpoofer.class, new AttributeSpoofer(player))
                 .put(EquipmentSpoofer.class, new EquipmentSpoofer(player))
                 .put(GamemodeSpoofer.class, new GamemodeSpoofer(player))
                 .put(ScoreboardSpoofer.class, new ScoreboardSpoofer(player))

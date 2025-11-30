@@ -51,10 +51,6 @@ spoof:
     players-only:
       enabled: false
 
-    # Prevents a player from receiving max health and max absorption attributes from other players.
-    attributes:
-      enabled: true
-
     # If enabled, hides the oxygen number of other entities.
     air-ticks:
       enabled: true
