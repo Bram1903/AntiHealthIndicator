@@ -49,6 +49,8 @@ public class Settings {
 
         private boolean airTicks = true;
         private boolean health = true;
+        private float healthValue = 20f;
+        private boolean randomizeHealth = true;
         private boolean absorption = true;
         private boolean xp = true;
     }

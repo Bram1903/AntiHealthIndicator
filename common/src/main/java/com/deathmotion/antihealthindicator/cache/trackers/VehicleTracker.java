@@ -24,6 +24,7 @@ import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.deathmotion.antihealthindicator.models.AHIPlayer;
 import com.deathmotion.antihealthindicator.models.Settings;
+import com.deathmotion.antihealthindicator.util.HealthUtil;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
@@ -37,8 +38,6 @@ import java.util.Collections;
 import java.util.Optional;
 
 public class VehicleTracker {
-
-    private static final float MIN_SPOOF_HEALTH = 1F;
 
     private final AHIPlayer player;
     private final EntityCache cache;
@@ -128,7 +127,7 @@ public class VehicleTracker {
             cache.setCurrentVehicleId(null);
         }
 
-        float health = entering ? Math.max(entity.getHealth(), MIN_SPOOF_HEALTH) : MIN_SPOOF_HEALTH;
+        float health = entering ? entity.getHealth() : HealthUtil.getSpoofValue();
         AHIPlatform.getInstance().getScheduler().runAsyncTask(task ->
                 player.user.sendPacketSilently(
                         new WrapperPlayServerEntityMetadata(

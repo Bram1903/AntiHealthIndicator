@@ -54,8 +54,7 @@ Ensure the [PacketEvents](https://modrinth.com/plugin/packetevents) library is i
 
 The plugin includes various spoofing features:
 
-- Health
-- Health Attributes
+- Health (including randomization)
 - Air Ticks
 - Player Absorption
 - Player Saturation

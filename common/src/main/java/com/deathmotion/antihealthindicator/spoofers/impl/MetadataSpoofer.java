@@ -23,6 +23,7 @@ import com.deathmotion.antihealthindicator.cache.entities.CachedEntity;
 import com.deathmotion.antihealthindicator.models.AHIPlayer;
 import com.deathmotion.antihealthindicator.models.Settings;
 import com.deathmotion.antihealthindicator.spoofers.Spoofer;
+import com.deathmotion.antihealthindicator.util.HealthUtil;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
@@ -112,7 +113,7 @@ public final class MetadataSpoofer extends Spoofer {
 
         Object value = entityData.getValue();
         if (value instanceof Float && (Float) value > 0f) {
-            setValue(entityData, 1f);
+            setValue(entityData, HealthUtil.getSpoofValue());
         }
     }
 

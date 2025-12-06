@@ -94,52 +94,146 @@ public class ConfigManager<P> {
         loadConfig();
     }
 
-    private void setConfigOptions(Map<String, Object> yamlData, Settings settings) {
-        settings.setDebug(getBoolean(yamlData, "debug.enabled", false));
-        settings.getUpdateChecker().setEnabled(getBoolean(yamlData, "update-checker.enabled", true));
-        settings.getUpdateChecker().setPrintToConsole(getBoolean(yamlData, "update-checker.print-to-console", true));
-        settings.getUpdateChecker().setNotifyInGame(getBoolean(yamlData, "update-checker.notify-in-game", true));
-        settings.setFoodSaturation(getBoolean(yamlData, "spoof.food-saturation.enabled", false));
-        settings.setTeamScoreboard(getBoolean(yamlData, "spoof.team-scoreboard.enabled", true));
-        settings.setGamemode(getBoolean(yamlData, "spoof.gamemode.enabled", true));
+    private void setConfigOptions(Map<String, Object> yaml, Settings settings) {
+        settings.setDebug(getValue(yaml, "debug.enabled", Boolean.class, false));
+        settings.getUpdateChecker().setEnabled(getValue(yaml, "update-checker.enabled", Boolean.class, true));
+        settings.getUpdateChecker().setPrintToConsole(getValue(yaml, "update-checker.print-to-console", Boolean.class, true));
+        settings.getUpdateChecker().setNotifyInGame(getValue(yaml, "update-checker.notify-in-game", Boolean.class, true));
 
-        setEntityDataOptions(yamlData, settings);
-        setItemOptions(yamlData, settings);
+        settings.setFoodSaturation(getValue(yaml, "spoof.food-saturation.enabled", Boolean.class, false));
+        settings.setTeamScoreboard(getValue(yaml, "spoof.team-scoreboard.enabled", Boolean.class, true));
+        settings.setGamemode(getValue(yaml, "spoof.gamemode.enabled", Boolean.class, true));
+
+        setEntityDataOptions(yaml, settings);
+        setItemOptions(yaml, settings);
     }
 
-    private void setEntityDataOptions(Map<String, Object> yamlData, Settings settings) {
-        settings.getEntityData().setEnabled(getBoolean(yamlData, "spoof.entity-data.enabled", true));
-        settings.getEntityData().setPlayersOnly(getBoolean(yamlData, "spoof.entity-data.players-only.enabled", false));
-        settings.getEntityData().setAirTicks(getBoolean(yamlData, "spoof.entity-data.air-ticks.enabled", true));
-        settings.getEntityData().setHealth(getBoolean(yamlData, "spoof.entity-data.health.enabled", true));
-        settings.getEntityData().setAbsorption(getBoolean(yamlData, "spoof.entity-data.absorption.enabled", true));
-        settings.getEntityData().setXp(getBoolean(yamlData, "spoof.entity-data.xp.enabled", true));
+    private void setEntityDataOptions(Map<String, Object> yaml, Settings settings) {
+        settings.getEntityData().setEnabled(getValue(yaml, "spoof.entity-data.enabled", Boolean.class, true));
+        settings.getEntityData().setPlayersOnly(getValue(yaml, "spoof.entity-data.players-only.enabled", Boolean.class, false));
+        settings.getEntityData().setAirTicks(getValue(yaml, "spoof.entity-data.air-ticks.enabled", Boolean.class, true));
+        settings.getEntityData().setHealth(getValue(yaml, "spoof.entity-data.health.enabled", Boolean.class, true));
+
+        float rawHealthValue = getValue(yaml, "spoof.entity-data.health.spoof-value", Float.class, 1f);
+        float clampedHealthValue = clampFloat(rawHealthValue, 1f, Integer.MAX_VALUE, "spoof.entity-data.health.spoof-value");
+        settings.getEntityData().setHealthValue(clampedHealthValue);
+
+        settings.getEntityData().setRandomizeHealth(getValue(yaml, "spoof.entity-data.health.randomize", Boolean.class, false));
+        settings.getEntityData().setAbsorption(getValue(yaml, "spoof.entity-data.absorption.enabled", Boolean.class, true));
+        settings.getEntityData().setXp(getValue(yaml, "spoof.entity-data.xp.enabled", Boolean.class, true));
     }
 
-    private void setItemOptions(Map<String, Object> yamlData, Settings settings) {
-        settings.getItems().setEnabled(getBoolean(yamlData, "spoof.entity-data.items.enabled", true));
-        settings.getItems().setStackAmount(getBoolean(yamlData, "spoof.entity-data.items.stack-amount.enabled", true));
-        settings.getItems().setDurability(getBoolean(yamlData, "spoof.entity-data.items.durability.enabled", true));
-        settings.getItems().setBrokenElytra(getBoolean(yamlData, "spoof.entity-data.items.durability.broken-elytra.enabled", true));
-        settings.getItems().setEnchantments(getBoolean(yamlData, "spoof.entity-data.items.enchantments.enabled", true));
+    private void setItemOptions(Map<String, Object> yaml, Settings settings) {
+        settings.getItems().setEnabled(getValue(yaml, "spoof.entity-data.items.enabled", Boolean.class, true));
+        settings.getItems().setStackAmount(getValue(yaml, "spoof.entity-data.items.stack-amount.enabled", Boolean.class, true));
+        settings.getItems().setDurability(getValue(yaml, "spoof.entity-data.items.durability.enabled", Boolean.class, true));
+        settings.getItems().setBrokenElytra(getValue(yaml, "spoof.entity-data.items.durability.broken-elytra.enabled", Boolean.class, true));
+        settings.getItems().setEnchantments(getValue(yaml, "spoof.entity-data.items.enchantments.enabled", Boolean.class, true));
     }
 
-    private boolean getBoolean(Map<String, Object> yamlData, String key, boolean defaultValue) {
-        Object value = findNestedValue(yamlData, key.split("\\."), defaultValue);
-        return value instanceof Boolean ? (Boolean) value : defaultValue;
-    }
+    private <T> T getValue(Map<String, Object> yamlData, String key, Class<T> type, T defaultValue) {
+        Object raw = findNestedValue(yamlData, key.split("\\."));
+        if (raw == null) {
+            platform.getLogManager().warn("Config value '" + key + "' not found, using default: " + defaultValue);
+            return defaultValue;
+        }
 
-    private Object findNestedValue(Map<String, Object> yamlData, String[] keys, Object defaultValue) {
-        Object value = yamlData;
-        for (String key : keys) {
-            if (value instanceof Map) {
-                value = ((Map<?, ?>) value).get(key);
-            } else {
-                platform.getLogManager().severe("Invalid config structure for key: " + String.join(".", keys));
+        if (type.isInstance(raw)) {
+            return type.cast(raw);
+        }
+
+        if (raw instanceof Number) {
+            Number n = (Number) raw;
+            try {
+                if (type == Integer.class) {
+                    return type.cast(n.intValue());
+                }
+                if (type == Long.class) {
+                    return type.cast(n.longValue());
+                }
+                if (type == Float.class) {
+                    return type.cast(n.floatValue());
+                }
+                if (type == Double.class) {
+                    return type.cast(n.doubleValue());
+                }
+            } catch (Exception e) {
+                platform.getLogManager().warn("Failed numeric conversion for key '" + key + "' (" + raw + "): " + e.getMessage() + ". Using default: " + defaultValue);
                 return defaultValue;
             }
         }
-        return value != null ? value : defaultValue;
+
+        if (raw instanceof String) {
+            String s = (String) raw;
+            try {
+                if (type == Integer.class) {
+                    return type.cast(Integer.parseInt(s));
+                }
+                if (type == Long.class) {
+                    return type.cast(Long.parseLong(s));
+                }
+                if (type == Float.class) {
+                    return type.cast(Float.parseFloat(s));
+                }
+                if (type == Double.class) {
+                    return type.cast(Double.parseDouble(s));
+                }
+                if (type == Boolean.class) {
+                    return type.cast(Boolean.parseBoolean(s));
+                }
+            } catch (Exception e) {
+                platform.getLogManager().warn("Failed to parse config value for key '" + key + "' from string '" + s + "': " + e.getMessage() + ". Using default: " + defaultValue);
+                return defaultValue;
+            }
+        }
+
+        if (raw instanceof Boolean && type != Boolean.class) {
+            platform.getLogManager().warn("Config value '" + key + "' is Boolean but expected " + type.getSimpleName() + ". Using default: " + defaultValue);
+            return defaultValue;
+        }
+
+        platform.getLogManager().warn("Config value '" + key + "' has incompatible type " +
+                "'" + raw.getClass().getSimpleName() + "', expected '" + type.getSimpleName() +
+                "'. Using default: " + defaultValue);
+        return defaultValue;
+    }
+
+    private float clampFloat(float value, float min, float max, String key) {
+        if (value < min) {
+            platform.getLogManager().warn("Config value '" + key + "' (" + value +
+                    ") is below minimum " + min + ", clamping to " + min + ".");
+            return min;
+        }
+        if (value > max) {
+            platform.getLogManager().warn("Config value '" + key + "' (" + value +
+                    ") is above maximum " + max + ", clamping to " + max + ".");
+            return max;
+        }
+        return value;
+    }
+
+    private Object findNestedValue(Map<String, Object> yamlData, String[] keys) {
+        Object value = yamlData;
+        StringBuilder path = new StringBuilder();
+
+        for (int i = 0; i < keys.length; i++) {
+            String key = keys[i];
+            if (i > 0) {
+                path.append('.');
+            }
+            path.append(key);
+
+            if (!(value instanceof Map)) {
+                platform.getLogManager().warn("Invalid config structure at '" + path + "': expected a section.");
+                return null;
+            }
+
+            value = ((Map<?, ?>) value).get(key);
+            if (value == null) {
+                return null;
+            }
+        }
+
+        return value;
     }
 }
-

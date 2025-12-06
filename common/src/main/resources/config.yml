@@ -59,6 +59,12 @@ spoof:
     health:
       enabled: true
 
+      # The health that will be used for spoofing (Must be between 1 and 2147483647).
+      spoof-value: 20
+
+      # If enabled, the spoofed health won't be statically set to the above setting but will instead be randomly chosen between 1 and the above value as a maximum
+      randomize: true
+
     # If enabled, hides the absorption of other players.
     absorption:
       enabled: true
