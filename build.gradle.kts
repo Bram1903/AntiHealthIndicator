@@ -7,7 +7,7 @@ plugins {
 
 group = "com.deathmotion.antihealthindicator"
 description = "A plugin that prevents hackers and modders from seeing the health of other players."
-val fullVersion = "2.4.5"
+val fullVersion = "2.5.0"
 val snapshot = true
 
 fun getVersionMeta(includeHash: Boolean): String {
