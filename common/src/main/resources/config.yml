@@ -6,10 +6,6 @@
 #   /_/    \_\_| |_|\__|_|_|  |_|\___|\__,_|_|\__|_| |_|_____|_| |_|\__,_|_|\___\__,_|\__\___/|_|
 #
 
-debug:
-  # If enabled, the plugin will print debug messages to players with the permission "AntiHealthIndicator.Debug".
-  enabled: false
-
 # This option determines whether the plugin will check for an update on startup.
 update-checker:
   enabled: true
@@ -47,11 +43,10 @@ spoof:
 
     # If enabled, metadata (like health, absorption, etc.) will only be hidden for other players.
     # Entities other than players are ignored (like mobs, animals, etc.).
-    # When enabled, the ignored vehicles, wolves and iron golems settings will have no effect.
     players-only:
       enabled: false
 
-    # If enabled, hides the oxygen number of other entities.
+    # If enabled, hides the oxygen value of other entities.
     air-ticks:
       enabled: true
 
@@ -86,13 +81,13 @@ spoof:
       durability:
         enabled: true
 
-        # If enabled, elytra durability spoofing will be disabled when the elytra's durability is 1 or less.
-        broken-elytra:
-          enabled: true
-
       # If enabled, hides the enchantments of other players items (e.g., tools, armor).
       # For example, if a player holds a sword with sharpness 5, it won't show the sharpness enchantment.
       # But rather Luck of the Sea I, which is not true, but we need to apply at least one enchantment
       # client-side, otherwise the client will render the item as if not enchanted.
       enchantments:
         enabled: true
+
+debug:
+  # If enabled, the plugin will print debug messages to players with the permission "AntiHealthIndicator.Debug".
+  enabled: false

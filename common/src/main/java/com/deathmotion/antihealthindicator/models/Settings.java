@@ -24,7 +24,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Settings {
-    private boolean debug = false;
 
     private UpdateChecker updateChecker = new UpdateChecker();
     private boolean foodSaturation = false;
@@ -32,6 +31,7 @@ public class Settings {
     private boolean teamScoreboard = true;
     private EntityData entityData = new EntityData();
     private Items items = new Items();
+    private boolean debug = false;
 
     @Getter
     @Setter
@@ -60,10 +60,7 @@ public class Settings {
     public static class Items {
         private boolean enabled = true;
         private boolean stackAmount = true;
-
         private boolean durability = true;
-        private boolean brokenElytra = true;
-
         private boolean enchantments = true;
     }
 }

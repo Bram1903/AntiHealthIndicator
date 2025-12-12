@@ -68,7 +68,7 @@ public final class EquipmentSpoofer extends Spoofer {
         }
 
         if (settings.isDurability() && item.isDamaged()) {
-            if (!isBrokenElytra(item, slot, settings)) {
+            if (!isBrokenElytra(item, slot)) {
                 item.setDamageValue(0);
             }
         }
@@ -78,11 +78,11 @@ public final class EquipmentSpoofer extends Spoofer {
         }
     }
 
-    private boolean isBrokenElytra(ItemStack item, EquipmentSlot slot, Settings.Items settings) {
+    private boolean isBrokenElytra(ItemStack item, EquipmentSlot slot) {
         if (item.getType() != ItemTypes.ELYTRA) return false;
         boolean broken = item.getDamageValue() >= item.getMaxDamage() - 1;
         boolean allowedSlot = slot == EquipmentSlot.MAIN_HAND || slot == EquipmentSlot.OFF_HAND || slot == EquipmentSlot.HELMET;
-        return settings.isBrokenElytra() && broken && allowedSlot;
+        return broken && allowedSlot;
     }
 
     private static class LazyHolder {
