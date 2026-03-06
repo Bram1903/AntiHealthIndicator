@@ -19,11 +19,13 @@
 package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
+import com.deathmotion.antihealthindicator.models.PlatformPlayer;
 import com.google.inject.Inject;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.UUID;
@@ -60,6 +62,11 @@ public class VelocityAntiHealthIndicator extends AHIPlatform<ProxyServer> {
         if (player == null) return false;
 
         return player.hasPermission(permission);
+    }
+
+    @Override
+    public @Nullable PlatformPlayer getPlatformPlayer(UUID user) {
+        return new VelocityPlatformPlayer(this.proxy.getPlayer(user).orElse(null));
     }
 
     @Override

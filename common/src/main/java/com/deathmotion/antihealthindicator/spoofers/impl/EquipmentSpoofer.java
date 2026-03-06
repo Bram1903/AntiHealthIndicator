@@ -51,6 +51,8 @@ public final class EquipmentSpoofer extends Spoofer {
         Settings.Items settings = configManager.getSettings().getItems();
         if (!settings.isEnabled()) return;
 
+        if (player.PlatformPlayer.hasPermission("AntiHealthIndicator.Bypass.Equipment")) return;
+
         WrapperPlayServerEntityEquipment packet = new WrapperPlayServerEntityEquipment(event);
         List<Equipment> items = packet.getEquipment();
         if (items.isEmpty()) return;

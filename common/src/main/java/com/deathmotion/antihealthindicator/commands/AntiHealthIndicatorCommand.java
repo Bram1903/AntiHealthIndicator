@@ -22,7 +22,6 @@ import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.commands.antihealthindicator.InfoCommand;
 import com.deathmotion.antihealthindicator.commands.antihealthindicator.ReloadCommand;
 import com.deathmotion.antihealthindicator.models.CommonUser;
-import com.deathmotion.antihealthindicator.util.CommandComponentCreator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;

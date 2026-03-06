@@ -43,6 +43,8 @@ public final class ScoreboardSpoofer extends Spoofer {
         final Settings settings = configManager.getSettings();
         if (!settings.isTeamScoreboard()) return;
 
+        if (player.PlatformPlayer.hasPermission("AntiHealthIndicator.Bypass.Health")) return;
+
         if (event.getPacketType().equals(PacketType.Play.Server.SCOREBOARD_OBJECTIVE)) {
             handleScoreboardObjective(event);
         }

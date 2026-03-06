@@ -24,12 +24,14 @@ import com.deathmotion.antihealthindicator.interfaces.Scheduler;
 import com.deathmotion.antihealthindicator.managers.ConfigManager;
 import com.deathmotion.antihealthindicator.managers.LogManager;
 import com.deathmotion.antihealthindicator.managers.PlayerDataManager;
+import com.deathmotion.antihealthindicator.models.PlatformPlayer;
 import com.deathmotion.antihealthindicator.packets.PacketPlayerJoinQuit;
 import com.deathmotion.antihealthindicator.packets.SpoofManagerPacketListener;
 import com.deathmotion.antihealthindicator.util.UpdateChecker;
 import com.github.retrooper.packetevents.PacketEvents;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -108,6 +110,15 @@ public abstract class AHIPlatform<P> {
      * @return true if the entity has the permission, false otherwise.
      */
     public abstract boolean hasPermission(UUID sender, String permission);
+
+
+    /**
+     * Retrieves the {@link PlatformPlayer} associated with the specified user.
+     *
+     * @param user The UUID of the user for whom the {@link PlatformPlayer} object is to be retrieved.
+     * @return The {@link PlatformPlayer} instance corresponding to the given UUID, or null if no player is found.
+     */
+    public abstract @Nullable PlatformPlayer getPlatformPlayer(UUID user);
 
     /**
      * Sends a console message.

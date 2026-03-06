@@ -19,8 +19,10 @@
 package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
+import com.deathmotion.antihealthindicator.models.PlatformPlayer;
 import com.google.inject.Inject;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
@@ -53,6 +55,10 @@ public class SpongeAntiHealthIndicator extends AHIPlatform<Platform> {
                 .orElse(false);
     }
 
+    @Override
+    public @Nullable PlatformPlayer getPlatformPlayer(UUID user) {
+        return new SpongePlatformPlayer(Sponge.server().player(user).orElse(null));
+    }
 
     @Override
     public void sendConsoleMessage(Component message) {

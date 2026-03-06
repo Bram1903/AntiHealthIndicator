@@ -11,6 +11,21 @@ permissions:
   AntiHealthIndicator.Bypass:
     description: "This permission prevents the player from receiving spoofed data."
     default: false
+  AntiHealthIndicator.Bypass.Health:
+    description: "This permission prevents the player from receiving spoofed health data."
+    default: false
+  AntiHealthIndicator.Bypass.Saturation:
+    description: "This permission prevents the player from receiving spoofed saturation data."
+    default: false
+  AntiHealthIndicator.Bypass.Gamemode:
+    description: "This permission prevents the player from receiving spoofed gamemode data."
+    default: false
+  AntiHealthIndicator.Bypass.Equipment:
+    description: "This permission prevents the player from receiving spoofed equipment data."
+    default: false
+  AntiHealthIndicator.Info:
+    description: "This permission allows players to see basic information about the plugin."
+    default: true
   AntiHealthIndicator.Reload:
     description: "This permission allows players to reload the configuration."
     default: op

@@ -19,6 +19,7 @@
 package com.deathmotion.antihealthindicator.packets;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
+import com.deathmotion.antihealthindicator.models.AHIPlayer;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
@@ -40,9 +41,11 @@ public class PacketPlayerJoinQuit<P> extends PacketListenerAbstract {
         if (user == null || user.getUUID() == null) return;
 
         platform.getPlayerDataManager().addUser(user);
+        AHIPlayer player = platform.getPlayerDataManager().getPlayer(user);
+        if (player == null) return;
 
         if (platform.getConfigManager().getSettings().getUpdateChecker().isNotifyInGame() && platform.getUpdateChecker().isUpdateAvailable()) {
-            if (platform.hasPermission(user.getUUID(), "AntiHealthIndicator.Update")) {
+            if (player.PlatformPlayer.hasPermission("AntiHealthIndicator.Update")) {
                 platform.getScheduler().runAsyncTaskDelayed((o) -> user.sendMessage(platform.getUpdateChecker().getUpdateComponent()), 2, TimeUnit.SECONDS);
             }
         }

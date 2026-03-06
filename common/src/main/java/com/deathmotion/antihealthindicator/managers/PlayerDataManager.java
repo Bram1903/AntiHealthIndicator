@@ -20,6 +20,7 @@ package com.deathmotion.antihealthindicator.managers;
 
 import com.deathmotion.antihealthindicator.AHIPlatform;
 import com.deathmotion.antihealthindicator.models.AHIPlayer;
+import com.deathmotion.antihealthindicator.models.PlatformPlayer;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
 import com.github.retrooper.packetevents.protocol.player.User;
 
@@ -47,7 +48,9 @@ public class PlayerDataManager<P> {
 
     public void addUser(final User user) {
         if (shouldCheck(user)) {
-            playerDataMap.put(user, new AHIPlayer(user));
+            PlatformPlayer platformPlayer = platform.getPlatformPlayer(user.getUUID());
+            if (platformPlayer == null) return;
+            playerDataMap.put(user, new AHIPlayer(user, platformPlayer));
         }
     }
 
