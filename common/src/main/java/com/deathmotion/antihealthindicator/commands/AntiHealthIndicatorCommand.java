@@ -39,7 +39,6 @@ import java.util.stream.Collectors;
 public class AntiHealthIndicatorCommand<P> {
     private final AHIPlatform<P> platform;
 
-    private final Component versionComponent;
     private final Map<String, SubCommand<P>> subCommands = new HashMap<>();
 
     public AntiHealthIndicatorCommand(AHIPlatform<P> platform) {
@@ -47,14 +46,12 @@ public class AntiHealthIndicatorCommand<P> {
 
         subCommands.put("info", new InfoCommand<>());
         subCommands.put("reload", new ReloadCommand<>(platform));
-
-        versionComponent = CommandComponentCreator.createAHICommandComponent();
     }
 
     public void onCommand(@NotNull CommonUser<P> sender, @NotNull String[] args) {
         platform.getScheduler().runAsyncTask((o) -> {
             if (!hasAnyPermission(sender)) {
-                sender.sendMessage(versionComponent);
+                sender.sendMessage(Component.text("You do not have permission to use this command.", NamedTextColor.RED));
                 return;
             }
 
@@ -104,7 +101,7 @@ public class AntiHealthIndicatorCommand<P> {
     private boolean hasPermissionForSubCommand(CommonUser<P> sender, String subCommand) {
         switch (subCommand) {
             case "info":
-                return true;
+                return sender.hasPermission("AntiHealthIndicator.Info");
             case "reload":
                 return sender.hasPermission("AntiHealthIndicator.Reload");
             default:
