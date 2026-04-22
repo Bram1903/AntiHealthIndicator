@@ -38,7 +38,7 @@ public final class FoodSaturationSpoofer extends Spoofer {
         final Settings settings = configManager.getSettings();
         if (!settings.isFoodSaturation()) return;
 
-        if (player.PlatformPlayer.hasPermission("AntiHealthIndicator.Bypass.Saturation")) return;
+        if (player.platformPlayer.hasPermission("AntiHealthIndicator.Bypass.Saturation")) return;
 
         WrapperPlayServerUpdateHealth packet = new WrapperPlayServerUpdateHealth(event);
 

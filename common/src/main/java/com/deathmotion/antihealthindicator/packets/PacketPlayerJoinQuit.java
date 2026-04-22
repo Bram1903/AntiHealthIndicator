@@ -45,7 +45,7 @@ public class PacketPlayerJoinQuit<P> extends PacketListenerAbstract {
         if (player == null) return;
 
         if (platform.getConfigManager().getSettings().getUpdateChecker().isNotifyInGame() && platform.getUpdateChecker().isUpdateAvailable()) {
-            if (player.PlatformPlayer.hasPermission("AntiHealthIndicator.Update")) {
+            if (player.platformPlayer.hasPermission("AntiHealthIndicator.Update")) {
                 platform.getScheduler().runAsyncTaskDelayed((o) -> user.sendMessage(platform.getUpdateChecker().getUpdateComponent()), 2, TimeUnit.SECONDS);
             }
         }
