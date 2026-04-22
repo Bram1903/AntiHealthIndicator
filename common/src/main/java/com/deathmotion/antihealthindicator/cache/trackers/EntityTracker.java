@@ -32,6 +32,8 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 
+import java.util.Objects;
+
 /**
  * Listens for EntityState events and manages the caching of various entity state details.
  */
@@ -40,7 +42,8 @@ public class EntityTracker {
     private final EntityCache entityCache;
     private final ConfigManager<?> configManager;
 
-    private DimensionType currentDimension;
+    private String worldName;
+    private DimensionType dimensionType;
 
     public EntityTracker(AHIPlayer player, EntityCache entityCache) {
         this.player = player;
@@ -117,21 +120,29 @@ public class EntityTracker {
     }
 
     private void handleRespawn(WrapperPlayServerRespawn packet) {
-        DimensionType dimension = packet.getDimensionType();
-
-        if (!dimension.equals(currentDimension)) {
+        if (isWorldChange(packet)) {
             clearCache();
         }
 
-        currentDimension = dimension;
+        worldName = packet.getWorldName().orElse(null);
+        dimensionType = packet.getDimensionType();
     }
 
     private void handleJoinGame(WrapperPlayServerJoinGame packet) {
-        currentDimension = packet.getDimensionType();
+        worldName = packet.getWorldName();
+        dimensionType = packet.getDimensionType();
         clearCache();
     }
 
     private void clearCache() {
         entityCache.resetUserCache();
+    }
+
+    private boolean isWorldChange(WrapperPlayServerRespawn respawn) {
+        if (respawn.getWorldName().isPresent()) {
+            return !Objects.equals(respawn.getWorldName().orElse(null), worldName);
+        }
+
+        return !respawn.getDimensionType().equals(dimensionType);
     }
 }
