@@ -28,17 +28,15 @@ import java.util.UUID;
 public class AHIPlayer {
     public final UUID uuid;
     public final User user;
-    public final PlatformPlayer platformPlayer;
 
     public final MetadataIndex metadataIndex;
     public final EntityCache entityCache;
 
     public final SpoofManager spoofManager;
 
-    public AHIPlayer(User user, PlatformPlayer platformPlayer) {
+    public AHIPlayer(User user) {
         this.uuid = user.getUUID();
         this.user = user;
-        this.platformPlayer = platformPlayer;
 
         this.metadataIndex = new MetadataIndex(user.getClientVersion());
         this.entityCache = new EntityCache(this);

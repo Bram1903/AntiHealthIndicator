@@ -43,8 +43,6 @@ public final class GamemodeSpoofer extends Spoofer {
         Settings settings = configManager.getSettings();
         if (!settings.isGamemode()) return;
 
-        if (player.platformPlayer.hasPermission("AntiHealthIndicator.Bypass.Gamemode")) return;
-
         final PacketTypeCommon packetType = event.getPacketType();
 
         if (packetType == PacketType.Play.Server.PLAYER_INFO) {

@@ -56,8 +56,6 @@ public final class MetadataSpoofer extends Spoofer {
         Settings settings = configManager.getSettings();
         if (!settings.getEntityData().isEnabled()) return;
 
-        if (player.platformPlayer.hasPermission("AntiHealthIndicator.Bypass.Health")) return;
-
         WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata(event);
         int entityId = packet.getEntityId();
 

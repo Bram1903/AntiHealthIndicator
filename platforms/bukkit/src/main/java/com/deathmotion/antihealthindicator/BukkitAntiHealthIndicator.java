@@ -19,7 +19,6 @@
 package com.deathmotion.antihealthindicator;
 
 import com.deathmotion.antihealthindicator.interfaces.Scheduler;
-import com.deathmotion.antihealthindicator.models.PlatformPlayer;
 import com.deathmotion.antihealthindicator.util.AHIVersions;
 import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import io.github.retrooper.packetevents.bstats.bukkit.Metrics;
@@ -29,7 +28,6 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -82,11 +80,6 @@ public class BukkitAntiHealthIndicator extends AHIPlatform<JavaPlugin> {
         if (commandSender == null) return false;
 
         return commandSender.hasPermission(permission);
-    }
-
-    @Override
-    public @Nullable PlatformPlayer getPlatformPlayer(UUID user) {
-        return new BukkitPlatformPlayer(Bukkit.getPlayer(user));
     }
 
     @Override
