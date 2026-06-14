@@ -88,6 +88,9 @@ spoof:
       enchantments:
         enabled: true
 
+      names:
+        enabled: true
+
 debug:
   # If enabled, the plugin will print debug messages to players with the permission "AntiHealthIndicator.Debug".
   enabled: false

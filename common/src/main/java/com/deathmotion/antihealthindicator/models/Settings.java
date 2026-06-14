@@ -62,5 +62,6 @@ public class Settings {
         private boolean stackAmount = true;
         private boolean durability = true;
         private boolean enchantments = true;
+        private boolean names = true;
     }
 }
