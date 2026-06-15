@@ -34,6 +34,7 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 public final class MetadataSpoofer extends Spoofer {
@@ -52,9 +53,10 @@ public final class MetadataSpoofer extends Spoofer {
         ((EntityData<@NotNull T>) data).setValue(spoofValue);
     }
 
-    static void removeNameComponents(PatchableComponentMap components) {
-        components.unset(ComponentTypes.CUSTOM_NAME);
-        components.unset(ComponentTypes.ITEM_NAME);
+    static void blankNameComponents(PatchableComponentMap components) {
+        Component blankName = Component.text(" ");
+        components.set(ComponentTypes.CUSTOM_NAME, blankName);
+        components.set(ComponentTypes.ITEM_NAME, blankName);
     }
 
     @Override
@@ -167,7 +169,7 @@ public final class MetadataSpoofer extends Spoofer {
 
         Object value = entityData.getValue();
         if (value instanceof ItemStack) {
-            removeNameComponents(((ItemStack) value).getComponents());
+            blankNameComponents(((ItemStack) value).getComponents());
         }
     }
 

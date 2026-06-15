@@ -13,7 +13,7 @@ import com.github.retrooper.packetevents.protocol.component.StaticComponentMap;
 import net.kyori.adventure.text.Component;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MetadataSpooferTest {
 
@@ -22,15 +22,15 @@ class MetadataSpooferTest {
     }
 
     @Test
-    void removesDroppedItemNameComponents() {
+    void blanksDroppedItemNameComponents() {
         PatchableComponentMap components = new PatchableComponentMap(StaticComponentMap.EMPTY);
         components.set(ComponentTypes.CUSTOM_NAME, Component.text("Diamond"));
         components.set(ComponentTypes.ITEM_NAME, Component.text("Rare Diamond"));
 
-        MetadataSpoofer.removeNameComponents(components);
+        MetadataSpoofer.blankNameComponents(components);
 
-        assertFalse(components.has(ComponentTypes.CUSTOM_NAME));
-        assertFalse(components.has(ComponentTypes.ITEM_NAME));
+        assertEquals(Component.text(" "), components.get(ComponentTypes.CUSTOM_NAME));
+        assertEquals(Component.text(" "), components.get(ComponentTypes.ITEM_NAME));
     }
 
     private static final class TestPacketEventsAPI extends PacketEventsAPI<Object> {
