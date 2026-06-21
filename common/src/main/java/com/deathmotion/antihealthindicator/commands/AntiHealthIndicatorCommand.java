@@ -138,6 +138,6 @@ public class AntiHealthIndicatorCommand<P> {
             return Component.text("You do not have permission to use any commands.", NamedTextColor.RED);
         }
 
-        return componentBuilder.build();
+        return componentBuilder.asComponent();
     }
 }

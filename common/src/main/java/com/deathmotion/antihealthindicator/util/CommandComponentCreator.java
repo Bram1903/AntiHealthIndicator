@@ -52,7 +52,7 @@ public class CommandComponentCreator {
                 .hoverEvent(HoverEvent.showText(createColoredText("Open Github Page!", NamedTextColor.GREEN, true)
                         .decorate(TextDecoration.UNDERLINED)))
                 .clickEvent(ClickEvent.openUrl(Constants.GITHUB_URL))
-                .build();
+                .asComponent();
     }
 
 }

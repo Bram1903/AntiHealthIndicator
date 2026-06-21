@@ -133,6 +133,6 @@ public class UpdateChecker<P> {
                         .hoverEvent(HoverEvent.showText(Component.text("Click to download", NamedTextColor.GREEN)))
                         .clickEvent(ClickEvent.openUrl(Constants.MODRINTH_URL)))
                 .append(Component.text("!", NamedTextColor.GREEN))
-                .build();
+                .asComponent();
     }
 }

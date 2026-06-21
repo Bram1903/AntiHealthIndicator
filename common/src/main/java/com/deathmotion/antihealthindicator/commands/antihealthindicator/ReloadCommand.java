@@ -43,7 +43,7 @@ public class ReloadCommand<P> implements SubCommand<P> {
         Component message = Component.text()
                 .append(Component.text("\u25cf", NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
                 .append(Component.text(" The configuration has been reloaded!", NamedTextColor.GREEN))
-                .build();
+                .asComponent();
 
         sender.sendMessage(message);
     }

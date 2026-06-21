@@ -69,7 +69,7 @@ tasks {
     // 1.18 - 1.20.4  = Java 17
     // 1-20.5+        = Java 21
     // 26.1+          = Java 25
-    val version = "26.1.2"
+    val version = "26.2"
     val javaVersion = JavaLanguageVersion.of(25)
 
     val jvmArgsExternal = listOf(
@@ -77,9 +77,11 @@ tasks {
     )
 
     val sharedBukkitPlugins = runPaper.downloadPluginsSpec {
-        url("https://cdn.modrinth.com/data/HYKaKraK/versions/ap8qHs7D/packetevents-spigot-2.12.1.jar")
-        url("https://github.com/ViaVersion/ViaVersion/releases/download/5.9.0/ViaVersion-5.9.0.jar")
-        url("https://github.com/ViaVersion/ViaBackwards/releases/download/5.9.0/ViaBackwards-5.9.0.jar")
+        // Waiting for a new PacketEvents release
+        //url("https://cdn.modrinth.com/data/HYKaKraK/versions/ap8qHs7D/packetevents-spigot-2.12.1.jar")
+        url("https://github.com/ViaVersion/ViaVersion/releases/download/5.10.0/ViaVersion-5.10.0.jar")
+        url("https://github.com/ViaVersion/ViaBackwards/releases/download/5.10.0/ViaBackwards-5.10.0.jar")
+        url("https://download.luckperms.net/1645/bukkit/loader/LuckPerms-Bukkit-5.5.57.jar")
     }
 
     runServer {
@@ -94,8 +96,7 @@ tasks {
 
         downloadPlugins {
             from(sharedBukkitPlugins)
-            url("https://ci.ender.zone/job/EssentialsX/lastSuccessfulBuild/artifact/jars/EssentialsX-2.22.0-dev+104-87bde72.jar")
-            url("https://cdn.modrinth.com/data/Vebnzrzj/versions/OrIs0S6b/LuckPerms-Bukkit-5.5.17.jar")
+            url("https://ci.ender.zone/job/EssentialsX/lastSuccessfulBuild/artifact/jars/EssentialsX-2.22.1-dev+11-28eb89f.jar")
         }
 
         jvmArgs = jvmArgsExternal
