@@ -88,7 +88,7 @@ public class EntityTracker {
 
     private void handleSpawnEntity(WrapperPlayServerSpawnEntity packet, Settings settings) {
         EntityType entityType = packet.getEntityType();
-        if (!EntityTypes.isTypeInstanceOf(entityType, EntityTypes.LIVINGENTITY)) return;
+        if (!EntityTypes.isTypeInstanceOf(entityType, EntityTypes.LIVINGENTITY) && entityType != EntityTypes.ITEM) return;
         if (settings.getEntityData().isPlayersOnly() && !EntityTypes.isTypeInstanceOf(entityType, EntityTypes.PLAYER))
             return;
 

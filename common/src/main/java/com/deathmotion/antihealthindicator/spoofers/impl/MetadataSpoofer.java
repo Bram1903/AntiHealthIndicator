@@ -25,12 +25,16 @@ import com.deathmotion.antihealthindicator.models.Settings;
 import com.deathmotion.antihealthindicator.spoofers.Spoofer;
 import com.deathmotion.antihealthindicator.util.HealthUtil;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
+import com.github.retrooper.packetevents.protocol.component.PatchableComponentMap;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 public final class MetadataSpoofer extends Spoofer {
@@ -47,6 +51,12 @@ public final class MetadataSpoofer extends Spoofer {
     @SuppressWarnings("unchecked")
     private static <T> void setValue(EntityData<?> data, T spoofValue) {
         ((EntityData<@NotNull T>) data).setValue(spoofValue);
+    }
+
+    static void blankNameComponents(PatchableComponentMap components) {
+        Component blankName = Component.text(" ");
+        components.set(ComponentTypes.CUSTOM_NAME, blankName);
+        components.set(ComponentTypes.ITEM_NAME, blankName);
     }
 
     @Override
@@ -99,6 +109,8 @@ public final class MetadataSpoofer extends Spoofer {
             } else {
                 spoofIronGolemMetadata(entityData, settings);
             }
+        } else if (entityType == EntityTypes.ITEM) {
+            spoofDroppedItemMetadata(entityData, settings);
         } else {
             applyDefaultSpoofing(entityData, settings);
             if (entityType == EntityTypes.PLAYER) {
@@ -149,6 +161,15 @@ public final class MetadataSpoofer extends Spoofer {
         }
         if (entityData.getIndex() == player.metadataIndex.XP && settings.getEntityData().isXp()) {
             setDynamicValue(entityData, 0);
+        }
+    }
+
+    private void spoofDroppedItemMetadata(EntityData<?> entityData, Settings settings) {
+        if (!settings.getItems().isEnabled() || !settings.getItems().isNames()) return;
+
+        Object value = entityData.getValue();
+        if (value instanceof ItemStack) {
+            blankNameComponents(((ItemStack) value).getComponents());
         }
     }
 

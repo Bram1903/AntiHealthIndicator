@@ -128,6 +128,7 @@ public class ConfigManager<P> {
         settings.getItems().setStackAmount(getValue(yaml, "spoof.entity-data.items.stack-amount.enabled", Boolean.class, true));
         settings.getItems().setDurability(getValue(yaml, "spoof.entity-data.items.durability.enabled", Boolean.class, true));
         settings.getItems().setEnchantments(getValue(yaml, "spoof.entity-data.items.enchantments.enabled", Boolean.class, true));
+        settings.getItems().setNames(getValue(yaml, "spoof.entity-data.items.names.enabled", Boolean.class, true));
     }
 
     private <T> T getValue(Map<String, Object> yamlData, String key, Class<T> type, T defaultValue) {
