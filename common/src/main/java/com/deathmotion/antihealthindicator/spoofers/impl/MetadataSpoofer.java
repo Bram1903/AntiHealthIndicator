@@ -45,8 +45,10 @@ public final class MetadataSpoofer extends Spoofer {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> void setValue(EntityData<?> data, T spoofValue) {
+    private static <T> boolean setValue(EntityData<?> data, T spoofValue) {
+        boolean changed = !spoofValue.equals(data.getValue());
         ((EntityData<@NotNull T>) data).setValue(spoofValue);
+        return changed;
     }
 
     @Override
@@ -67,8 +69,14 @@ public final class MetadataSpoofer extends Spoofer {
 
         if (shouldIgnoreEntity(entityId, cachedEntity, settings)) return;
 
-        packet.getEntityMetadata().forEach(entityData -> handleEntityMetadata(cachedEntity, entityData, settings));
-        event.markForReEncode(true);
+        boolean changed = false;
+        for (EntityData<?> entityData : packet.getEntityMetadata()) {
+            changed |= handleEntityMetadata(cachedEntity, entityData, settings);
+        }
+
+        if (changed) {
+            event.markForReEncode(true);
+        }
     }
 
     private boolean shouldIgnoreEntity(int entityId, CachedEntity cachedEntity, Settings settings) {
@@ -89,42 +97,45 @@ public final class MetadataSpoofer extends Spoofer {
         return !settings.getEntityData().isPlayersOnly() && entityCache.getCurrentVehicleId().map(currentVehicleId -> currentVehicleId == entityId).orElse(false);
     }
 
-    private void handleEntityMetadata(CachedEntity cachedEntity, EntityData<?> entityData, Settings settings) {
+    private boolean handleEntityMetadata(CachedEntity cachedEntity, EntityData<?> entityData, Settings settings) {
         final EntityType entityType = cachedEntity.getEntityType();
-        updateAirTicks(entityData, settings);
+        boolean changed = updateAirTicks(entityData, settings);
 
         if (entityType == EntityTypes.IRON_GOLEM) {
             if (!healthTexturesSupported) {
-                applyDefaultSpoofing(entityData, settings);
+                changed |= applyDefaultSpoofing(entityData, settings);
             } else {
-                spoofIronGolemMetadata(entityData, settings);
+                changed |= spoofIronGolemMetadata(entityData, settings);
             }
         } else {
-            applyDefaultSpoofing(entityData, settings);
+            changed |= applyDefaultSpoofing(entityData, settings);
             if (entityType == EntityTypes.PLAYER) {
-                spoofPlayerMetadata(entityData, settings);
+                changed |= spoofPlayerMetadata(entityData, settings);
             }
         }
+
+        return changed;
     }
 
-    private void applyDefaultSpoofing(EntityData<?> entityData, Settings settings) {
-        if (entityData.getIndex() != player.metadataIndex.HEALTH) return;
-        if (!settings.getEntityData().isHealth()) return;
+    private boolean applyDefaultSpoofing(EntityData<?> entityData, Settings settings) {
+        if (entityData.getIndex() != player.metadataIndex.HEALTH) return false;
+        if (!settings.getEntityData().isHealth()) return false;
 
         Object value = entityData.getValue();
         if (value instanceof Float && (Float) value > 0f) {
-            setValue(entityData, HealthUtil.getSpoofValue());
+            return setValue(entityData, HealthUtil.getSpoofValue());
         }
+        return false;
     }
 
-    private void spoofIronGolemMetadata(EntityData<?> entityData, Settings settings) {
-        if (entityData.getIndex() != player.metadataIndex.HEALTH || !settings.getEntityData().isHealth()) return;
+    private boolean spoofIronGolemMetadata(EntityData<?> entityData, Settings settings) {
+        if (entityData.getIndex() != player.metadataIndex.HEALTH || !settings.getEntityData().isHealth()) return false;
 
         final Object value = entityData.getValue();
-        if (!(value instanceof Float)) return;
+        if (!(value instanceof Float)) return false;
 
         final float health = (Float) value;
-        if (health <= 0f) return;
+        if (health <= 0f) return false;
 
         final float maxHealth = 100f;
         final float ratio = health / maxHealth;
@@ -140,39 +151,43 @@ public final class MetadataSpoofer extends Spoofer {
             spoofed = maxHealth * 0.24f;  // Heavy cracks
         }
 
-        setValue(entityData, spoofed);
+        return setValue(entityData, spoofed);
     }
 
-    private void spoofPlayerMetadata(EntityData<?> entityData, Settings settings) {
+    private boolean spoofPlayerMetadata(EntityData<?> entityData, Settings settings) {
+        boolean changed = false;
         if (entityData.getIndex() == player.metadataIndex.ABSORPTION && settings.getEntityData().isAbsorption()) {
-            setDynamicValue(entityData, 0);
+            changed = setDynamicValue(entityData, 0);
         }
         if (entityData.getIndex() == player.metadataIndex.XP && settings.getEntityData().isXp()) {
-            setDynamicValue(entityData, 0);
+            changed |= setDynamicValue(entityData, 0);
         }
+        return changed;
     }
 
-    private void updateAirTicks(EntityData<?> entityData, Settings settings) {
+    private boolean updateAirTicks(EntityData<?> entityData, Settings settings) {
         if (entityData.getIndex() == player.metadataIndex.AIR_TICKS && settings.getEntityData().isAirTicks()) {
-            setDynamicValue(entityData, 1);
+            return setDynamicValue(entityData, 1);
         }
+        return false;
     }
 
-    private void setDynamicValue(EntityData<?> entityData, int spoofValue) {
+    private boolean setDynamicValue(EntityData<?> entityData, int spoofValue) {
         Object value = entityData.getValue();
 
         if (value instanceof Integer) {
-            setValue(entityData, spoofValue);
+            return setValue(entityData, spoofValue);
         } else if (value instanceof Short) {
-            setValue(entityData, (short) spoofValue);
+            return setValue(entityData, (short) spoofValue);
         } else if (value instanceof Byte) {
-            setValue(entityData, (byte) spoofValue);
+            return setValue(entityData, (byte) spoofValue);
         } else if (value instanceof Long) {
-            setValue(entityData, (long) spoofValue);
+            return setValue(entityData, (long) spoofValue);
         } else if (value instanceof Float) {
-            setValue(entityData, (float) spoofValue);
+            return setValue(entityData, (float) spoofValue);
         } else if (value instanceof Double) {
-            setValue(entityData, (double) spoofValue);
+            return setValue(entityData, (double) spoofValue);
         }
+        return false;
     }
 }

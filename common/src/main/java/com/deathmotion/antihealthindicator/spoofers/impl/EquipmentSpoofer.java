@@ -55,27 +55,40 @@ public final class EquipmentSpoofer extends Spoofer {
         List<Equipment> items = packet.getEquipment();
         if (items.isEmpty()) return;
 
-        items.forEach(eq -> applySpoof(eq.getItem(), eq.getSlot(), settings));
-        packet.setEquipment(items);
-        event.markForReEncode(true);
+        boolean changed = false;
+        for (Equipment eq : items) {
+            changed |= applySpoof(eq.getItem(), eq.getSlot(), settings);
+        }
+
+        if (changed) {
+            packet.setEquipment(items);
+            event.markForReEncode(true);
+        }
     }
 
-    private void applySpoof(ItemStack item, EquipmentSlot slot, Settings.Items settings) {
-        if (item.isEmpty()) return;
+    private boolean applySpoof(ItemStack item, EquipmentSlot slot, Settings.Items settings) {
+        if (item.isEmpty()) return false;
+
+        boolean changed = false;
 
         if (settings.isStackAmount() && item.getAmount() > 1) {
             item.setAmount(1);
+            changed = true;
         }
 
         if (settings.isDurability() && item.isDamaged()) {
             if (!isBrokenElytra(item, slot)) {
                 item.setDamageValue(0);
+                changed = true;
             }
         }
 
         if (settings.isEnchantments() && item.isEnchanted()) {
             item.setEnchantments(getDefaultEnchants());
+            changed = true;
         }
+
+        return changed;
     }
 
     private boolean isBrokenElytra(ItemStack item, EquipmentSlot slot) {
